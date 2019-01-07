@@ -1,0 +1,2 @@
+> Type d avec précision et longeur ("|%12.4hd|", 12) --> |   12.000|
+> Type d sans précision et longeur ("|%12hd|", 12) --> |   12|
