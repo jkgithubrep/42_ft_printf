@@ -6,12 +6,13 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/07 11:24:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/16 14:42:25 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/01/17 18:02:08 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <limits.h>
+#include <float.h>
 #define BOLD "\x1b[1m"
 #define UNDERLINE "\x1b[4m"
 #define NC "\x1b[0m"
@@ -105,6 +106,15 @@ void	test_unsigned_long(char *desc, char *fmt, char *test_str, unsigned long tes
 }
 
 void	test_long_long(char *desc, char *fmt, char *test_str, long long test)
+{
+	test_desc(desc, fmt, test_str);
+	printf("|" YELLOW);
+	printf(fmt, test);
+	printf(NC "|");
+	printf("\n");
+}
+
+void	test_float(char *desc, char *fmt, char *test_str, float test)
 {
 	test_desc(desc, fmt, test_str);
 	printf("|" YELLOW);
@@ -266,6 +276,21 @@ void	test_type_hexadecimal_X(void)
 	test_unsigned_int("Random unsigned int with 5 width and 0 flag", "%05X", "42u", 42u);
 }
 
+void	test_type_float_f(void)
+{
+	print_h1("TYPE: FLOAT (%f)");
+	print_h2("=> Valid format:");
+	test_float("Zero float:", "%f", "0.f", 0.f);
+	test_float("Random float:", "%f", "42.f", 42.f);
+	test_float("Negative number:", "%f", "-42.f", -42.f);
+	test_float("Number with null integer part and 3 digits decimal part", "%f", ".123f", .123f);
+	test_float("Number with null integer part and 7 digits decimal part", "%f", ".1234567f", .1234567f);
+	test_float("Number with 1 digit integer part and 7 digits decimal part", "%f", "1.1234567f", 1.1234567f);
+	test_float("Number with 2 digits integer part and 7 digits decimal part", "%f", "12.1234567f", 12.1234567f);
+	test_float("Number with 3 digits integer part and 7 digits decimal part", "%f", "123.1234567f", 123.1234567f);
+	test_float("Number with 4 digits integer part and 7 digits decimal part", "%f", "1234.1234567f", 1234.1234567f);
+}
+
 int		main(int ac, char **av)
 {
 	(void)ac;
@@ -282,7 +307,9 @@ int		main(int ac, char **av)
 	test_type_hexadecimal_x();
 	//HEXADECIMAL X
 	test_type_hexadecimal_X();
+	//FLOAT f
+	test_type_float_f();
 	printf("\n");
-	printf("|%#010x|\n", 42);
+	printf("|%--++--5.3d|\n", 42);
 	return (0);
 }
