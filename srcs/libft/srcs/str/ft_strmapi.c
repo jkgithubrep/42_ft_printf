@@ -1,36 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*   ft_strmapi.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/14 12:18:13 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/14 16:09:41 by jkettani         ###   ########.fr       */
+/*   Created: 2018/11/22 17:01:34 by jkettani          #+#    #+#             */
+/*   Updated: 2018/12/06 11:27:35 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdarg.h>
-#include <stdio.h>
+#include "libft.h"
 
-void		ft_printf(const char *fmt, ...)
+char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {
-	va_list		va;
-	int			d;
+	char			*s2;
+	unsigned int	i;
 
-	va_start(va, fmt);
-	while (*fmt)
+	if (s == NULL || f == NULL)
+		return (NULL);
+	s2 = (char *)ft_memalloc(ft_strlen(s) + 1);
+	if (s2 == NULL)
+		return (NULL);
+	i = 0;
+	while (s[i] && f)
 	{
-		d = va_arg(va, int);
-		printf("%d", d);
-		++fmt;
+		s2[i] = f(i, s[i]);
+		i++;
 	}
-	printf("\n");
-	va_end(va);
-}
-
-int		main(void)
-{
-	ft_printf("123456", 1, 2, 3, 4, 5, 6);
-	return (0);
+	s2[i] = 0;
+	return (s2);
 }

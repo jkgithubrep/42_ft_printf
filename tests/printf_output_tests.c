@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/07 11:24:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/17 18:02:08 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/01/18 18:33:50 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,6 +310,6 @@ int		main(int ac, char **av)
 	//FLOAT f
 	test_type_float_f();
 	printf("\n");
-	printf("|%--++--5.3d|\n", 42);
+	printf("|%05.4d|\n", 42);
 	return (0);
 }
