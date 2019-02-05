@@ -1,16 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   printf_output_tests.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/07 11:24:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/18 18:33:50 by jkettani         ###   ########.fr       */
+/*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
+/*   Updated: 2019/02/05 18:42:27 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
+#include <string.h>
 #include <limits.h>
 #include <float.h>
 #define BOLD "\x1b[1m"
@@ -21,6 +22,22 @@
 #define YELLOW "\x1b[33m"
 #define BLUE "\x1b[34m"
 #define MAGENTA "\x1b[35m"
+#define PRINTF_TEST do { \
+	int		ret;\
+	printf(" > %s (", desc);\
+	printf("\"|");\
+	printf(MAGENTA "%s" NC, fmt);\
+	printf("|\", |");\
+	printf(BLUE "%s" NC, test_str);\
+	printf("|): ");\
+	printf("|" YELLOW);\
+	ret = printf(fmt, test);\
+	printf(NC "|");\
+	printf(", |" YELLOW);\
+	printf("%d", ret);\
+	printf(NC "|");\
+	printf("\n");\
+	} while (0)
 
 void	print_h1(char *str)
 {
@@ -32,95 +49,49 @@ void	print_h2(char *str)
 	printf(BOLD "\n%s\n\n" NC, str);
 }
 
-void	test_desc(char *desc, char *fmt, char *test_str)
-{
-	printf(" > %s (", desc);
-	printf("\"|");
-	printf(MAGENTA "%s" NC, fmt);
-	printf("|\", |");
-	printf(BLUE "%s" NC, test_str);
-	printf("|): ");
-}
-
 void	test_char(char *desc, char *fmt, char *test_str, char test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_unsigned_char(char *desc, char *fmt, char *test_str, unsigned char test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_int(char *desc, char *fmt, char *test_str, int test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_unsigned_int(char *desc, char *fmt, char *test_str, unsigned int test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_short(char *desc, char *fmt, char *test_str, short test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_long(char *desc, char *fmt, char *test_str, long test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_unsigned_long(char *desc, char *fmt, char *test_str, unsigned long test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_long_long(char *desc, char *fmt, char *test_str, long long test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_float(char *desc, char *fmt, char *test_str, float test)
 {
-	test_desc(desc, fmt, test_str);
-	printf("|" YELLOW);
-	printf(fmt, test);
-	printf(NC "|");
-	printf("\n");
+	PRINTF_TEST;
 }
 
 void	test_type_char(void)
@@ -151,46 +122,49 @@ void	test_type_int(void)
 	print_h1("TYPE: INT (%d | %i)");
 	print_h2("=> Valid format:");
 	test_int("Zero", "%d", "0", 0);
-	test_int("Zero with .0 precision", "%.d", "0", 0);
-	test_int("Zero with .3 precision", "%.3d", "0", 0);
+	test_int("Zero + . precision", "%.d", "0", 0);
+	test_int("Zero + .3 precision", "%.3d", "0", 0);
 	test_int("Random int", "%d", "42", 42);
 	test_int("Int max", "%d", "2147483647", INT_MAX);
 	test_int("Int max + 1", "%d", "2147483648", INT_MAX + 1);
 	test_int("Int min", "%d", "-2147483648", INT_MIN);
 	test_int("Unsigned int max", "%d", "4294967295", UINT_MAX);
-	test_int("Random int with precision .1", "%.1d", "42", 42);
-	test_int("Random int with precision .4", "%.1d", "42", 42);
-	test_int("Random int with 3 width and .5 precision -- precision > width", "%3.5d", "42", 42);
-	test_int("Random int with 5 width and .3 precision -- precision < width", "%5.3d", "42", 42);
-	test_int("Random int filled with 0", "%0d", "42", 42);
-	test_int("Random int with 5 spaces filled with 0", "%05d", "42", 42);
-	test_int("Random int with 5 spaces filled with 0 -- multiple 0", "%00005d", "42", 42);
-	test_int("Random int with + sign", "%+d", "42", 42);
-	test_int("Random int with multiple + signs", "%++++d", "42", 42);
-	test_int("Random int with 5 spaces filled with 0 and space instead of + sign", "% 05d", "42", 42);
-	test_int("Random int with + sign and 5 spaces filled with 0", "%+05d", "42", 42);
-	test_int("Random int with + sign and 5 spaces filled with 0 -- 0 and + sign in reverse order", "%0+5d", "42", 42);
-	test_int("Random int with multiple + signs and 5 spaces filled with multiple 0", "%+++++000005d", "42", 42);
-	test_int("Random int and space instead of + sign", "% d", "42", 42);
-	test_int("Random int and multiple spaces instead of + signs", "%     d", "42", 42);
-	test_int("Random int with 5 spaces", "%5d", "42", 42);
-	test_int("Random int with 5 spaces and + sign", "%+5d", "42", 42);
-	test_int("Random int with 1 space", "%1d", "42", 42);
-	test_int("Random int left aligned with 5 spaces", "%-5d", "42", 42);
-	test_int("Random int left aligned with 5 spaces -- multiple - signs", "%------5d", "42", 42);
-	test_int("Random int left aligned with 5 spaces and + sign", "%-+5d", "42", 42);
-	test_int("Random int left aligned with 5 spaces and + sign -- multiple - and + signs", "%---++++---5d", "42", 42);
-	test_int("Random int left aligned with 5 spaces and space instead of + sign", "%- 5d", "42", 42);
-	test_int("Random int left aligned with 5 spaces and space instead of + sign -- reverse order", "% -5d", "42", 42);
-	test_int("Random int left aligned with 5 spaces and space instead of + sign -- multiple - and spaces", "%----    ---5d", "42", 42);
-	test_int("Random int left aligned with 1 space", "%-1d", "42", 42);
-	test_char("Random char with hh length modifier", "%hhd", "298", (char)42);
-	test_char("Random char with hh length modifier", "%hhd", "298", (char)298);
-	test_short("Short max with h length modifier", "%hd", "32767", SHRT_MAX);
-	test_short("Short max + 1 with h length modifier", "%hd", "32767", (short)(SHRT_MAX + 1));
-	test_long("Long max with l length modifier", "%ld", "9223372036854775807", LONG_MAX);
-	test_long_long("Long long max with ll length modifier", "%lld", "9223372036854775807", LLONG_MAX);
-	test_long_long("Long long max with L length modifier", "%Ld", "9223372036854775807", LLONG_MAX);
+	test_int("Random int + '.1' precision -- precision < nb digits", "%.1d", "42", 42);
+	test_int("Random int + '.4' precision -- precision > nb digits", "%.1d", "42", 42);
+	test_int("Random int + '3' width + '.5' precision -- precision > width", "%3.5d", "42", 42);
+	test_int("Random int + '5' width + '.3' precision -- precision < width", "%5.3d", "42", 42);
+	test_int("Random int + '0' flag", "%0d", "42", 42);
+	test_int("Random int + '0' flag + '5' width", "%05d", "42", 42);
+	test_int("Random int + multiple '0' flags + '5' width", "%00005d", "42", 42);
+	test_int("Random int + '+' flag", "%+d", "42", 42);
+	test_int("Random int + multiple '+' flags", "%++++d", "42", 42);
+	test_int("Random int + ' ' flag + '0' flag + '5' width", "% 05d", "42", 42);
+	test_int("Random int + '+' flag + '0' flag + '5' width", "%+05d", "42", 42);
+	test_int("Random int + '+' flag + '0' flag + '5' width -- flags in reverse order", "%0+5d", "42", 42);
+	test_int("Random int + multiple '+' flags  + multiple '0' flags + '5' width", "%+++++000005d", "42", 42);
+	test_int("Random int + ' ' flag", "% d", "42", 42);
+	test_int("Random int + multiple ' ' flags", "%     d", "42", 42);
+	test_int("Random int + 5 width", "%5d", "42", 42);
+	test_int("Random int + '+' flag + '5' width", "%+5d", "42", 42);
+	test_int("Random int + '1' width -- width < nb digits", "%1d", "42", 42);
+	test_int("Random int + '-' flag + '5' width", "%-5d", "42", 42);
+	test_int("Random int + multiple '-' flags", "%------5d", "42", 42);
+	test_int("Random int + '-' flag + '+' flag + '5' width", "%-+5d", "42", 42);
+	test_int("Random int + '-' flag + '+' flag + '5' width -- flags alternate", "%---++++---5d", "42", 42);
+	test_int("Random int + '-' flag + ' ' flag + '5' width", "%- 5d", "42", 42);
+	test_int("Random int + '-' flag + ' ' flag + '5' width -- reverse order", "% -5d", "42", 42);
+	test_int("Random int + '-' flag + ' ' flag + '5' width -- flags alternate", "%----    ---5d", "42", 42);
+	test_int("Random int + '-' flag + '1' width -- width < nb digits", "%-1d", "42", 42);
+	test_char("Random char + 'hh' modifier", "%hhd", "42", (char)42);
+	test_char("Random char + 'hh' modifier", "%hhd", "298", (char)298);
+	test_short("Short max + 'h' modifier", "%hd", "32767", SHRT_MAX);
+	test_short("Short max + 1 + 'h' modifier", "%hd", "32767", (short)(SHRT_MAX + 1));
+	test_long("Long max + 'l' modifier", "%ld", "9223372036854775807", LONG_MAX);
+	test_long_long("Long long max + 'll' modifier", "%lld", "9223372036854775807", LLONG_MAX);
+	test_long_long("Long long max + 'L' length modifier", "%Ld", "9223372036854775807", LLONG_MAX);
+	print_h2("=> Invalid format:");
+	test_int("Random int + '+' flag + ' ' flag -- ' ' flag ignored", "%+ d", "42", 42);
+	test_int("Random int + invalid conversion specifier", "%=d", "42", 42);
 }
 
 void	test_type_octal(void)
@@ -293,23 +267,47 @@ void	test_type_float_f(void)
 
 int		main(int ac, char **av)
 {
-	(void)ac;
-	(void)av;
-	//CHAR
-	test_type_char();
-	//INT
-	test_type_int();
-	//OCTAL
-	test_type_octal();
-	//UNSIGNED INT
-	test_type_unsigned_int();
-	//HEXADECIMAL x
-	test_type_hexadecimal_x();
-	//HEXADECIMAL X
-	test_type_hexadecimal_X();
-	//FLOAT f
-	test_type_float_f();
+	void	(*tab_test[])(void) = {
+		&test_type_char, 
+		&test_type_int, 
+		&test_type_octal,
+		&test_type_unsigned_int,
+		&test_type_hexadecimal_x,
+		&test_type_hexadecimal_X,
+		&test_type_float_f
+	};
+	int		i;
+
+	if (ac == 1)
+	{
+		i = -1;
+		while (++i < sizeof(tab_test)/sizeof(tab_test[0]))
+			(*tab_test[i])();
+	}
+	else if (ac == 2)
+	{
+		if (!strcmp(av[1],"char"))
+			test_type_char();
+		else if (!strcmp(av[1],"int"))
+			test_type_int();
+		else if (!strcmp(av[1],"octal"))
+			test_type_octal();
+		else if (!strcmp(av[1],"unsigned_int"))
+			test_type_unsigned_int();
+		else if (!strcmp(av[1],"hexa_x"))
+			test_type_hexadecimal_x();
+		else if (!strcmp(av[1],"hexa_X"))
+			test_type_hexadecimal_X();
+		else if (!strcmp(av[1],"float_f"))
+			test_type_float_f();
+		else
+			printf("%s\n", "Unknown category");
+	}
+	else
+	{
+		printf("%s\n", "Wrong number of arguments, 0 or 1 expected.");
+	}
 	printf("\n");
-	printf("|%05.4d|\n", 42);
+	printf("|%+=d|\n", 42);
 	return (0);
 }
