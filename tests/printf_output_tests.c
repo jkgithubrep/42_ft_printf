@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/05 18:42:27 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/06 16:15:54 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,8 @@ void	test_type_int(void)
 	test_int("Zero + . precision", "%.d", "0", 0);
 	test_int("Zero + .3 precision", "%.3d", "0", 0);
 	test_int("Random int", "%d", "42", 42);
+	test_int("Random int + 'INT_MAX + 1' width", "%2147483648d", "42", 42);
+	test_int("Random int + 'INT_MAX + 1' precision", "%.2147483648d", "42", 42);
 	test_int("Int max", "%d", "2147483647", INT_MAX);
 	test_int("Int max + 1", "%d", "2147483648", INT_MAX + 1);
 	test_int("Int min", "%d", "-2147483648", INT_MIN);
@@ -164,35 +166,97 @@ void	test_type_int(void)
 	test_long_long("Long long max + 'L' length modifier", "%Ld", "9223372036854775807", LLONG_MAX);
 	print_h2("=> Invalid format:");
 	test_int("Random int + '+' flag + ' ' flag -- ' ' flag ignored", "%+ d", "42", 42);
+	test_int("Random int + '-' flag + '0' flag -- '0' flag ignored", "%-05d", "42", 42);
 	test_int("Random int + invalid conversion specifier", "%=d", "42", 42);
+	test_int("Random int + '+' flag + '0' flag + invalid conversion specifier", "%+0=d", "42", 42);
+	test_int("Random int + '+' flag + invalid conversion specifier -- alternate", "%+=+d", "42", 42);
+	test_int("Random int + \% sign only", "%", "42", 42);
+	test_int("Random int + \% sign + '5' width -- no type", "%5", "42", 42);
 }
 
 void	test_type_octal(void)
 {
-	print_h1("TYPE: OCTAL (%o)");
+	print_h1("TYPE: OCTAL (%d | %i)");
 	print_h2("=> Valid format:");
+	test_int("Zero", "%o", "0", 0);
+	test_int("Zero + . precision", "%.o", "0", 0);
+	test_int("Zero + .3 precision", "%.3o", "0", 0);
 	test_int("Random int", "%o", "42", 42);
-	test_int("Random int with # flag", "%#o", "42", 42);
-	test_int("Random int with 5 spaces filled with 0 and # flag", "%0#5o", "42", 42);
-	test_int("Random int with multiple # flags", "%######o", "42", 42);
+	test_int("Random int + 'INT_MAX + 1' width", "%2147483648o", "42", 42);
+	test_int("Random int + 'INT_MAX + 1' precision", "%.2147483648o", "42", 42);
 	test_int("Int max", "%o", "2147483647", INT_MAX);
 	test_int("Int max + 1", "%o", "2147483648", INT_MAX + 1);
 	test_int("Int min", "%o", "-2147483648", INT_MIN);
 	test_int("Unsigned int max", "%o", "4294967295", UINT_MAX);
-	test_int("Random int filled with 0", "%0o", "42", 42);
-	test_int("Random int with 5 spaces filled with 0", "%05o", "42", 42);
-	test_int("Random int with 5 spaces", "%5o", "42", 42);
-	test_int("Random int with 1 space", "%1o", "42", 42);
-	test_int("Random int left aligned with 5 spaces", "%-5o", "42", 42);
-	test_int("Random int left aligned with 1 space", "%-1o", "42", 42);
-	test_char("Random char with hh length modifier", "%hho", "298", (char)42);
-	test_char("Random char with hh length modifier", "%hho", "298", (char)298);
-	test_short("Short max with h length modifier", "%ho", "32767", SHRT_MAX);
-	test_short("Short max + 1 with h length modifier", "%ho", "32767", (short)(SHRT_MAX + 1));
-	test_long("Long max with l length modifier", "%lo", "9223372036854775807", LONG_MAX);
-	test_long_long("Long long max with ll length modifier", "%llo", "9223372036854775807", LLONG_MAX);
-	test_long_long("Long long max with L length modifier", "%Lo", "9223372036854775807", LLONG_MAX);
+	test_int("Random int + '.1' precision -- precision < nb digits", "%.1o", "42", 42);
+	test_int("Random int + '.4' precision -- precision > nb digits", "%.1o", "42", 42);
+	test_int("Random int + '3' width + '.5' precision -- precision > width", "%3.5o", "42", 42);
+	test_int("Random int + '5' width + '.3' precision -- precision < width", "%5.3o", "42", 42);
+	test_int("Random int + '0' flag", "%0o", "42", 42);
+	test_int("Random int + '0' flag + '5' width", "%05o", "42", 42);
+	test_int("Random int + multiple '0' flags + '5' width", "%00005o", "42", 42);
+	test_int("Random int + '+' flag", "%+o", "42", 42);
+	test_int("Random int + multiple '+' flags", "%++++o", "42", 42);
+	test_int("Random int + ' ' flag + '0' flag + '5' width", "% 05o", "42", 42);
+	test_int("Random int + '+' flag + '0' flag + '5' width", "%+05o", "42", 42);
+	test_int("Random int + '+' flag + '0' flag + '5' width -- flags in reverse order", "%0+5o", "42", 42);
+	test_int("Random int + multiple '+' flags  + multiple '0' flags + '5' width", "%+++++000005o", "42", 42);
+	test_int("Random int + ' ' flag", "% o", "42", 42);
+	test_int("Random int + multiple ' ' flags", "%     o", "42", 42);
+	test_int("Random int + 5 width", "%5o", "42", 42);
+	test_int("Random int + '+' flag + '5' width", "%+5o", "42", 42);
+	test_int("Random int + '1' width -- width < nb digits", "%1o", "42", 42);
+	test_int("Random int + '-' flag + '5' width", "%-5o", "42", 42);
+	test_int("Random int + multiple '-' flags", "%------5o", "42", 42);
+	test_int("Random int + '-' flag + '+' flag + '5' width", "%-+5o", "42", 42);
+	test_int("Random int + '-' flag + '+' flag + '5' width -- flags alternate", "%---++++---5o", "42", 42);
+	test_int("Random int + '-' flag + ' ' flag + '5' width", "%- 5o", "42", 42);
+	test_int("Random int + '-' flag + ' ' flag + '5' width -- reverse order", "% -5o", "42", 42);
+	test_int("Random int + '-' flag + ' ' flag + '5' width -- flags alternate", "%----    ---5o", "42", 42);
+	test_int("Random int + '-' flag + '1' width -- width < nb digits", "%-1o", "42", 42);
+	test_char("Random char + 'hh' modifier", "%hho", "42", (char)42);
+	test_char("Random char + 'hh' modifier", "%hho", "298", (char)298);
+	test_short("Short max + 'h' modifier", "%ho", "32767", SHRT_MAX);
+	test_short("Short max + 1 + 'h' modifier", "%ho", "32767", (short)(SHRT_MAX + 1));
+	test_long("Long max + 'l' modifier", "%lo", "9223372036854775807", LONG_MAX);
+	test_long_long("Long long max + 'll' modifier", "%llo", "9223372036854775807", LLONG_MAX);
+	test_long_long("Long long max + 'L' length modifier", "%Lo", "9223372036854775807", LLONG_MAX);
+	print_h2("=> Invalid format:");
+	test_int("Random int + '+' flag + ' ' flag -- ' ' flag ignored", "%+ o", "42", 42);
+	test_int("Random int + '-' flag + '0' flag -- '0' flag ignored", "%-05o", "42", 42);
+	test_int("Random int + invalid conversion specifier", "%=o", "42", 42);
+	test_int("Random int + '+' flag + '0' flag + invalid conversion specifier", "%+0=o", "42", 42);
+	test_int("Random int + '+' flag + invalid conversion specifier -- alternate", "%+=+o", "42", 42);
+	test_int("Random int + \% sign only", "%", "42", 42);
+	test_int("Random int + \% sign + '5' width -- no typo", "%5", "42", 42);
 }
+
+//void	test_type_octal(void)
+//{
+//	print_h1("TYPE: OCTAL (%o)");
+//	print_h2("=> Valid format:");
+//	test_int("Random int", "%o", "42", 42);
+//	test_int("Random int with # flag", "%#o", "42", 42);
+//	test_int("Random int with 5 spaces filled with 0 and # flag", "%0#5o", "42", 42);
+//	test_int("Random int with multiple # flags", "%######o", "42", 42);
+//	test_int("Int max", "%o", "2147483647", INT_MAX);
+//	test_int("Int max + 1", "%o", "2147483648", INT_MAX + 1);
+//	test_int("Int min", "%o", "-2147483648", INT_MIN);
+//	test_int("Unsigned int max", "%o", "4294967295", UINT_MAX);
+//	test_int("Random int filled with 0", "%0o", "42", 42);
+//	test_int("Random int with 5 spaces filled with 0", "%05o", "42", 42);
+//	test_int("Random int with 5 spaces", "%5o", "42", 42);
+//	test_int("Random int with 1 space", "%1o", "42", 42);
+//	test_int("Random int left aligned with 5 spaces", "%-5o", "42", 42);
+//	test_int("Random int left aligned with 1 space", "%-1o", "42", 42);
+//	test_char("Random char with hh length modifier", "%hho", "298", (char)42);
+//	test_char("Random char with hh length modifier", "%hho", "298", (char)298);
+//	test_short("Short max with h length modifier", "%ho", "32767", SHRT_MAX);
+//	test_short("Short max + 1 with h length modifier", "%ho", "32767", (short)(SHRT_MAX + 1));
+//	test_long("Long max with l length modifier", "%lo", "9223372036854775807", LONG_MAX);
+//	test_long_long("Long long max with ll length modifier", "%llo", "9223372036854775807", LLONG_MAX);
+//	test_long_long("Long long max with L length modifier", "%Lo", "9223372036854775807", LLONG_MAX);
+//}
 
 void	test_type_unsigned_int(void)
 {
@@ -267,6 +331,7 @@ void	test_type_float_f(void)
 
 int		main(int ac, char **av)
 {
+	char	*str;
 	void	(*tab_test[])(void) = {
 		&test_type_char, 
 		&test_type_int, 
@@ -308,6 +373,49 @@ int		main(int ac, char **av)
 		printf("%s\n", "Wrong number of arguments, 0 or 1 expected.");
 	}
 	printf("\n");
-	printf("|%+=d|\n", 42);
+	printf("|%o|\n", 0);
+	printf("|%o|\n", 0);
+	printf("|%.o|\n", 0);
+	printf("|%.3o|\n", 0);
+	printf("|%o|\n", 42);
+	printf("|%2147483648o|\n", 42);
+	printf("|%.2147483648o|\n", 42);
+	printf("|%o|\n", INT_MAX);
+	printf("|%o|\n", INT_MAX + 1);
+	printf("|%o|\n", INT_MIN);
+	printf("|%o|\n", UINT_MAX);
+	printf("|%.1o|\n", 42);
+	printf("|%.1o|\n", 42);
+	printf("|%3.5o|\n", 42);
+	printf("|%5.3o|\n", 42);
+	printf("|%0o|\n", 42);
+	printf("|%05o|\n", 42);
+	printf("|%00005o|\n", 42);
+	printf("|%+o|\n", 42);
+	printf("|%++++o|\n", 42);
+	printf("|% 05o|\n", 42);
+	printf("|%+05o|\n", 42);
+	printf("|%0+5o|\n", 42);
+	printf("|%+++++000005o|\n", 42);
+	printf("|% o|\n", 42);
+	printf("|%     o|\n", 42);
+	printf("|%5o|\n", 42);
+	printf("|%+5o|\n", 42);
+	printf("|%1o|\n", 42);
+	printf("|%-5o|\n", 42);
+	printf("|%------5o|\n", 42);
+	printf("|%-+5o|\n", 42);
+	printf("|%---++++---5o|\n", 42);
+	printf("|%- 5o|\n", 42);
+	printf("|% -5o|\n", 42);
+	printf("|%----    ---5o|\n", 42);
+	printf("|%-1o|\n", 42);
+	printf("|%hho|\n", (char)42);
+	printf("|%hho|\n", (char)298);
+	printf("|%ho|\n", SHRT_MAX);
+	printf("|%ho|\n", (short)(SHRT_MAX + 1));
+	printf("|%lo|\n", LONG_MAX);
+	printf("|%llo|\n", LLONG_MAX);
+	printf("|%Lo|\n", LLONG_MAX);
 	return (0);
 }
