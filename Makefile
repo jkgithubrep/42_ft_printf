@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/05 15:44:00 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/08 12:38:27 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,6 +40,7 @@ RMDIR =            rmdir -p
 AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
+CERRFLAGS =        -Wall -Wextra
 CFLAGS =           -Werror -Wall -Wextra
 CPPFLAGS =         -I$(INC_PATH) -I$(INC_PATH_LFT)
 DEPFLAGS =         -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
@@ -98,7 +99,7 @@ printf_test: $(TEST_PRINTF)
 
 .PHONY: $(TEST_PRINTF)
 $(TEST_PRINTF):
-	$(QUIET) $(CC) $(TEST_PRINTF_SRC) -o $@
+	$(QUIET) $(CC) $(CERRFLAGS) $(TEST_PRINTF_SRC) -o $@
 	$(QUIET) ./$@ $(select)
 
 .PHONY: clean
