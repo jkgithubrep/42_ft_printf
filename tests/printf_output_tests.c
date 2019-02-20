@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/19 19:08:45 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/20 17:43:52 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@
 /*
 ** Macro that formats the printf test output
 */
-#define PRINTF_TEST do { \
+#define PRINTF_TEST_ARGS do { \
 					int		ret;\
 					printf(" > %s (", desc);\
 					printf("\"|");\
@@ -57,6 +57,81 @@
 					printf(NC "|");\
 					printf("\n");\
 					} while (0)
+#define PRINTF_TEST_NO_ARGS do { \
+					int		ret;\
+					printf(" > %s (", desc);\
+					printf("\"|");\
+					printf(MAGENTA "%s" NC, fmt);\
+					printf("|\"|): ");\
+					printf("|" YELLOW);\
+					ret = printf(fmt);\
+					printf(NC "|");\
+					printf(", |" YELLOW);\
+					printf("%d", ret);\
+					printf(NC "|");\
+					printf("\n");\
+					} while (0)
+#define PRINTF_TEST_2_ARGS do { \
+					int		ret;\
+					printf(" > %s (", desc);\
+					printf("\"|");\
+					printf(MAGENTA "%s" NC, fmt);\
+					printf("|\", |");\
+					printf(BLUE "%s" NC, test1_str);\
+					printf("|, |");\
+					printf(BLUE "%s" NC, test2_str);\
+					printf("|): ");\
+					printf("|" YELLOW);\
+					ret = printf(fmt, test1, test2);\
+					printf(NC "|");\
+					printf(", |" YELLOW);\
+					printf("%d", ret);\
+					printf(NC "|");\
+					printf("\n");\
+					} while (0)
+#define PRINTF_TEST_3_ARGS do { \
+					int		ret;\
+					printf(" > %s (", desc);\
+					printf("\"|");\
+					printf(MAGENTA "%s" NC, fmt);\
+					printf("|\", |");\
+					printf(BLUE "%s" NC, test1_str);\
+					printf("|, |");\
+					printf(BLUE "%s" NC, test2_str);\
+					printf("|, |");\
+					printf(BLUE "%s" NC, test3_str);\
+					printf("|): ");\
+					printf("|" YELLOW);\
+					ret = printf(fmt, test1, test2, test3);\
+					printf(NC "|");\
+					printf(", |" YELLOW);\
+					printf("%d", ret);\
+					printf(NC "|");\
+					printf("\n");\
+					} while (0)
+#define PRINTF_TEST_4_ARGS do { \
+					int		ret;\
+					printf(" > %s (", desc);\
+					printf("\"|");\
+					printf(MAGENTA "%s" NC, fmt);\
+					printf("|\", |");\
+					printf(BLUE "%s" NC, test1_str);\
+					printf("|, |");\
+					printf(BLUE "%s" NC, test2_str);\
+					printf("|, |");\
+					printf(BLUE "%s" NC, test3_str);\
+					printf("|, |");\
+					printf(BLUE "%s" NC, test4_str);\
+					printf("|): ");\
+					printf("|" YELLOW);\
+					ret = printf(fmt, test1, test2, test3, test4);\
+					printf(NC "|");\
+					printf(", |" YELLOW);\
+					printf("%d", ret);\
+					printf(NC "|");\
+					printf("\n");\
+					} while (0)
+
 
 void	print_h1(char *str)
 {
@@ -70,74 +145,93 @@ void	print_h2(char *str)
 
 void	test_char(char *desc, char *fmt, char *test_str, char test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_string(char *desc, char *fmt, char *test_str, char *test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_unsigned_char(char *desc, char *fmt, char *test_str, unsigned char test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_int(char *desc, char *fmt, char *test_str, int test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_unsigned_int(char *desc, char *fmt, char *test_str, unsigned int test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_short(char *desc, char *fmt, char *test_str, short test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_unsigned_short(char *desc, char *fmt, char *test_str, unsigned short test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_long(char *desc, char *fmt, char *test_str, long test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_unsigned_long(char *desc, char *fmt, char *test_str, unsigned long test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_long_long(char *desc, char *fmt, char *test_str, long long test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_unsigned_long_long(char *desc, char *fmt, char *test_str, unsigned long long test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_double(char *desc, char *fmt, char *test_str, double test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
 void	test_long_double(char *desc, char *fmt, char *test_str, long double test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
-void	test_void_pointer(char *desc, char *fmt, char*test_str, void *test)
+void	test_void_pointer(char *desc, char *fmt, char *test_str, void *test)
 {
-	PRINTF_TEST;
+	PRINTF_TEST_ARGS;
 }
 
+void	test_no_args(char *desc, char *fmt)
+{
+	PRINTF_TEST_NO_ARGS;
+}
+
+void	test_2_int(char *desc, char *fmt, char *test1_str, char *test2_str, int test1, int test2)
+{
+	PRINTF_TEST_2_ARGS;
+}
+
+void	test_3_int(char *desc, char *fmt, char *test1_str, char *test2_str, char *test3_str, int test1, int test2, int test3)
+{
+	PRINTF_TEST_3_ARGS;
+}
+
+void	test_4_int(char *desc, char *fmt, char *test1_str, char *test2_str, char *test3_str, char *test4_str, int test1, int test2, int test3, int test4)
+{
+	PRINTF_TEST_4_ARGS;
+}
 
 void	test_type_int(void)
 {
@@ -662,6 +756,24 @@ void	test_type_pointer(void)
 	test_void_pointer("Random char", "%p", "&test_char", &test_char);
 }
 
+void	test_misc(void)
+{
+	print_h1("TYPE: MISC");
+	print_h2("=> Valid format:");
+	test_no_args("2 '%' signs", "%%");
+	test_no_args("3 '%' signs", "%%%");
+	test_no_args("4 '%' signs", "%%%%");
+	test_2_int("'*' field width", "%*d", "10", "1", 10, 1);
+	test_2_int("'.*' precision", "%.*d", "10", "1", 10, 1);
+	test_3_int("'*' field width + '.*' precision", "%*.*d", "10", "2", "1", 10, 3, 1);
+	test_4_int("4 args + '*' field width", "%*d%*d", "10", "1", "10", "100", 10, 1, 10, 100);
+	test_2_int("2 args + '$' sign + '*' field width", "%2$*1$d %1$*1$d", "10", "1", 10, 1);
+	test_2_int("2 args + '$' sign + '.*' precision", "%2$.*1$d %1$.*1$d", "10", "1", 10, 1);
+	print_h2("=> Invalid format:");
+	test_3_int("'**' field width", "%**d", "2", "10", "1", 2, 10, 100);
+	test_3_int("'***' field width", "%***d", "2", "10", "1", 2, 10, 100);
+}
+
 
 int		main(int ac, char **av)
 {
@@ -676,7 +788,8 @@ int		main(int ac, char **av)
 		&test_type_double_a,
 		&test_type_char,
 		&test_type_string,
-		&test_type_pointer
+		&test_type_pointer,
+		&test_misc,
 	};
 	int		i;
 
@@ -712,6 +825,8 @@ int		main(int ac, char **av)
 			test_type_string();
 		else if (!strcmp(av[1],"pointer"))
 			test_type_pointer();
+		else if (!strcmp(av[1],"misc"))
+			test_misc();
 		else
 			printf("%s\n", "Unknown category");
 	}
@@ -720,6 +835,6 @@ int		main(int ac, char **av)
 		printf("%s\n", "Wrong number of arguments, 0 or 1 expected");
 	}
 	printf("\n");
-	printf("|%5p|\n", "test");
+	printf("|%*.*d|\n", 10, 2, 1);
 	return (0);
 }
