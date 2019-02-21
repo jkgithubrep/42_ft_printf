@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/20 17:43:52 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/21 17:20:13 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,25 +19,25 @@
 /*
 ** Colors definition
 */
-#define BOLD "\x1b[1m"
-#define UNDERLINE "\x1b[4m"
-#define NC "\x1b[0m"
-#define RED "\x1b[31m"
-#define GREEN "\x1b[32m"
-#define YELLOW "\x1b[33m"
-#define BLUE "\x1b[34m"
-#define MAGENTA "\x1b[35m"
+//#define BOLD "\x1b[1m"
+//#define UNDERLINE "\x1b[4m"
+//#define NC "\x1b[0m"
+//#define RED "\x1b[31m"
+//#define GREEN "\x1b[32m"
+//#define YELLOW "\x1b[33m"
+//#define BLUE "\x1b[34m"
+//#define MAGENTA "\x1b[35m"
 /*
 ** Colors definition canceled
 */
-//#define BOLD ""
-//#define UNDERLINE ""
-//#define NC ""
-//#define RED ""
-//#define GREEN ""
-//#define YELLOW ""
-//#define BLUE ""
-//#define MAGENTA ""
+#define BOLD ""
+#define UNDERLINE ""
+#define NC ""
+#define RED ""
+#define GREEN ""
+#define YELLOW ""
+#define BLUE ""
+#define MAGENTA ""
 /*
 ** Macro that formats the printf test output
 */
@@ -835,6 +835,7 @@ int		main(int ac, char **av)
 		printf("%s\n", "Wrong number of arguments, 0 or 1 expected");
 	}
 	printf("\n");
-	printf("|%*.*d|\n", 10, 2, 1);
+//	printf("|%s%c\0%s|\n", "Hello", 0, ", ça va ?");
+	printf("|%1$d|\n", 42);
 	return (0);
 }
