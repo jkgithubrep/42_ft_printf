@@ -6,15 +6,23 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/21 16:21:51 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/22 21:26:03 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UTILS_H
 # define UTILS_H
-# include "libft.h"
+
 # include "ft_printf.h"
 
-int				is_conv_spec(char c);
+int				is_type(const char c);
+int				is_flag(const char c);
+int				is_len_modif(const char c);
+void			save_int_value(int int_value, t_format *conv_params);
+const char		*skip_digits(const char *fmt);
+const char		*save_value_skip_digits(const char *fmt, t_format *conv_params);
+void			save_flag(const char c, t_format *conv_params);
+void			save_len_modif(const char *fmt, t_format *conv_params);
+const char		*read_fmt(const char *fmt, t_format *conv_params);
 
 #endif
