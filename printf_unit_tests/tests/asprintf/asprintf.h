@@ -1,23 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   read_fmt.h                                         :+:      :+:    :+:   */
+/*   asprintf.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/22 22:21:11 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 12:12:50 by jkettani         ###   ########.fr       */
+/*   Created: 2019/02/23 19:25:01 by jkettani          #+#    #+#             */
+/*   Updated: 2019/02/23 19:25:29 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef READ_FMT_H
-# define READ_FMT_H
+#ifndef ASPRINTF
+# define ASPRINTF
 
-int		read_fmt_test_type_only(void);
-int		read_fmt_test_type_width(void);
-int		read_fmt_test_type_width_precision(void);
-int		read_fmt_test_type_len_mod_h(void);
-int		read_fmt_test_type_len_mod_hh(void);
-int		read_fmt_test_type_hard_valid(void);
+int		asprintf_basic_test(void);
 
-#endif
+# endif

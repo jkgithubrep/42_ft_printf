@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/22 22:35:08 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/23 19:35:11 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,9 @@ SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   print/ft_putnbr_fd print/ft_putchar_fd \
 				   print/ft_print_bytes print/ft_putchar print/ft_putnbr_base \
 				   str/ft_strchr str/ft_is_in_str convert/ft_atoi char/ft_isdigit\
-				   char/ft_isspace
+				   char/ft_isspace convert/ft_digits_base convert/ft_udigits_base \
+				   convert/ft_imaxtoa_base convert/ft_uimaxtoa_base str/ft_strnew \
+				   mem/ft_bzero mem/ft_memset
 SRC_NAME =     	   ft_printf utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))

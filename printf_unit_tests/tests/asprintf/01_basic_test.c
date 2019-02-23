@@ -1,23 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   read_fmt.h                                         :+:      :+:    :+:   */
+/*   01_basic_test.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/22 22:21:11 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 12:12:50 by jkettani         ###   ########.fr       */
+/*   Created: 2019/02/23 19:19:10 by jkettani          #+#    #+#             */
+/*   Updated: 2019/02/23 20:30:28 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef READ_FMT_H
-# define READ_FMT_H
+#include "ft_printf.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <limits.h>
 
-int		read_fmt_test_type_only(void);
-int		read_fmt_test_type_width(void);
-int		read_fmt_test_type_width_precision(void);
-int		read_fmt_test_type_len_mod_h(void);
-int		read_fmt_test_type_len_mod_hh(void);
-int		read_fmt_test_type_hard_valid(void);
+int		asprintf_basic_test(void)
+{
+	char	*str;
+	int		ret;
 
-#endif
+	ft_asprintf(&str, "%u", UINT_MAX);
+	printf("%s", str);
+	ret = strcmp(str, "52");
+	if (str)
+		free(str);
+	if (!ret)
+		return (0);
+	else
+		return (-1);
+}
+
