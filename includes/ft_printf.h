@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 19:15:45 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/24 17:07:01 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,10 @@ typedef union				u_dbls{
 	t_ldouble				ldbl;
 }							t_dbls;
 
+# define BUF_SIZE			4096
+
 # define TYPES             "dcsouxXfeEgGaApi%"
+# define SIGNED_TYPES      "dic"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
 
@@ -73,9 +76,15 @@ typedef union				u_dbls{
 # define HASH              '#'
 # define ZERO              '0'
 
-# define DEC               10
-# define OCT               8
-# define HEX               16
+# define DEC_BASE          "0123456789"
+# define OCT_BASE          "01234567"
+# define L_HEX_BASE        "0123456789abcdef"
+# define U_HEX_BASE        "0123456789ABCDEF"
+
+typedef enum		e_sign_type{
+	UNSIGNED = 0x0,
+	SIGNED = 0x1,
+}					t_sign_type;
 
 enum				e_flags{
 	FL_MINUS = 0x1,
@@ -99,33 +108,13 @@ typedef enum		e_len_modifs{
 	LEN_MOD_NA
 }					t_len_modifs;
 
-//typedef enum	e_types{
-//	TYPE_D,
-//	TYPE_C,
-//	TYPE_S,
-//	TYPE_O,
-//	TYPE_U,
-//	TYPE_X,
-//	TYPE_CAP_X,
-//	TYPE_F,
-//	TYPE_E,
-//	TYPE_CAP_E,
-//	TYPE_G,
-//	TYPE_CAP_G,
-//	TYPE_A,
-//	TYPE_CAP_A,
-//	TYPE_P,
-//	TYPE_I,
-//	TYPE_%
-//}				t_types;
-
 typedef struct		s_format{
 	int				width;
 	int				prec;
 	t_uint			flags;
 	t_len_modifs	len_mod;
 	char 			type_char;
-
+	t_sign_type     is_signed;
 }					t_format;
 
 int					ft_printf(const char *fmt, ...);

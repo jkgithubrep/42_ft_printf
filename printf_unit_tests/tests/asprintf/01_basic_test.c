@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/23 19:19:10 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 20:30:28 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/24 16:01:40 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,13 @@
 
 int		asprintf_basic_test(void)
 {
-	char	*str;
-	int		ret;
+	char		*str;
+	int			ret;
 
-	ft_asprintf(&str, "%u", UINT_MAX);
+	printf("printf: %hhd ", (char)1234);
+	ft_asprintf(&str, "%hhd", (char)1234);
 	printf("%s", str);
-	ret = strcmp(str, "52");
+	ret = strcmp(str, "*");
 	if (str)
 		free(str);
 	if (!ret)
