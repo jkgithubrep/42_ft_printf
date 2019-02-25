@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/24 10:48:37 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/25 21:33:19 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,7 @@ AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
 CERRFLAGS =        -Wall -Wextra
-CFLAGS =           -Werror -Wall -Wextra
+CFLAGS =           -g3 -Werror -Wall -Wextra
 CPPFLAGS =         -I$(INC_PATH) -I$(INC_PATH_LFT)
 DEPFLAGS =         -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 LIBFLAGS =         -L$(LIB_PATH) -lftprintf
@@ -56,8 +56,13 @@ SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   convert/ft_udigits_base convert/ft_imaxtoa_base \
 				   convert/ft_uimaxtoa_base str/ft_strnew mem/ft_bzero \
 				   mem/ft_memset convert/ft_is_valid_base char/ft_isprint \
-				   char/ft_issign
-SRC_NAME =     	   ft_printf utils \
+				   char/ft_issign math/ft_max str/ft_strpad_left \
+				   str/ft_strpad_right str/ft_strprepend str/ft_strappend \
+				   str/ft_strcnew str/ft_strjoin str/ft_strcat str/ft_strcpy \
+				   print/ft_putendl print/ft_putendl_fd str/ft_strskip \
+				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
+				   mem/ft_memcpy print/ft_putnbr
+SRC_NAME =     	   ft_printf utils dbg_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/24 17:07:01 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/25 19:54:05 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,11 @@ typedef union				u_dbls{
 # define BUF_SIZE			4096
 
 # define TYPES             "dcsouxXfeEgGaApi%"
-# define SIGNED_TYPES      "dic"
+# define SIGNED_TYPES      "di"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
+# define NUM_TYPES         "douxXi"
+# define TYPE_PREFIX       "oxX"
 
 # define DOLLAR            '$'
 # define ASTERISK          '*'
@@ -81,6 +83,10 @@ typedef union				u_dbls{
 # define L_HEX_BASE        "0123456789abcdef"
 # define U_HEX_BASE        "0123456789ABCDEF"
 
+# define PREF_OCT          "0"
+# define PREF_L_HEX        "0x"
+# define PREF_U_HEX        "0X"
+
 typedef enum		e_sign_type{
 	UNSIGNED = 0x0,
 	SIGNED = 0x1,
@@ -94,7 +100,8 @@ enum				e_flags{
 	FL_ZERO = 0x10,
 	FL_PREC = 0x20,
 	FL_WIDTH = 0x40,
-	FL_ERR = 0x80
+	FL_NULL = 0x80,
+	FL_ERR = 0x100,
 };
 
 typedef enum		e_len_modifs{
@@ -115,7 +122,13 @@ typedef struct		s_format{
 	t_len_modifs	len_mod;
 	char 			type_char;
 	t_sign_type     is_signed;
+	int				is_neg;
 }					t_format;
+
+typedef struct		s_result{
+	char			*str;
+	int				count;
+}					t_result;
 
 int					ft_printf(const char *fmt, ...);
 int					ft_dprintf(int d, const char *fmt, ...);

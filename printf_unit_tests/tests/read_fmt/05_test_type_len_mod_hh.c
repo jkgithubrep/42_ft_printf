@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/22 22:33:31 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/22 22:34:46 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/25 18:48:10 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int		read_fmt_test_type_len_mod_hh(void)
 	const char	*ret;
 
 	fmt = "hhd";
-	ret = read_fmt(fmt, &conv_params);
+	ret = parse_conv_spec(fmt, &conv_params);
 	if (!*ret && WIDTH == 0 && PREC == 0 && L_FLAGS == 0u
 			&& LEN_MOD == LEN_MOD_HH && TYPE_C == 'd')
 		return (0);

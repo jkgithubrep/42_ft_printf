@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/14 12:18:13 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 19:16:20 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/25 19:17:37 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "libft.h"
 #include "ft_printf.h"
 #include "utils.h"
+#include <stdio.h>
 
 int				ft_printf(const char *fmt, ...)
 {

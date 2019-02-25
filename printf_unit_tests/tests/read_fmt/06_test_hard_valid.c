@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/23 12:09:39 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 12:12:44 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/25 18:48:10 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int		read_fmt_test_type_hard_valid(void)
 	const char	*ret;
 
 	fmt = "++---00   ##2399.123456hhd";
-	ret = read_fmt(fmt, &conv_params);
+	ret = parse_conv_spec(fmt, &conv_params);
 	if (!*ret && WIDTH == 2399 && PREC == 123456
 			&& L_FLAGS == (FL_PLUS | FL_MINUS | FL_ZERO | FL_SPACE | FL_HASH
 				| FL_PREC)
