@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/25 21:33:19 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/26 12:00:40 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,7 +61,7 @@ SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   str/ft_strcnew str/ft_strjoin str/ft_strcat str/ft_strcpy \
 				   print/ft_putendl print/ft_putendl_fd str/ft_strskip \
 				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
-				   mem/ft_memcpy print/ft_putnbr
+				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat
 SRC_NAME =     	   ft_printf utils dbg_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))

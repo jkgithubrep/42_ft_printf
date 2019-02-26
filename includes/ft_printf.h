@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/25 19:54:05 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/26 15:50:22 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <stdarg.h>
 # include <stdint.h>
+# include <stdlib.h>
 
 /*
 ** Typedefs
@@ -42,11 +43,14 @@ typedef union				u_ints{
 	t_int					s_int;
 	t_lint					s_lint;
 	t_llint					s_llint;
+	intmax_t				s_intmax;
 	t_uchar					u_char;
 	t_ushort				u_short;
 	t_uint					u_int;
 	t_ulint					u_lint;
 	t_ullint				u_llint;
+	size_t					u_size_t;
+	uintmax_t				u_intmax;
 }							t_ints;
 
 /*
@@ -58,14 +62,23 @@ typedef union				u_dbls{
 	t_ldouble				ldbl;
 }							t_dbls;
 
+# define EXIT_FAIL          -1
 # define BUF_SIZE			4096
 
-# define TYPES             "dcsouxXfeEgGaApi%"
+/*
+** Length modifiers j and z not handled
+*/
+
+# define TYPES             "diuoxXfeEgGaAcsp"
 # define SIGNED_TYPES      "di"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
 # define NUM_TYPES         "douxXi"
 # define TYPE_PREFIX       "oxX"
+
+/*
+** DOLLAR and ASTERISK unused.
+*/
 
 # define DOLLAR            '$'
 # define ASTERISK          '*'
@@ -116,13 +129,13 @@ typedef enum		e_len_modifs{
 }					t_len_modifs;
 
 typedef struct		s_format{
-	int				width;
+	char 			type_char;
+	int				is_neg;
 	int				prec;
+	int				width;
 	t_uint			flags;
 	t_len_modifs	len_mod;
-	char 			type_char;
 	t_sign_type     is_signed;
-	int				is_neg;
 }					t_format;
 
 typedef struct		s_result{

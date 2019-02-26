@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/25 12:34:06 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/26 14:13:22 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ RMDIR =                 rmdir -p
 AR =                    ar
 ARFLAGS =               -rcs
 CC =                    gcc
-CFLAGS =                -g3 -Werror -Wall -Wextra
+CFLAGS =                -g3 -Wall -Wextra #-Werror
 NAME =                  tests
 SRC_PATH =              .
 INCLUDE_PATH =          .
