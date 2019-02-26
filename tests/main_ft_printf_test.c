@@ -6,14 +6,14 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:28:29 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 15:56:23 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/26 17:48:24 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 #include <stdio.h>
 
-#define ARGS "%jx", -4294967296
+#define ARGS "%10s", NULL
 
 int		main(int ac, char **av)
 {

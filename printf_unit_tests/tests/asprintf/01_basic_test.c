@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/23 19:19:10 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 16:29:18 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/26 18:31:00 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define ARGS "%#010X", 42
+#define ARGS "%+d", -42
 
 int		asprintf_basic_test(void)
 {

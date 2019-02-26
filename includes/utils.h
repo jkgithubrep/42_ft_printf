@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/25 21:18:03 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/26 18:28:01 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ void			save_type(const char c, t_format *conv_params);
 const char		*parse_conv_spec(const char *fmt, t_format *conv_params);
 intmax_t		get_int_arg_val(t_format *conv_params, va_list args);
 char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params);
-void			init_variables(t_format *conv_params, int *i, t_result *result);
+void			init_variables(int *i, t_result *result);
+void			reset_conv_params(t_format *conv_params);
 int				parse_fmt(char **str, const char *fmt, va_list args);
 t_ints			convert_imax_to_ints(intmax_t arg_val, t_format *conv_params);
 char			*int_arg_val_to_str_conv(intmax_t arg_val, const char *base,

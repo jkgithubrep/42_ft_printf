@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 16:35:12 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/26 18:29:45 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,10 @@ char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params)
 {
 	char		*str;
 
-	if (conv_params->type_char == 'o')
+	if ((conv_params->flags & FL_NULL) && (conv_params->flags & FL_PREC)
+			&& !conv_params->prec)
+		str = ft_strnew(0);
+	else if (conv_params->type_char == 'o')
 		str = int_arg_val_to_str_conv(arg_val, OCT_BASE, conv_params);
 	else if (conv_params->type_char == 'x')
 		str = int_arg_val_to_str_conv(arg_val, L_HEX_BASE, conv_params);
@@ -362,8 +365,8 @@ int				has_sign(int nb_zeros_prec, t_format *conv_params)
 {
 	return (is_signed_type(conv_params->type_char)
 				&& ((conv_params->is_neg && nb_zeros_prec)
-					|| (conv_params->flags & FL_PLUS)
-					|| (conv_params->flags & FL_SPACE)));
+					|| (!conv_params->is_neg && ((conv_params->flags & FL_PLUS)
+						|| (conv_params->flags & FL_SPACE)))));
 }
 
 /*
@@ -437,7 +440,8 @@ char			*format_int_str(char *val_str, t_format *conv_params)
 
 	conv_params->is_neg = (val_str[0] == '-') ? 1 : 0;
 	nb_digits = ft_strlen(val_str) - conv_params->is_neg;
-	if (!(conv_params->flags & FL_PREC) && has_prefix(conv_params))
+	if ((conv_params->flags & FL_ZERO) && !(conv_params->flags & FL_MINUS) 
+			&& !(conv_params->flags & FL_PREC) && has_prefix(conv_params))
 		nb_zeros_prec = conv_params->prec = conv_params->width - (nb_digits
 				+ (conv_params->type_char == 'o' ? 1 : 2));
 	else
@@ -446,7 +450,9 @@ char			*format_int_str(char *val_str, t_format *conv_params)
 		prepend_prec(&val_str, nb_zeros_prec);
 	if (has_sign(nb_zeros_prec, conv_params))
 		prepend_sign(&val_str, conv_params);
-	if (has_prefix(conv_params) && !(conv_params->flags & FL_NULL))
+	if (has_prefix(conv_params) && (!(conv_params->flags & FL_NULL)
+				|| ((conv_params->flags & FL_NULL) 
+				&& (conv_params->type_char == 'o'))))
 		prepend_prefix(&val_str, conv_params);
 	if ((padding = get_nb_padding(ft_strlen(val_str), conv_params->width)) > 0)
 		add_padding(&val_str, padding, conv_params);
@@ -509,7 +515,10 @@ char			*get_formatted_str_str(t_format *conv_params, va_list args)
 {
 	char		*val_str;
 
-	val_str = ft_strdup(get_str_arg_val(args));
+	if (!(val_str = get_str_arg_val(args)))
+		val_str = ft_strdup("(null)");
+	else
+		val_str = ft_strdup(val_str);
 	val_str = format_str(val_str, conv_params);
 	return (val_str);
 }
@@ -551,6 +560,8 @@ void			add_to_buff(char *buf, int *index, t_result *result,
 	int		len;
 	int		i;
 
+	if (!val_str)
+		return ;
 	len = ft_strlen(val_str);
 	i = 0;
 	if (*index + len > BUF_SIZE)
@@ -559,7 +570,14 @@ void			add_to_buff(char *buf, int *index, t_result *result,
 		buf[(*index)++] = val_str[i++];
 }
 
-void			init_variables(t_format *conv_params, int *i, t_result *result)
+void			init_variables(int *i, t_result *result)
+{
+	*i = 0;
+	result->str = NULL;
+	result->count = 0;
+}
+
+void			reset_conv_params(t_format *conv_params)
 {
 	conv_params->type_char = 0;
 	conv_params->is_neg = 0;
@@ -568,9 +586,6 @@ void			init_variables(t_format *conv_params, int *i, t_result *result)
 	conv_params->flags = 0u;
 	conv_params->len_mod = LEN_MOD_NA;
 	conv_params->is_signed = UNSIGNED;
-	*i = 0;
-	result->str = NULL;
-	result->count = 0;
 }
 
 int				parse_fmt(char **str, const char *fmt, va_list args)
@@ -580,13 +595,14 @@ int				parse_fmt(char **str, const char *fmt, va_list args)
 	t_format	conv_params;
 	t_result	result;
 
-	init_variables(&conv_params, &i, &result);
+	init_variables(&i, &result);
 	while (*fmt)
 	{
 		if (*fmt == PERCENT && *(fmt + 1) != PERCENT)
 		{
+			reset_conv_params(&conv_params);
 			fmt = parse_conv_spec(fmt + 1, &conv_params);
-			dbg_print_conv_params(&conv_params);
+//			dbg_print_conv_params(&conv_params);
 			add_to_buff(buf, &i, &result, get_formatted_str(&conv_params, args));
 		}
 		else if (*fmt == PERCENT && *(fmt + 1) == PERCENT)

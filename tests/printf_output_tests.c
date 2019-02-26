@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 16:13:47 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/26 18:31:10 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -836,7 +836,7 @@ int		main(int ac, char **av)
 	}
 	printf("\n");
 //	printf("|%s%c\0%s|\n", "Hello", 0, ", ça va ?");
-	printf("%#08x", 42);
+	printf("%#.x", 0);
 //	printf("|%%|\n", &i);
 	return (0);
 }
