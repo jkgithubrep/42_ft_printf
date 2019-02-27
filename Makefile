@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/26 12:00:40 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/27 13:16:22 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,7 +51,7 @@ SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   print/ft_putstr_fd str/ft_strlen print/ft_putnbr \
 				   print/ft_putnbr_fd print/ft_putchar_fd \
 				   print/ft_print_bytes print/ft_putchar print/ft_putnbr_base \
-				   str/ft_strchr str/ft_is_in_str convert/ft_atoi \
+				   str/ft_strchr str/ft_instr convert/ft_atoi \
 				   char/ft_isdigit char/ft_isspace convert/ft_digits_base \
 				   convert/ft_udigits_base convert/ft_imaxtoa_base \
 				   convert/ft_uimaxtoa_base str/ft_strnew mem/ft_bzero \

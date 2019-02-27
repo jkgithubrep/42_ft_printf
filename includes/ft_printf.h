@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 15:50:22 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 17:38:35 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdarg.h>
 # include <stdint.h>
 # include <stdlib.h>
+# include <sys/types.h>
 
 /*
 ** Typedefs
@@ -43,6 +44,7 @@ typedef union				u_ints{
 	t_int					s_int;
 	t_lint					s_lint;
 	t_llint					s_llint;
+	ssize_t					s_size_t;
 	intmax_t				s_intmax;
 	t_uchar					u_char;
 	t_ushort				u_short;
@@ -63,7 +65,7 @@ typedef union				u_dbls{
 }							t_dbls;
 
 # define EXIT_FAIL          -1
-# define BUF_SIZE			4096
+# define BUF_SIZE			1
 
 /*
 ** Length modifiers j and z not handled
@@ -142,6 +144,11 @@ typedef struct		s_result{
 	char			*str;
 	int				count;
 }					t_result;
+
+typedef struct		s_buf{
+	char			buf[BUF_SIZE];
+	int				i;
+}					t_buf;
 
 int					ft_printf(const char *fmt, ...);
 int					ft_dprintf(int d, const char *fmt, ...);

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 18:28:01 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 16:32:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,12 @@ void			save_type(const char c, t_format *conv_params);
 const char		*parse_conv_spec(const char *fmt, t_format *conv_params);
 intmax_t		get_int_arg_val(t_format *conv_params, va_list args);
 char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params);
-void			init_variables(int *i, t_result *result);
-void			reset_conv_params(t_format *conv_params);
+void			init_variables(t_buf *binf, t_result *result);
 int				parse_fmt(char **str, const char *fmt, va_list args);
 t_ints			convert_imax_to_ints(intmax_t arg_val, t_format *conv_params);
 char			*int_arg_val_to_str_conv(intmax_t arg_val, const char *base,
 					t_format *conv_params);
-int				get_nb_zeros_prec(int nb_digits, int prec);
+int				get_nb_zeros_prec(int nb_digits, t_format *conv_params);
 int				get_nb_padding(int curr_len, int width);
 char			*prepend_prec(char **val_str, int nb_zeros_prec);
 char			*prepend_sign(char **val_str, t_format *conv_params);
@@ -52,5 +51,6 @@ char			*get_formatted_str_int(t_format *conv_params, va_list args);
 char			*format_str(char *val_str, t_format *conv_params);
 char			*format_char_str(char *val_str, t_format *conv_params);
 char			*char_arg_val_to_str(t_uchar arg_val);
+void			build_final_str(t_result *result, char *append, int len);
 
 #endif

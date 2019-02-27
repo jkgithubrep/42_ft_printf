@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/23 19:19:10 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 18:31:00 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 17:25:34 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define ARGS "%+d", -42
+#define ARGS "@moulitest: %03.2d", 1
 
 int		asprintf_basic_test(void)
 {
@@ -24,10 +24,10 @@ int		asprintf_basic_test(void)
 	int			ret;
 
 	printf("|");
-	printf(ARGS);
-	printf("|\n");
-	ft_asprintf(&str, ARGS);
-	printf("|%s|\n", str);
+	ret = printf(ARGS);
+	printf("|, ret = |%d|\n", ret);
+	ret = ft_asprintf(&str, ARGS);
+	printf("|%s|, ret = |%d|\n", str, ret);
 	ret = strcmp(str, "ma chaine");
 	if (str)
 		free(str);

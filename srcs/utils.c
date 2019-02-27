@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 18:29:45 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 17:20:53 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 int				is_type(const char c)
 {
-	return (ft_is_in_str(c, TYPES));
+	return (ft_instr(c, TYPES));
 }
 
 /*
@@ -34,7 +34,7 @@ int				is_type(const char c)
 
 int				is_flag(const char c)
 {
-	return (ft_is_in_str(c, FLAGS));
+	return (ft_instr(c, FLAGS));
 }
 
 /*
@@ -45,7 +45,7 @@ int				is_flag(const char c)
 
 int				is_len_modif(const char c)
 {
-	return (ft_is_in_str(c, LEN_MODIFS));
+	return (ft_instr(c, LEN_MODIFS));
 }
 
 /*
@@ -56,7 +56,7 @@ int				is_len_modif(const char c)
 
 int				is_signed_type(const char c)
 {
-	return (ft_is_in_str(c, SIGNED_TYPES));
+	return (ft_instr(c, SIGNED_TYPES));
 }
 
 /*
@@ -67,7 +67,7 @@ int				is_signed_type(const char c)
 
 int				is_num_type(const char c)
 {
-	return (ft_is_in_str(c, NUM_TYPES));
+	return (ft_instr(c, NUM_TYPES));
 }
 
 /*
@@ -148,6 +148,8 @@ void			save_len_modif(const char *fmt, t_format *conv_params)
 
 void			save_type(const char c, t_format *conv_params)
 {
+	if (c == PERCENT)
+		conv_params->flags |= FL_ERR;
 	if (c == 'p')
 	{
 		conv_params->flags |= FL_HASH;
@@ -172,7 +174,11 @@ const char		*parse_conv_spec(const char *fmt, t_format *conv_params)
 		if (ft_isdigit(*fmt) && *fmt != ZERO)
 			fmt = save_value_skip_digits(fmt, conv_params) - 1;
 		else if (*fmt == DOT)
+		{
 			conv_params->flags |= FL_PREC;
+			if (ft_isdigit(*(fmt + 1)))
+				fmt = save_value_skip_digits(fmt + 1, conv_params) - 1;
+		}
 		else if (is_flag(*fmt))
 			save_flag(*fmt, conv_params);
 		else if (is_len_modif(*fmt))
@@ -210,7 +216,7 @@ intmax_t		get_int_arg_val(t_format *conv_params, va_list args)
 	else if (conv_params->len_mod == LEN_MOD_J)
 		arg_val = (intmax_t)va_arg(args, intmax_t);
 	else if (conv_params->len_mod == LEN_MOD_Z)
-		arg_val = (size_t)va_arg(args, size_t);
+		arg_val = (ssize_t)va_arg(args, ssize_t);
 	else
 		arg_val = (int)va_arg(args, int);
 	return (arg_val);
@@ -255,7 +261,7 @@ t_ints			convert_imax_to_ints(intmax_t arg_val, t_format *conv_params)
 	else if (conv_params->len_mod == LEN_MOD_LL)
 		val.s_llint = (long long)arg_val;
 	else if (conv_params->len_mod == LEN_MOD_Z)
-		val.u_size_t = (size_t)arg_val;
+		val.s_size_t = (ssize_t)arg_val;
 	else if (conv_params->len_mod == LEN_MOD_J)
 		val.s_intmax = (intmax_t)arg_val;
 	return (val);
@@ -269,31 +275,30 @@ t_ints			convert_imax_to_ints(intmax_t arg_val, t_format *conv_params)
 char			*int_arg_val_to_str_conv(intmax_t arg_val, const char *base,
 					t_format *conv_params)
 {
-	char		*str;
 	t_ints		val;
 
 	val = convert_imax_to_ints(arg_val, conv_params);
 	if (conv_params->len_mod == LEN_MOD_HH)
-		str = conv_params->is_signed ? ft_imaxtoa_base(val.s_char, base)
-										: ft_uimaxtoa_base(val.u_char, base);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_char, base)
+										: ft_uimaxtoa_base(val.u_char, base));
 	else if (conv_params->len_mod == LEN_MOD_H)
-		str = conv_params->is_signed ? ft_imaxtoa_base(val.s_short, base)
-										: ft_uimaxtoa_base(val.u_short, base);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_short, base)
+										: ft_uimaxtoa_base(val.u_short, base));
 	else if (conv_params->len_mod == LEN_MOD_L)
-		str = conv_params->is_signed ? ft_imaxtoa_base(val.s_lint, base)
-										: ft_uimaxtoa_base(val.u_lint, base);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_lint, base)
+										: ft_uimaxtoa_base(val.u_lint, base));
 	else if (conv_params->len_mod == LEN_MOD_LL)
-		str = conv_params->is_signed ? ft_imaxtoa_base(val.s_llint, base)
-										: ft_uimaxtoa_base(val.u_llint, base);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_llint, base)
+										: ft_uimaxtoa_base(val.u_llint, base));
 	else if (conv_params->len_mod == LEN_MOD_J)
-		str = conv_params->is_signed ? ft_imaxtoa_base(val.s_intmax, base)
-										: ft_uimaxtoa_base(val.u_intmax, base);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_intmax, base)
+										: ft_uimaxtoa_base(val.u_intmax, base));
 	else if (conv_params->len_mod == LEN_MOD_Z)
-		str = ft_uimaxtoa_base(val.u_size_t, base);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_size_t, base)
+										: ft_uimaxtoa_base(val.u_size_t, base));
 	else
-		str = conv_params->is_signed ? ft_imaxtoa_base(val.s_int, base)
-										: ft_uimaxtoa_base(val.u_int, base);
-	return (str);
+		return (conv_params->is_signed ? ft_imaxtoa_base(val.s_int, base)
+										: ft_uimaxtoa_base(val.u_int, base));
 }
 
 /*
@@ -325,9 +330,30 @@ char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params)
 ** Calculate the number of zeros for the precision.
 */
 
-int				get_nb_zeros_prec(int nb_digits, int prec)
+int				get_nb_zeros_prec(int nb_digits, t_format *conv_params)
 {
-	return ((int)ft_max(nb_digits, prec) - nb_digits);
+	int			nb;
+
+	nb = 0;
+	if (conv_params->flags & FL_PREC)
+		nb = (int)ft_max(nb_digits, conv_params->prec) - nb_digits;
+	else if ((conv_params->flags & FL_ZERO) && !(conv_params->flags & FL_MINUS))
+	{
+		if (is_signed_type(conv_params->type_char))
+			nb = (int)ft_max(conv_params->width
+					- (nb_digits
+						+ (((conv_params->is_neg)
+							|| (conv_params->flags & FL_PLUS)
+							|| (conv_params->flags & FL_SPACE)) ? 1 : 0)), 0);
+		else if (ft_instr(conv_params->type_char, TYPE_PREFIX)
+				&& (conv_params->flags & FL_HASH))
+			nb = (int)ft_max(conv_params->width
+					- (nb_digits
+							+ ((conv_params->type_char == 'o') ? 1 : 2)), 0);
+		else
+			nb = (int)ft_max(conv_params->width - nb_digits, 0);
+	}
+	return (nb);
 }
 
 /*
@@ -390,8 +416,11 @@ char			*prepend_sign(char **val_str, t_format *conv_params)
 
 int				has_prefix(t_format *conv_params)
 {
-	return ((conv_params->flags & FL_HASH)
-			&& ft_is_in_str(conv_params->type_char, TYPE_PREFIX));
+	return (ft_instr(conv_params->type_char, TYPE_PREFIX)
+			&& conv_params->flags & FL_HASH
+			&& (!(conv_params->flags & FL_NULL)
+				|| ((conv_params->flags & FL_NULL)
+				&& (conv_params->type_char == 'o'))));
 }
 
 /*
@@ -419,10 +448,6 @@ char			*add_padding(char **val_str, int padding, t_format *conv_params)
 {
 	if (conv_params->flags & FL_MINUS)
 		ft_strpad_right(val_str, ' ', padding);
-	else if (is_num_type(conv_params->type_char)
-				&& (conv_params->flags & FL_ZERO)
-				&& !(conv_params->flags & FL_PREC))
-		ft_strpad_left(val_str, '0', padding);
 	else
 		ft_strpad_left(val_str, ' ', padding);
 	return (*val_str);
@@ -440,19 +465,12 @@ char			*format_int_str(char *val_str, t_format *conv_params)
 
 	conv_params->is_neg = (val_str[0] == '-') ? 1 : 0;
 	nb_digits = ft_strlen(val_str) - conv_params->is_neg;
-	if ((conv_params->flags & FL_ZERO) && !(conv_params->flags & FL_MINUS) 
-			&& !(conv_params->flags & FL_PREC) && has_prefix(conv_params))
-		nb_zeros_prec = conv_params->prec = conv_params->width - (nb_digits
-				+ (conv_params->type_char == 'o' ? 1 : 2));
-	else
-		nb_zeros_prec = get_nb_zeros_prec(nb_digits, conv_params->prec);
+	nb_zeros_prec = get_nb_zeros_prec(nb_digits, conv_params);
 	if (nb_zeros_prec)
 		prepend_prec(&val_str, nb_zeros_prec);
 	if (has_sign(nb_zeros_prec, conv_params))
 		prepend_sign(&val_str, conv_params);
-	if (has_prefix(conv_params) && (!(conv_params->flags & FL_NULL)
-				|| ((conv_params->flags & FL_NULL) 
-				&& (conv_params->type_char == 'o'))))
+	if (has_prefix(conv_params))
 		prepend_prefix(&val_str, conv_params);
 	if ((padding = get_nb_padding(ft_strlen(val_str), conv_params->width)) > 0)
 		add_padding(&val_str, padding, conv_params);
@@ -506,6 +524,8 @@ char			*get_formatted_str_char(t_format *conv_params, va_list args)
 		arg_val = conv_params->type_char;
 	else
 		arg_val = get_char_arg_val(args);
+	if (!arg_val)
+		conv_params->flags |= FL_NULL;
 	val_str = char_arg_val_to_str(arg_val);
 	val_str = format_char_str(val_str, conv_params);
 	return (val_str);
@@ -537,25 +557,28 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
-void			save_buf(char *buf, int *index, t_result *result)
+void			build_final_str(t_result *result, char *append, int len)
 {
 	char		*tmp;
 
-//	dbg_print_nbr("index", *index);
-//	dbg_print_nbr("count", result->count);
 	if (!result->str)
-		tmp = (char *)ft_memjoin("", 0, buf, *index);
+		tmp = (char *)ft_memjoin("", 0, append, len);
 	else
-		tmp = (char	*)ft_memjoin(result->str, result->count, buf, *index);
-	if (result->str)	
+		tmp = (char	*)ft_memjoin(result->str, result->count, append, len);
+	if (result->str)
 		ft_strdel(&result->str);
 	result->str = tmp;
-	result->count += *index;
-	*index = 0;
+	result->count += len;
 }
 
-void			add_to_buff(char *buf, int *index, t_result *result,
-															char *val_str)
+void			save_buf(t_buf *binf, t_result *result)
+{
+	build_final_str(result, binf->buf, binf->i);
+	binf->i = 0;
+}
+
+void			add_to_buff(t_buf *binf, t_result *result,
+						t_format *conv_params, char *val_str)
 {
 	int		len;
 	int		i;
@@ -563,57 +586,49 @@ void			add_to_buff(char *buf, int *index, t_result *result,
 	if (!val_str)
 		return ;
 	len = ft_strlen(val_str);
-	i = 0;
-	if (*index + len > BUF_SIZE)
-		save_buf(buf, index, result);
-	while (len--)
-		buf[(*index)++] = val_str[i++];
+	if (conv_params->type_char == 'c' && (conv_params->flags & FL_NULL))
+		++len;
+	if (len > BUF_SIZE || (binf->i + len > BUF_SIZE))
+		save_buf(binf, result);
+	if (len > BUF_SIZE)
+		build_final_str(result, val_str, len);
+	else
+	{
+		i = 0;
+		while (len--)
+			binf->buf[(binf->i)++] = val_str[i++];
+	}
 }
 
-void			init_variables(int *i, t_result *result)
+void			init_variables(t_buf *binf, t_result *result)
 {
-	*i = 0;
+	binf->i = 0;
 	result->str = NULL;
 	result->count = 0;
 }
 
-void			reset_conv_params(t_format *conv_params)
-{
-	conv_params->type_char = 0;
-	conv_params->is_neg = 0;
-	conv_params->prec = 0;
-	conv_params->width = 0;
-	conv_params->flags = 0u;
-	conv_params->len_mod = LEN_MOD_NA;
-	conv_params->is_signed = UNSIGNED;
-}
-
 int				parse_fmt(char **str, const char *fmt, va_list args)
 {
-	char		buf[BUF_SIZE];
-	int			i;
+	t_buf		binf;
 	t_format	conv_params;
 	t_result	result;
 
-	init_variables(&i, &result);
+	init_variables(&binf, &result);
 	while (*fmt)
 	{
-		if (*fmt == PERCENT && *(fmt + 1) != PERCENT)
+		if (binf.i > BUF_SIZE - 1)
+			save_buf(&binf, &result);
+		if (*fmt == PERCENT)
 		{
-			reset_conv_params(&conv_params);
+			conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
 			fmt = parse_conv_spec(fmt + 1, &conv_params);
-//			dbg_print_conv_params(&conv_params);
-			add_to_buff(buf, &i, &result, get_formatted_str(&conv_params, args));
-		}
-		else if (*fmt == PERCENT && *(fmt + 1) == PERCENT)
-		{
-			buf[i++] = '%';
-			fmt = fmt + 2;
+			add_to_buff(&binf, &result, &conv_params,
+									get_formatted_str(&conv_params, args));
 		}
 		else
-			buf[i++] = *fmt++;
+			binf.buf[binf.i++] = *fmt++;
 	}
-	save_buf(buf, &i, &result);
+	save_buf(&binf, &result);
 	*str = result.str;
 	return (result.count);
 }
