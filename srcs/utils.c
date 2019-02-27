@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/27 17:20:53 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 18:15:59 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -414,13 +414,12 @@ char			*prepend_sign(char **val_str, t_format *conv_params)
 ** Check if `val_str` should have a prefix ('0', '0x' or '0X');
 */
 
-int				has_prefix(t_format *conv_params)
+int				has_prefix(int nb_zeros_prec, t_format *conv_params)
 {
 	return (ft_instr(conv_params->type_char, TYPE_PREFIX)
 			&& conv_params->flags & FL_HASH
-			&& (!(conv_params->flags & FL_NULL)
-				|| ((conv_params->flags & FL_NULL)
-				&& (conv_params->type_char == 'o'))));
+			&& !(conv_params->flags & FL_NULL) 
+			&& !((conv_params->type_char == 'o') && nb_zeros_prec));
 }
 
 /*
@@ -470,7 +469,7 @@ char			*format_int_str(char *val_str, t_format *conv_params)
 		prepend_prec(&val_str, nb_zeros_prec);
 	if (has_sign(nb_zeros_prec, conv_params))
 		prepend_sign(&val_str, conv_params);
-	if (has_prefix(conv_params))
+	if (has_prefix(nb_zeros_prec, conv_params))
 		prepend_prefix(&val_str, conv_params);
 	if ((padding = get_nb_padding(ft_strlen(val_str), conv_params->width)) > 0)
 		add_padding(&val_str, padding, conv_params);

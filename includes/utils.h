@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/27 16:32:57 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 18:13:08 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char			*add_padding(char **val_str, int padding,
 					t_format *conv_params);
 char			*format_int_str(char *val_str, t_format *conv_params);
 int				has_sign(int nb_zeros_prec, t_format *conv_params);
-int				has_prefix(t_format *conv_params);
+int				has_prefix(int nb_zeros_prec, t_format *conv_params);
 char			*get_formatted_str(t_format *conv_params, va_list args);
 char			*get_formatted_str_str(t_format *conv_params, va_list args);
 char			*get_formatted_str_char(t_format *conv_params, va_list args);

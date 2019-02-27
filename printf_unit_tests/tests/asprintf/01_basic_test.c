@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/23 19:19:10 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/27 17:25:34 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/27 18:16:49 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define ARGS "@moulitest: %03.2d", 1
+#define ARGS "%0#44zo", -975099071
+//#define ARGS "%#zo", 0
 
 int		asprintf_basic_test(void)
 {
