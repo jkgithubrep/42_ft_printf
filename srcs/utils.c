@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/27 18:15:59 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/28 17:24:26 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,13 +152,19 @@ void			save_type(const char c, t_format *conv_params)
 		conv_params->flags |= FL_ERR;
 	if (c == 'p')
 	{
-		conv_params->flags |= FL_HASH;
+		conv_params->flags |= (FL_HASH | FL_POINT);
 		conv_params->len_mod = LEN_MOD_L;
 		conv_params->type_char = 'x';
 	}
+	else if (c == 'D' || c == 'O' || c == 'U')
+	{
+		conv_params->len_mod = LEN_MOD_L;
+		conv_params->type_char = ft_tolower(c);
+	}
 	else
 		conv_params->type_char = c;
-	conv_params->is_signed = (is_signed_type(c)) ? SIGNED : UNSIGNED;
+	conv_params->is_signed = (is_signed_type(conv_params->type_char)) ?
+															SIGNED : UNSIGNED;
 }
 
 /*
@@ -169,7 +175,7 @@ void			save_type(const char c, t_format *conv_params)
 
 const char		*parse_conv_spec(const char *fmt, t_format *conv_params)
 {
-	while (*fmt && !is_type(*fmt))
+	while (*fmt && !ft_instr(*fmt, TYPES))
 	{
 		if (ft_isdigit(*fmt) && *fmt != ZERO)
 			fmt = save_value_skip_digits(fmt, conv_params) - 1;
@@ -192,7 +198,7 @@ const char		*parse_conv_spec(const char *fmt, t_format *conv_params)
 	}
 	if (*fmt)
 		save_type(*fmt, conv_params);
-	return (++fmt);
+	return ((*fmt) ? ++fmt : fmt);
 }
 
 /*
@@ -327,7 +333,27 @@ char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params)
 }
 
 /*
-** Calculate the number of zeros for the precision.
+** Calculate the number of zeros for the precision:
+**     1) FL_PREC flag is set (if precision is given, '0' flag is ignored):
+**            nb = MAX(nb of digits, precision) - nb of digits;
+**  or
+**     2) FL_ZERO flag is set but not FL_MINUS ('-' flag overides '0' flag):
+**         a) type is signed ('d' or 'i'):
+**            nb = MAX(width - (nb of digits [+ 1 for sign symbol]), 0);
+**         b) type is prefixed ('x' or 'X'):
+**            nb = MAX(width - (nb of digits + 2), 0);
+**         c) type is 'o' or 'u':
+**            nb = MAX(width - nb_digits, 0);
+**     if:
+**         - type is 'o'
+**         - FL_HASH flag is set
+**         - nb of zeros to add equals to zero
+**         and
+**                - value is not equal to zero
+**            or  - value is zero
+**                - FL_PREC flag is set
+**                - precision equals zero
+**     then, +1 is added to force the increase of the precision.
 */
 
 int				get_nb_zeros_prec(int nb_digits, t_format *conv_params)
@@ -341,18 +367,19 @@ int				get_nb_zeros_prec(int nb_digits, t_format *conv_params)
 	{
 		if (is_signed_type(conv_params->type_char))
 			nb = (int)ft_max(conv_params->width
-					- (nb_digits
-						+ (((conv_params->is_neg)
+					- (nb_digits + ((conv_params->is_neg)
 							|| (conv_params->flags & FL_PLUS)
-							|| (conv_params->flags & FL_SPACE)) ? 1 : 0)), 0);
-		else if (ft_instr(conv_params->type_char, TYPE_PREFIX)
-				&& (conv_params->flags & FL_HASH))
-			nb = (int)ft_max(conv_params->width
-					- (nb_digits
-							+ ((conv_params->type_char == 'o') ? 1 : 2)), 0);
+							|| (conv_params->flags & FL_SPACE))), 0);
+		else if (has_prefix(conv_params))
+			nb = (int)ft_max(conv_params->width - (nb_digits + 2), 0);
 		else
 			nb = (int)ft_max(conv_params->width - nb_digits, 0);
 	}
+	if ((conv_params->type_char == 'o') && (conv_params->flags & FL_HASH)
+			&& !nb && (!(conv_params->flags & FL_NULL)
+				|| ((conv_params->flags & FL_NULL)
+					&& (conv_params->flags & FL_PREC) && !conv_params->prec)))
+		nb++;
 	return (nb);
 }
 
@@ -384,7 +411,12 @@ char			*prepend_prec(char **val_str, int nb_zeros_prec)
 }
 
 /*
-** Check if `val_str` should be prefixed with a sign symbol ('-', '+' or ' ').
+** Check if `val_str` should be prefixed with a sign symbol ('-', '+' or ' '):
+**  - type is 'd' or 'i',
+**		1) - the value is a negative number,
+**		   - at least one zero has been added for the precision/padding;
+**	or  2) - the value is a positive number,
+**         - either flag FL_PLUS ('+') or FL_SPACE (' ') is set.
 */
 
 int				has_sign(int nb_zeros_prec, t_format *conv_params)
@@ -411,15 +443,18 @@ char			*prepend_sign(char **val_str, t_format *conv_params)
 }
 
 /*
-** Check if `val_str` should have a prefix ('0', '0x' or '0X');
+** Check if `val_str` should have a prefix ('0x' or '0X'):
+**  - type has to be either ('x' or 'X'),
+**  - FL_HASH flag is set,
+**  - value is not zero.
 */
 
-int				has_prefix(int nb_zeros_prec, t_format *conv_params)
+int				has_prefix(t_format *conv_params)
 {
-	return (ft_instr(conv_params->type_char, TYPE_PREFIX)
-			&& conv_params->flags & FL_HASH
-			&& !(conv_params->flags & FL_NULL) 
-			&& !((conv_params->type_char == 'o') && nb_zeros_prec));
+	return ((conv_params->flags & FL_POINT)
+			|| (ft_instr(conv_params->type_char, TYPE_PREFIX)
+				&& conv_params->flags & FL_HASH
+				&& !(conv_params->flags & FL_NULL)));
 }
 
 /*
@@ -447,6 +482,9 @@ char			*add_padding(char **val_str, int padding, t_format *conv_params)
 {
 	if (conv_params->flags & FL_MINUS)
 		ft_strpad_right(val_str, ' ', padding);
+	else if (!is_num_type(conv_params->type_char)
+			&& (conv_params->flags & FL_ZERO))
+		ft_strpad_left(val_str, '0', padding);
 	else
 		ft_strpad_left(val_str, ' ', padding);
 	return (*val_str);
@@ -469,7 +507,7 @@ char			*format_int_str(char *val_str, t_format *conv_params)
 		prepend_prec(&val_str, nb_zeros_prec);
 	if (has_sign(nb_zeros_prec, conv_params))
 		prepend_sign(&val_str, conv_params);
-	if (has_prefix(nb_zeros_prec, conv_params))
+	if (has_prefix(conv_params))
 		prepend_prefix(&val_str, conv_params);
 	if ((padding = get_nb_padding(ft_strlen(val_str), conv_params->width)) > 0)
 		add_padding(&val_str, padding, conv_params);
@@ -597,6 +635,7 @@ void			add_to_buff(t_buf *binf, t_result *result,
 		while (len--)
 			binf->buf[(binf->i)++] = val_str[i++];
 	}
+	ft_strdel(&val_str);
 }
 
 void			init_variables(t_buf *binf, t_result *result)

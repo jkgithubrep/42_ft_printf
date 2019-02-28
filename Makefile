@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/27 13:16:22 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/28 17:07:00 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ INC_PATH =         includes
 INC_PATH_LFT =     $(SRC_PATH)/libft/includes
 OBJ_PATH =         .obj
 TEST_PATH =        tests
-TEST_SRC =         $(TEST_PATH)/main_test.c
+TEST_SRC =         $(TEST_PATH)/main_ft_printf_test.c
 TEST_PRINTF_SRC =  $(TEST_PATH)/printf_output_tests.c
 LFT_PATH =         libft/srcs
 LIB_PATH =         .
@@ -40,6 +40,11 @@ RMDIR =            rmdir -p
 AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
+ifeq ($(type), full)
+VALFLAGS =         --leak-check=full 
+else
+VALFLAGS =         
+endif
 CERRFLAGS =        -Wall -Wextra
 CFLAGS =           -g3 -Werror -Wall -Wextra
 CPPFLAGS =         -I$(INC_PATH) -I$(INC_PATH_LFT)
@@ -61,7 +66,8 @@ SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   str/ft_strcnew str/ft_strjoin str/ft_strcat str/ft_strcpy \
 				   print/ft_putendl print/ft_putendl_fd str/ft_strskip \
 				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
-				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat
+				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat char/ft_tolower \
+				   char/ft_isupper
 SRC_NAME =     	   ft_printf utils dbg_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
@@ -104,6 +110,11 @@ $(TEST): all
 	$(QUIET) $(CC) $(CFLAGS) $(CPPFLAGS) $(TEST_SRC) $(LIBFLAGS) -o $@
 	$(ECHO) "Launching tests..."
 	$(QUIET) ./$@
+
+.PHONY: valgrind
+valgrind: test
+	$(ECHO) "Launching valgrind on $(WARN_COLOR)$(TEST)$(NC)"
+	$(QUIET) valgrind $(VALFLAGS) ./$(TEST)
 
 .PHONY: printf_test
 printf_test: $(TEST_PRINTF)

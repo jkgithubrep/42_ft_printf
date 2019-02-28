@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/27 17:38:35 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/28 15:08:40 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,12 +71,12 @@ typedef union				u_dbls{
 ** Length modifiers j and z not handled
 */
 
-# define TYPES             "diuoxXfeEgGaAcsp"
+# define TYPES             "dDiuUoOxXfeEgGaAcsp"
 # define SIGNED_TYPES      "di"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
 # define NUM_TYPES         "douxXi"
-# define TYPE_PREFIX       "oxX"
+# define TYPE_PREFIX       "xX"
 
 /*
 ** DOLLAR and ASTERISK unused.
@@ -116,7 +116,8 @@ enum				e_flags{
 	FL_PREC = 0x20,
 	FL_WIDTH = 0x40,
 	FL_NULL = 0x80,
-	FL_ERR = 0x100,
+	FL_POINT = 0x100,
+	FL_ERR = 0x200,
 };
 
 typedef enum		e_len_modifs{
