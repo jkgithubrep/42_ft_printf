@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/28 17:07:00 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/28 17:30:37 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -107,7 +107,7 @@ test: $(TEST)
 .PHONY: $(TEST)
 $(TEST): all
 	$(ECHO) "Compiling $(WARN_COLOR)$@$(NC)..."
-	$(QUIET) $(CC) $(CFLAGS) $(CPPFLAGS) $(TEST_SRC) $(LIBFLAGS) -o $@
+	$(QUIET) $(CC) $(CERRFLAGS) $(CPPFLAGS) $(TEST_SRC) $(LIBFLAGS) -o $@
 	$(ECHO) "Launching tests..."
 	$(QUIET) ./$@
 

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/28 17:24:26 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/28 17:56:30 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,86 +16,10 @@
 #include <stdio.h>
 
 /*
-** Check if char argument c is a conversion specifier (or type).
-** Return value: returns zero if c is not a conversion specifier and non-zero
-**               if the character tests true.
-*/
-
-int				is_type(const char c)
-{
-	return (ft_instr(c, TYPES));
-}
-
-/*
-** Check if char argument c is a flag.
-** Return value: returns zero if c is not a flag and non-zero
-**               if the character tests true.
-*/
-
-int				is_flag(const char c)
-{
-	return (ft_instr(c, FLAGS));
-}
-
-/*
-** Check if char argument c is a length modifier.
-** Return value: returns zero if c is not a length modifier and non-zero
-**               if the character tests true.
-*/
-
-int				is_len_modif(const char c)
-{
-	return (ft_instr(c, LEN_MODIFS));
-}
-
-/*
-** Check if char argument c is a signed type.
-** Return value: returns zero if c is not a signed type and non-zero if the
-**               character tests true.
-*/
-
-int				is_signed_type(const char c)
-{
-	return (ft_instr(c, SIGNED_TYPES));
-}
-
-/*
-** Check if char argument c is a numeric type.
-** Return value: returns zero if c is not a numeric type  and non-zero if
-**               character tests true.
-*/
-
-int				is_num_type(const char c)
-{
-	return (ft_instr(c, NUM_TYPES));
-}
-
-/*
-** Save int value either as a precision or a width depending on the value
-** of the flag FL_PREC.
-*/
-
-void			save_int_value(int int_value, t_format *conv_params)
-{
-	if (conv_params->flags & FL_PREC)
-		conv_params->prec = int_value;
-	else
-		conv_params->width = int_value;
-}
-
-/*
-** Skip digits in the string given as argument.
-** Return a pointer to the next non-digit char.
-*/
-
-const char		*skip_digits(const char *fmt)
-{
-	return (ft_strskip(fmt, &ft_isdigit));
-}
-
-/*
 ** Take a string starting with a digit as argument, extract the number as an int
 ** and return pointer to next non-digit character in the string.
+** Int value either is saved as a precision or a width depending on the value
+** of the flag FL_PREC.
 */
 
 const char		*save_value_skip_digits(const char *fmt, t_format *conv_params)
@@ -103,8 +27,11 @@ const char		*save_value_skip_digits(const char *fmt, t_format *conv_params)
 	int		int_value;
 
 	int_value = ft_atoi(fmt);
-	save_int_value(int_value, conv_params);
-	fmt = skip_digits(fmt);
+	if (conv_params->flags & FL_PREC)
+		conv_params->prec = int_value;
+	else
+		conv_params->width = int_value;
+	fmt = ft_strskip(fmt, &ft_isdigit);
 	return (fmt);
 }
 
@@ -163,7 +90,7 @@ void			save_type(const char c, t_format *conv_params)
 	}
 	else
 		conv_params->type_char = c;
-	conv_params->is_signed = (is_signed_type(conv_params->type_char)) ?
+	conv_params->is_signed = (ft_instr(conv_params->type_char, SIGNED_TYPES)) ?
 															SIGNED : UNSIGNED;
 }
 
@@ -185,9 +112,9 @@ const char		*parse_conv_spec(const char *fmt, t_format *conv_params)
 			if (ft_isdigit(*(fmt + 1)))
 				fmt = save_value_skip_digits(fmt + 1, conv_params) - 1;
 		}
-		else if (is_flag(*fmt))
+		else if (ft_instr(*fmt, FLAGS))
 			save_flag(*fmt, conv_params);
-		else if (is_len_modif(*fmt))
+		else if (ft_instr(*fmt, LEN_MODIFS))
 			save_len_modif(fmt, conv_params);
 		else
 		{
@@ -365,7 +292,7 @@ int				get_nb_zeros_prec(int nb_digits, t_format *conv_params)
 		nb = (int)ft_max(nb_digits, conv_params->prec) - nb_digits;
 	else if ((conv_params->flags & FL_ZERO) && !(conv_params->flags & FL_MINUS))
 	{
-		if (is_signed_type(conv_params->type_char))
+		if (ft_instr(conv_params->type_char, SIGNED_TYPES))
 			nb = (int)ft_max(conv_params->width
 					- (nb_digits + ((conv_params->is_neg)
 							|| (conv_params->flags & FL_PLUS)
@@ -421,7 +348,7 @@ char			*prepend_prec(char **val_str, int nb_zeros_prec)
 
 int				has_sign(int nb_zeros_prec, t_format *conv_params)
 {
-	return (is_signed_type(conv_params->type_char)
+	return (ft_instr(conv_params->type_char, SIGNED_TYPES)
 				&& ((conv_params->is_neg && nb_zeros_prec)
 					|| (!conv_params->is_neg && ((conv_params->flags & FL_PLUS)
 						|| (conv_params->flags & FL_SPACE)))));
@@ -482,7 +409,7 @@ char			*add_padding(char **val_str, int padding, t_format *conv_params)
 {
 	if (conv_params->flags & FL_MINUS)
 		ft_strpad_right(val_str, ' ', padding);
-	else if (!is_num_type(conv_params->type_char)
+	else if (!ft_instr(conv_params->type_char, NUM_TYPES)
 			&& (conv_params->flags & FL_ZERO))
 		ft_strpad_left(val_str, '0', padding);
 	else
@@ -585,7 +512,7 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	char		*val_str;
 
 	val_str = NULL;
-	if (is_num_type(conv_params->type_char))
+	if (ft_instr(conv_params->type_char, NUM_TYPES))
 		val_str = get_formatted_str_int(conv_params, args);
 	else if (conv_params->type_char == 'c' || conv_params->flags & FL_ERR)
 		val_str = get_formatted_str_char(conv_params, args);

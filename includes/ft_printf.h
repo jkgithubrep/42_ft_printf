@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/28 15:08:40 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/28 18:03:08 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ typedef union				u_dbls{
 }							t_dbls;
 
 # define EXIT_FAIL          -1
-# define BUF_SIZE			1
+# define BUF_SIZE			4096
 
 /*
 ** Length modifiers j and z not handled
@@ -102,12 +102,12 @@ typedef union				u_dbls{
 # define PREF_L_HEX        "0x"
 # define PREF_U_HEX        "0X"
 
-typedef enum		e_sign_type{
+typedef enum				e_sign_type{
 	UNSIGNED = 0x0,
 	SIGNED = 0x1,
-}					t_sign_type;
+}							t_sign_type;
 
-enum				e_flags{
+enum						e_flags{
 	FL_MINUS = 0x1,
 	FL_PLUS = 0x2,
 	FL_SPACE = 0x4,
@@ -120,7 +120,7 @@ enum				e_flags{
 	FL_ERR = 0x200,
 };
 
-typedef enum		e_len_modifs{
+typedef enum				e_len_modifs{
 	LEN_MOD_HH,
 	LEN_MOD_H,
 	LEN_MOD_L,
@@ -129,70 +129,40 @@ typedef enum		e_len_modifs{
 	LEN_MOD_J,
 	LEN_MOD_Z,
 	LEN_MOD_NA
-}					t_len_modifs;
+}							t_len_modifs;
 
-typedef struct		s_format{
-	char 			type_char;
-	int				is_neg;
-	int				prec;
-	int				width;
-	t_uint			flags;
-	t_len_modifs	len_mod;
-	t_sign_type     is_signed;
-}					t_format;
+typedef struct				s_format{
+	char					type_char;
+	int						is_neg;
+	int						prec;
+	int						width;
+	t_uint					flags;
+	t_len_modifs			len_mod;
+	t_sign_type				is_signed;
+}							t_format;
 
-typedef struct		s_result{
-	char			*str;
-	int				count;
-}					t_result;
+typedef struct				s_work{
+	char					*final_str;
+	char					buf[BUF_SIZE];
+	int						count;
+	int						i;
+}							t_work;
 
-typedef struct		s_buf{
-	char			buf[BUF_SIZE];
-	int				i;
-}					t_buf;
+typedef struct				s_result{
+	char					*str;
+	int						count;
+}							t_result;
 
-int					ft_printf(const char *fmt, ...);
-int					ft_dprintf(int d, const char *fmt, ...);
-int					ft_asprintf(char **str, const char *fmt, ...);
-int					ft_vdprintf(int d, const char *fmt, va_list args);
-int					ft_vasprintf(char **str, const char *fmt, va_list args);
+typedef struct				s_buf{
+	char					buf[BUF_SIZE];
+	int						i;
+}							t_buf;
 
-/*
-** INTEGER CONVERSION:
-** minus ('-'): Left-justify the result in the field.
-** plus ('+'):  For signed %d and %i conversions, print a plus sign if the value
-**              is positive.
-** space (' '): For signed %d and %i conversions, if the result does not start
-**              with a plus or minus sign, prefix it with a space instead.
-**              Flag ignored if '+' flag also supplied.
-** hash ('#'):  For the '%o' conversion, forces the leading digit to be '0'
-**              as if by increasing the precision.
-**              For '%x' or '%X', prefixes a leading '0x' or '0X' to the
-**              result.
-**              Does not do anything for '%d', '%i' or '%u'.
-** zero ('0'):  Pad the field with zeros instead of spaces.
-**              The zeros are placed after any indication of sign or base.
-**              Flag ignored if '-' flag also specified, or if a precision
-**              is specified.
-*/
-
-/*
-** List of the conversion specifiers expected to end a conversion specification:
-**  - d, i: int converted to signed decimal notation;
-**  - o, u, x, X: unsigned int converted to octal (o), unsigned decimal (u),
-**    or unsigned hexadecimal (x, X);
-**  - e, E: double argument rounded and converted in the style [-]d.ddde+/-dd
-**          (exponential notation);
-**  - f: double argument rounded and converted in the style [-]ddd.ddd
-**       (fixed-point) notation;
-**  - g, G: double argument converted in the style of f or e (or E for G conver-
-**          sions);
-**  - a, A: double argument converted to hexadecimal notation in the style
-**          [-]0xh.hhhp+/-dd (0X for A conversions);
-**  - c: int argument converted to an unsigned char;
-**  - s: const char * argument (string) is printed;
-**  - p: void * pointer argument printed in hexadecimal;
-**  - %: a '%' is written, no argument is converted.
-*/
+int							ft_printf(const char *fmt, ...);
+int							ft_dprintf(int d, const char *fmt, ...);
+int							ft_asprintf(char **str, const char *fmt, ...);
+int							ft_vdprintf(int d, const char *fmt, va_list args);
+int							ft_vasprintf(char **str, const char *fmt,
+																va_list args);
 
 #endif

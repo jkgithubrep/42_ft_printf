@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/26 14:13:22 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/28 17:53:38 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,8 +61,6 @@ READ_FMT_SRC_NAME =     00_launcher 01_test_type_only \
 						06_test_hard_valid
 ASPRINTF_SRC_NAME =     00_launcher 01_basic_test
 SRC_NAME =              main \
-                        $(addprefix is_type/, $(IS_CONV_SPEC_SRC_NAME)) \
-                        $(addprefix read_fmt/, $(READ_FMT_SRC_NAME)) \
                         $(addprefix asprintf/, $(ASPRINTF_SRC_NAME))
 SRC =                   $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =                   $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
