@@ -1,21 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   02_test_i.c                                        :+:      :+:    :+:   */
+/*   00_launcher.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/21 15:27:17 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/22 21:12:38 by jkettani         ###   ########.fr       */
+/*   Created: 2019/01/21 15:59:47 by jkettani          #+#    #+#             */
+/*   Updated: 2019/03/01 18:48:48 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.h"
+#include <stdio.h>
+#include "libunit.h"
+#include "ft_printf.h"
+#include "printf.h"
 
-int		is_conv_spec_test_i(void)
+int					printf_launcher(void)
 {
-	if (is_type('i'))
-		return (0);
-	else
-		return (-1);
+	t_unit_test 	*test_list;
+	int				err;
+	int				fd;
+
+	err = 0;
+	fd = 1;
+	test_list = NULL;
+	print_fct_name_fd("ASPRINTF", fd);
+	if ((err = load_test(&test_list, "Basic test", 
+						&asprintf_basic_test, SUCCESS)))
+		print_error_fd(err, fd);
+	return (launch_tests(&test_list, fd));
 }

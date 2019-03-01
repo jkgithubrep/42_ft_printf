@@ -1,21 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   01_test_d.c                                        :+:      :+:    :+:   */
+/*   main_test.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/21 15:22:55 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/22 21:12:23 by jkettani         ###   ########.fr       */
+/*   Created: 2019/01/18 12:28:29 by jkettani          #+#    #+#             */
+/*   Updated: 2019/03/01 13:53:22 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.h"
+#include <math.h>
+#include <stdio.h>
 
-int		is_conv_spec_test_d(void)
+int		main(int ac, char **av)
 {
-	if (is_type('d'))
-		return (0);
-	else
-		return (-1);
+	double	dbl;
+	int		nb;
+
+	(void)ac;
+	(void)av;
+	dbl = 0.002;
+	nb = (int)floor(log10(dbl));
+
+	printf("%d\n", nb);
+	return (0);
 }

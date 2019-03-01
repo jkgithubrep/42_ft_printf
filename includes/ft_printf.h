@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/28 18:03:08 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/01 18:48:16 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdint.h>
 # include <stdlib.h>
 # include <sys/types.h>
+# include "utils.h"
 
 /*
 ** Typedefs
