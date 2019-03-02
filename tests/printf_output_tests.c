@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/08 15:09:36 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/02/16 16:30:00 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,14 @@
 #define YELLOW "\x1b[33m"
 #define BLUE "\x1b[34m"
 #define MAGENTA "\x1b[35m"
+//#define BOLD ""
+//#define UNDERLINE ""
+//#define NC ""
+//#define RED ""
+//#define GREEN ""
+//#define YELLOW ""
+//#define BLUE ""
+//#define MAGENTA ""
 #define PRINTF_TEST do { \
 					int		ret;\
 					printf(" > %s (", desc);\
@@ -110,8 +118,11 @@ void	test_type_int(void)
 	print_h1("TYPE: INT (%d | %i)");
 	print_h2("=> Valid format:");
 	test_int("Zero", "%d", "0", 0);
-	test_int("Zero + . precision", "%.d", "0", 0);
-	test_int("Zero + .3 precision", "%.3d", "0", 0);
+	test_int("Minus zero", "%d", "-0", -0);
+	test_int("Minus zero + '+' flag", "%+d", "0", 0);
+	test_int("Minus zero + '+' flag + '.' precision", "%+.d", "0", 0);
+	test_int("Zero + '.' precision", "%.d", "0", 0);
+	test_int("Zero + '.3' precision", "%.3d", "0", 0);
 	test_int("Random int", "%d", "42", 42);
 //	test_int("Random int + 'INT_MAX + 1' width", "%2147483648d", "42", 42);
 //	test_int("Random int + 'INT_MAX + 1' precision", "%.2147483648d", "42", 42);
@@ -454,6 +465,7 @@ int		main(int ac, char **av)
 		printf("%s\n", "Wrong number of arguments, 0 or 1 expected");
 	}
 	printf("\n");
-	printf("|%.100f|\n", 1.F/0.F);
+	printf("|%f|\n", 10e3082);
+	printf("|%lu|\n", sizeof(double) * 8);
 	return (0);
 }
