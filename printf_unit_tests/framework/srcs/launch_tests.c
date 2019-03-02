@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 18:42:36 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/25 11:36:40 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/02 15:54:54 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,14 @@
 #include <errno.h>
 #include "libunit.h"
 #include "print.h"
-#include "print_util.h"
 #include "error.h"
 
-static void				reset_stats(t_stats *stats)
-{
-	stats->test_ret = 0;
-	stats->status = 0;
-	stats->count_success = 0;
-	stats->count_tests = 0;
-}
+/*
+** Create a new child process, launch the unit test and catch the exit status of
+** the test or a signal in the parent process.
+*/
 
-static int				launch_unit_test(t_unit_test *test, t_stats *stats, int fd)
+static int				launch_unit_test(t_unit_test *test, t_stats *stats)
 {
 	pid_t	pid;
 
@@ -47,12 +43,15 @@ static int				launch_unit_test(t_unit_test *test, t_stats *stats, int fd)
 			stats->status = WTERMSIG(stats->status);
 		else
 			return (EUSIG);
-		print_test_result_fd(test, stats, fd);
 	}
 	else if (pid == -1)
 		return (errno);
 	return (0);
 }
+
+/*
+** Delete a node in the list of tests and return a pointer on the next one.
+*/
 
 static t_unit_test		*del_test_next(t_unit_test *test)
 {
@@ -63,6 +62,10 @@ static t_unit_test		*del_test_next(t_unit_test *test)
 	return (next);
 }
 
+/*
+** Delete the entire list of tests.
+*/
+
 static void				del_list(t_unit_test **test_list)
 {
 	if (!test_list)
@@ -71,24 +74,38 @@ static void				del_list(t_unit_test **test_list)
 		*test_list = del_test_next(*test_list);
 }
 
+/*
+** Launch each unit test stored in `test_list' in a new process, get its return
+** value, and print the result accordingly.
+** When each unit test has been launched, print the number of successful tests,
+** and return 0 if all tests were sucessful, otherwise return -1.
+*/
+
 int						launch_tests(t_unit_test **test_list, int fd)
 {
 	t_unit_test		*test;
 	t_stats			stats;
 	int				err;
+	int				fd_trace;
 
 	if (!test_list)
 		return (ENULL);
-	reset_stats(&stats);
-	fd = 1;
+	stats = (t_stats){0};
 	test = *test_list;
+	fd_trace = get_fd(TRACE_FILE, OUTPUT_MODE, OP_APPEND);
 	while (test)
 	{
-		if ((err = launch_unit_test(test, &stats, fd)))
+		print_test_name_fd(test->test_name, fd);
+		if (fd_trace != fd)
+			print_test_name_trace_fd(test->test_name, fd_trace);
+		if ((err = launch_unit_test(test, &stats)))
 		{
 			del_list(&test);
 			return (err);
 		}
+		print_test_result_fd(test, &stats, fd);
+		if (fd_trace != fd)
+			print_test_result_no_color_fd(test, &stats, fd_trace);
 		test = del_test_next(test);
 	}
 	print_final_fd(&stats, fd);
