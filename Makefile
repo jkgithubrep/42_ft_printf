@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/08 12:38:27 by jkettani         ###   ########.fr        #
+#    Updated: 2019/02/28 17:30:37 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ INC_PATH =         includes
 INC_PATH_LFT =     $(SRC_PATH)/libft/includes
 OBJ_PATH =         .obj
 TEST_PATH =        tests
-TEST_SRC =         $(TEST_PATH)/main_test.c
+TEST_SRC =         $(TEST_PATH)/main_ft_printf_test.c
 TEST_PRINTF_SRC =  $(TEST_PATH)/printf_output_tests.c
 LFT_PATH =         libft/srcs
 LIB_PATH =         .
@@ -40,8 +40,13 @@ RMDIR =            rmdir -p
 AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
+ifeq ($(type), full)
+VALFLAGS =         --leak-check=full 
+else
+VALFLAGS =         
+endif
 CERRFLAGS =        -Wall -Wextra
-CFLAGS =           -Werror -Wall -Wextra
+CFLAGS =           -g3 -Werror -Wall -Wextra
 CPPFLAGS =         -I$(INC_PATH) -I$(INC_PATH_LFT)
 DEPFLAGS =         -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 LIBFLAGS =         -L$(LIB_PATH) -lftprintf
@@ -50,8 +55,20 @@ POSTCOMPILE =      @mv -f $(OBJ_PATH)/$*.Td $(OBJ_PATH)/$*.d && touch $@
 SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   print/ft_putstr_fd str/ft_strlen print/ft_putnbr \
 				   print/ft_putnbr_fd print/ft_putchar_fd \
-				   print/ft_print_bytes print/ft_putchar print/ft_putnbr_base
-SRC_NAME =     	   ft_printf \
+				   print/ft_print_bytes print/ft_putchar print/ft_putnbr_base \
+				   str/ft_strchr str/ft_instr convert/ft_atoi \
+				   char/ft_isdigit char/ft_isspace convert/ft_digits_base \
+				   convert/ft_udigits_base convert/ft_imaxtoa_base \
+				   convert/ft_uimaxtoa_base str/ft_strnew mem/ft_bzero \
+				   mem/ft_memset convert/ft_is_valid_base char/ft_isprint \
+				   char/ft_issign math/ft_max str/ft_strpad_left \
+				   str/ft_strpad_right str/ft_strprepend str/ft_strappend \
+				   str/ft_strcnew str/ft_strjoin str/ft_strcat str/ft_strcpy \
+				   print/ft_putendl print/ft_putendl_fd str/ft_strskip \
+				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
+				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat char/ft_tolower \
+				   char/ft_isupper
+SRC_NAME =     	   ft_printf utils dbg_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
@@ -90,9 +107,14 @@ test: $(TEST)
 .PHONY: $(TEST)
 $(TEST): all
 	$(ECHO) "Compiling $(WARN_COLOR)$@$(NC)..."
-	$(QUIET) $(CC) $(CFLAGS) $(CPPFLAGS) $(TEST_SRC) $(LIBFLAGS) -o $@
+	$(QUIET) $(CC) $(CERRFLAGS) $(CPPFLAGS) $(TEST_SRC) $(LIBFLAGS) -o $@
 	$(ECHO) "Launching tests..."
 	$(QUIET) ./$@
+
+.PHONY: valgrind
+valgrind: test
+	$(ECHO) "Launching valgrind on $(WARN_COLOR)$(TEST)$(NC)"
+	$(QUIET) valgrind $(VALFLAGS) ./$(TEST)
 
 .PHONY: printf_test
 printf_test: $(TEST_PRINTF)

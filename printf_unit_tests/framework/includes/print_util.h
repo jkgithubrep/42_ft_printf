@@ -1,19 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_test.c                                        :+:      :+:    :+:   */
+/*   print_util.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/18 12:28:29 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/18 17:31:15 by jkettani         ###   ########.fr       */
+/*   Created: 2018/12/01 23:23:12 by jkettani          #+#    #+#             */
+/*   Updated: 2018/12/02 16:11:00 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int		main(int ac, char **av)
-{
-	(void)ac;
-	(void)av;
+#ifndef PRINT_UTIL_H
+# define PRINT_UTIL_H
 
-	return (0);
-}
+void		putchar_fd(char c, int fd);
+void		putstr_fd(char const *str, int fd);
+void		putendl_fd(char const *s, int fd);
+void		putnbr_fd(int n, int fd);
+
+#endif

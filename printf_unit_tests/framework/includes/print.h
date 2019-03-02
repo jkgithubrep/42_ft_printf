@@ -1,19 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_test.c                                        :+:      :+:    :+:   */
+/*   print.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/18 12:28:29 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/18 17:31:15 by jkettani         ###   ########.fr       */
+/*   Created: 2018/12/01 23:27:01 by jkettani          #+#    #+#             */
+/*   Updated: 2019/01/25 17:53:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int		main(int ac, char **av)
-{
-	(void)ac;
-	(void)av;
+#ifndef PRINT_H
+# define PRINT_H
 
-	return (0);
-}
+void		print_error_fd(int err, int fd);
+void		print_test_result_fd(t_unit_test *test, t_stats *stats, int fd);
+void		print_final_fd(t_stats *stats, int fd);
+void		print_fct_name_fd(char *fct_name, int fd);
+
+#endif

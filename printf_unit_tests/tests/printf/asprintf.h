@@ -1,19 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_test.c                                        :+:      :+:    :+:   */
+/*   asprintf.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/18 12:28:29 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/18 17:31:15 by jkettani         ###   ########.fr       */
+/*   Created: 2019/02/23 19:25:01 by jkettani          #+#    #+#             */
+/*   Updated: 2019/02/23 19:25:29 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int		main(int ac, char **av)
-{
-	(void)ac;
-	(void)av;
+#ifndef ASPRINTF
+# define ASPRINTF
 
-	return (0);
-}
+int		asprintf_basic_test(void);
+
+# endif
