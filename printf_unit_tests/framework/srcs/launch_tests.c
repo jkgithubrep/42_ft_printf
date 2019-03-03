@@ -6,17 +6,28 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 18:42:36 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/02 15:54:54 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/03 15:35:04 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+/*
+** Includes:
+**   - libunit.h: t_unit_test, t_stats, TIMEOUT
+**   - print.h: print functions
+**   - error.h: user defined errors (EUSIG, ENULL)
+**   - unistd.h: fork, alarm
+**   - stdlib.h: free
+**   - sys/wait.h: wait
+**   - errno.h: errno
+*/
+
+#include "libunit.h"
+#include "print.h"
+#include "error.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include "libunit.h"
-#include "print.h"
-#include "error.h"
 
 /*
 ** Create a new child process, launch the unit test and catch the exit status of

@@ -6,14 +6,22 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 14:59:57 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/25 11:32:02 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/03 15:36:41 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <errno.h>
+/*
+** Includes:
+**   - libunit.h: t_unit_test
+**   - error.h: user defined errors (EUSIG, ENULL)
+**   - stdlib.h: malloc
+**   - errno.h: errno
+*/
+
 #include "libunit.h"
 #include "error.h"
+#include <stdlib.h>
+#include <errno.h>
 
 static int				create_test(t_unit_test **test, char *test_name, 
 							int (*test_fct)(void), int exp_ret)

@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/12/01 13:30:57 by jkettani          #+#    #+#              #
-#    Updated: 2019/01/22 14:55:32 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/03 15:14:51 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,12 +32,12 @@ RMDIR =         rmdir -p
 AR =            ar
 ARFLAGS =       -rcs
 CC =            gcc
-CFLAGS =        -Werror -Wall -Wextra
+CFLAGS =        -g3 -Werror -Wall -Wextra
 CPPFLAGS =      -I$(INCLUDE_PATH) 
 COMPILE.c =     $(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c
 DEPFLAGS =      -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 POSTCOMPILE =   mv -f $(OBJ_PATH)/$*.Td $(OBJ_PATH)/$*.d && touch $@
-SRC_NAME =	    load_test launch_tests print
+SRC_NAME =	    load_test launch_tests print print_trace utils stdout_utils
 SRC =           $(addprefix $(SRC_PATH)/,$(addsuffix .c, $(SRC_NAME)))
 OBJ =           $(addprefix $(OBJ_PATH)/,$(SRC:.c=.o))
 DEP =           $(addprefix $(OBJ_PATH)/,$(SRC:.c=.d))

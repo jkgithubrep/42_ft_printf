@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 14:47:30 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/02 16:56:36 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/03 14:26:51 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 ** Parameters
 */
 
+# define BUF_SIZE 4096
 # define TIMEOUT 2
 # define OUTPUT_MODE M_FILE
 # define TRACE_FILE "trace.txt"
@@ -97,12 +98,13 @@ int							load_test(t_unit_test **test_list, char *test_name,
 										int (*test_fct)(void), int exp_ret);
 int							launch_tests(t_unit_test **test_list, int fd);
 void						print_error_fd(int err, int fd);
-void						print_header_fd(int fd);
-void						print_trace_header_fd(int fd);
 void						print_fct_name_fd(char *fct_name, int fd);
+void						print_trace_header_fd(int fd);
 void						print_fct_name_trace_fd(char *fct_name, int fd);
-void						print_test_name_fd(char *test_name, int fd);
 int							get_fd(const char *path, t_output_mode output_mode,
 									t_open_mode open_mode);
+int							pipe_stdout(int *pfd, int *save_out);
+int							read_pipe(char **str, int *ret, int *pfd, 
+																int *save_out);
 
 #endif
