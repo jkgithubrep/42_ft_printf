@@ -16,8 +16,11 @@ TMPL_TEST_FILE_NAME=XXX_test_template.c
 TMPL_TEST=$TMPL_FOLDER_PATH/$TMPL_TEST_FILE_NAME
 TMPL_HEADER_FILE_NAME=header_template.h
 TMPL_HEADER=$TMPL_FOLDER_PATH/$TMPL_HEADER_FILE_NAME
-TESTS_FILE="tests.txt"
-BAK_FOLDER="backup"
+TMPL_MAIN_FILE_NAME=main_template.h
+TMPL_MAIN=$TMPL_FOLDER_PATH/$TMPL_MAIN_FILE_NAME
+MAKEFILE_FILE=file_paths;
+TESTS_FILE=tests.txt
+BAK_FOLDER=backup
 
 # Print error message
 print_err(){
@@ -155,13 +158,31 @@ add_prototypes(){
 	mv ${fct_name}/${fct_name}_tmp.h ${fct_name}/${fct_name}.h
 }
 
+save_file_path(){
+	local fct_name="$1"
+	local file_name="$2"
+	echo "Adding ${BLUE}${fct_name}/${file_name}${NC} to ${BLUE}${MAKEFILE_FILE}${NC}..."
+	echo "${fct_name}/${file_name} \\" >> $MAKEFILE_FILE
+}
+
+add_fct_in_main(){
+	local fct_name="$1"
+	sed -e "s/\/\*FCTS_HERE\*\//{\"${fct_name}\", ${fct_name}_launcher},"$'\\\n\\\t'"&/" -e "s/\/\*PROTOTYPES_HERE\*\//int"$'\\\t'"${fct_name}_launcher(void);"$'\\\n'"&/" main.h > main_tmp.h
+	rm -f main.h
+	mv main_tmp.h main.h
+}
+
 generate_tests(){
 	local fcts=`cat $TESTS_FILE | cut -d';' -f1 | sort | uniq`
+	printf "" > ${MAKEFILE_FILE}
+	cp ${TMPL_MAIN} ./main.h
 	for fct in $fcts
 	do
 		create_folder $fct
 		add_template_to_folder $fct
 		replace_fct_name $fct
+		save_file_path "$fct" "000_launcher"
+		add_fct_in_main "$fct"
 		tests=`grep -w $fct tests.txt | cut -d';' -f2 | sort | uniq`
 		local index=0
 		for test_fct in $tests
@@ -171,9 +192,13 @@ generate_tests(){
 			create_test "$fct" "$test_fct" "$test_name" "$index_pref"
 			add_prototypes "$fct" "$test_fct"
 			load_test "$fct" "$test_fct" "$test_name"
+			save_file_path "$fct" "${index_pref}_${test_fct}"
 			((index++))
 		done
 	done
+	sed -e "1s/^/SRC_NAME += /" -e "$ s/ \\\//" ${MAKEFILE_FILE} > ${MAKEFILE_FILE}_tmp
+	rm -rf ${MAKEFILE_FILE}
+	mv ${MAKEFILE_FILE}_tmp ${MAKEFILE_FILE}
 }
 
 clean_tests(){

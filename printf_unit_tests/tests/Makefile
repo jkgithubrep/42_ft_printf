@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/04 11:19:51 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/04 19:16:14 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,12 +55,14 @@ COMPILE.c =             $(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c
 DEPFLAGS =              -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 POSTCOMPILE =           @mv -f $(OBJ_PATH)/$*.Td $(OBJ_PATH)/$*.d && touch $@
 PRINTF_SRC_NAME =       00_launcher 01_basic_test
-SRC_NAME =              main tests\
-                        $(addprefix printf/, $(PRINTF_SRC_NAME))
+SRC_NAME =              main tests
+-include file_paths
+#                        $(addprefix printf/, $(PRINTF_SRC_NAME))
 SRC =                   $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =                   $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
 DEP =                   $(addprefix $(OBJ_PATH)/, $(SRC:.c=.d))
 OBJ_TREE =              $(shell find $(OBJ_PATH) -type d -print 2> /dev/null)
+
 
 .SUFFIXES:
 .SUFFIXES: .c .o .h
@@ -69,6 +71,10 @@ OBJ_TREE =              $(shell find $(OBJ_PATH) -type d -print 2> /dev/null)
 
 .PHONY: all
 all: $(NAME)
+
+.PHONY: dbg
+dbg:
+	echo $(SRC)
 
 .PRECIOUS: $(OBJ_PATH)%/. $(OBJ_PATH)/.
 $(OBJ_PATH)/. $(OBJ_PATH)%/.: 
@@ -131,3 +137,4 @@ re: fclean all
 
 .PRECIOUS: $(OBJ_PATH)/%.d
 -include $(DEP)
+

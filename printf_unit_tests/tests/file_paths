@@ -1,0 +1,6 @@
+SRC_NAME += conv_d/000_launcher \
+conv_d/000_zero \
+conv_d/001_zero_dot_only_precision \
+conv_o/000_launcher \
+conv_o/000_zero \
+conv_o/001_zero_dot_only_precision

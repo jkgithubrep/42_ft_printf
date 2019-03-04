@@ -9,7 +9,7 @@
 
 int		TMPL_FCT_NAME_TMPL_TEST_FCT_NAME(void)
 {
-	t_test_rslt	*test_rslt;
+	t_test_rslt	test_rslt;
 	int			pfd[2];
 	int			nbytes_read;
 	int			ret_value;
@@ -17,7 +17,7 @@ int		TMPL_FCT_NAME_TMPL_TEST_FCT_NAME(void)
 	int			err;
 	int			fd_trace;
 
-	test_rslt = {NULL, NULL, 0, 0};
+	test_rslt = (t_test_rslt){NULL, NULL, 0, 0};
 	fd_trace = get_fd(TRACE_FILE, OUTPUT_MODE, OP_APPEND);
 	if ((err = pipe_stdout(pfd, &save_out)))
 		return (free_result(&test_rslt, err));
