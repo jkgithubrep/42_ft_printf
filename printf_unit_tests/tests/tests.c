@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/03 16:37:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/03 16:51:56 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/04 11:30:00 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void		print_test_result_values_trace(t_result *result, int fd_trace)
+void		print_header_fd(int fd)
 {
-	dprintf(fd_trace, "expected: |%s|, ret = %d\n", result->ref_str,
-				result->ref_ret);
-	dprintf(fd_trace, "actual: |%s|, ret = %d\n", result->user_str,
-				result->user_ret);
+ dprintf(fd, " ____       _       _    __   _            _       \n");
+ dprintf(fd, "|  _ \\ _ __(_)_ __ | |_ / _| | |_ ___  ___| |_ ___ \n");
+ dprintf(fd, "| |_) | '__| | '_ \\| __| |_  | __/ _ \\/ __| __/ __|\n");
+ dprintf(fd, "|  __/| |  | | | | | |_|  _| | ||  __/\\__ \\ |_\\__ \\\n");
+ dprintf(fd, "|_|   |_|  |_|_| |_|\\__|_|    \\__\\___||___/\\__|___/\n\n");
+
+ dprintf(fd, "     by: jkettani\n\n");
 }
 
-void		free_result(t_result *result)
+void		print_test_result_values_trace(t_test_rslt *test_rslt, int fd_trace)
 {
-	free(result.user_str);
-	free(result.ref_str);
+	dprintf(fd_trace, "  > expected: |%s|, ret = %d\n", test_rslt->ref_str,
+				test_rslt->ref_ret);
+	dprintf(fd_trace, "  > actual: |%s|, ret = %d\n", test_rslt->user_str,
+				test_rslt->user_ret);
+}
+
+int			free_result(t_test_rslt *test_rslt, int ret_value)
+{
+	if (test_rslt->user_str)
+		free(test_rslt->user_str);
+	if (test_rslt->ref_str)
+		free(test_rslt->ref_str);
+	return (ret_value);
 }

@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   asprintf.h                                         :+:      :+:    :+:   */
+/*   printf.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/23 19:25:01 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/23 19:25:29 by jkettani         ###   ########.fr       */
+/*   Created: 2019/03/04 10:08:56 by jkettani          #+#    #+#             */
+/*   Updated: 2019/03/04 10:09:11 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ASPRINTF
-# define ASPRINTF
+#ifndef PRINTF_H
+# define PRINTF_H
 
-int		asprintf_basic_test(void);
+int		printf_basic_test(void);
 
-# endif
+#endif

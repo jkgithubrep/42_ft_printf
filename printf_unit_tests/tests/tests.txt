@@ -1,0 +1,4 @@
+conv_d;zero;%d, 0
+conv_d;zero_dot_only_precision;%.d, 0
+conv_o;zero;%o, 0
+conv_o;zero_dot_only_precision;%.o 0

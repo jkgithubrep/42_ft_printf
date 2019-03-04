@@ -6,20 +6,22 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/03 16:27:36 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/03 16:45:10 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/04 11:10:28 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TESTS_H
 # define TESTS_H
 
-typedef struct		s_result{
+typedef struct		s_test_rslt{
 	char 			*user_str;
 	char			*ref_str;
 	int				user_ret;
 	int				ref_ret;
-}					t_result;
+}					t_test_rslt;
 
-void		print_test_result_values_trace(t_result *result, int fd_trace);
+void				print_test_result_values_trace(t_test_rslt *test_rslt,
+																int fd_trace);
+int					free_result(t_test_rslt *test_rslt, int ret_value);
 
 # endif

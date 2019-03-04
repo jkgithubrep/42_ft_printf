@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 21:34:44 by jkettani          #+#    #+#             */
-/*   Updated: 2019/01/22 14:59:13 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/04 11:27:34 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,21 @@ int		main(int ac, char **av)
 	unsigned int	j;
 	int				err;
 	int				fd;
+	int				fd_trace;
 
-	fd = 1;
+	fd = STDOUT_FILENO;
+	fd_trace = get_fd(TRACE_FILE, OUTPUT_MODE, OP_TRUNC);
+	print_header_fd(fd);
+	if (fd_trace != fd)
+		print_trace_header_fd(fd_trace);
 	err = 0;
 	if (ac == 1)
 	{
 		i = 0;
 		while (strcmp(g_launchtab[i].fct_name, ""))
 		{
-			(g_launchtab[i++].launcher)();
+			if ((err = (g_launchtab[i++].launcher)()) > 0)
+				print_error_fd(err, fd);
 			dprintf(fd, "\n");
 		}
 	}
@@ -43,8 +49,8 @@ int		main(int ac, char **av)
 			{
 				if (!strcmp(g_launchtab[j].fct_name, av[i]))
 				{
-					if (err == (g_launchtab[j].launcher)())
-						print_error_fd(err, 1);
+					if ((err == (g_launchtab[j].launcher)()) > 0)
+						print_error_fd(err, fd);
 					dprintf(fd, "\n");
 					break ;
 				}

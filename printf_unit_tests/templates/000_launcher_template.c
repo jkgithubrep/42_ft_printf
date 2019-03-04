@@ -1,8 +1,14 @@
 #include "libunit.h"
 #include "ft_printf.h"
-#include "TMPL_FCT_NAME.h" // ex: "my_fct.h"
+#include "TMPL_FCT_NAME.h"
 
-int					TMPL_FCT_NAME_launcher(void) // ex: my_fct_launcher(void);
+/* Load test format:
+	if ((err = load_test(&test_list, "TMPL_TEST_NAME",
+			&TMPL_FCT_NAME_TMPL_TEST_FCT_NAME, SUCCESS)))
+		return (err);
+*/
+
+int					TMPL_FCT_NAME_launcher(void)
 {
 	t_unit_test 	*test_list;
 	char			*fct_name;
@@ -10,7 +16,7 @@ int					TMPL_FCT_NAME_launcher(void) // ex: my_fct_launcher(void);
 	int				fd;
 	int				fd_trace;
 
-	fct_name = "TMPL_FCT_NAME"; // ex: my_fct
+	fct_name = "TMPL_FCT_NAME";
 	err = 0;
 	fd = TESTS_OUTPUT_FD;
 	fd_trace = get_fd(TRACE_FILE, OUTPUT_MODE, OP_APPEND);
@@ -18,8 +24,8 @@ int					TMPL_FCT_NAME_launcher(void) // ex: my_fct_launcher(void);
 	print_fct_name_fd(fct_name, fd);
 	if (fd_trace != fd)
 		print_fct_name_trace_fd(fct_name, fd_trace);
-	if ((err = load_test(&test_list, "TMPL_TEST_NAME", // ex: Basic test
-			&TMPL_FCT_NAME_TMPL_TEST_FCT_NAME, SUCCESS))) // ex: &my_fct_basic_1
-		return (err);
+
+	/*LOAD_TEST_HERE*/
+
 	return (launch_tests(&test_list, fd));
 }

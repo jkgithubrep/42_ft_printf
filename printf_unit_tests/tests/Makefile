@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/03 16:52:47 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/04 11:19:51 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ ARFLAGS =               -rcs
 CC =                    gcc
 CFLAGS =                -g3 -Wall -Wextra #-Werror
 NAME =                  tests
+TRACE =                 trace.txt
 SRC_PATH =              .
 INCLUDE_PATH =          .
 OBJ_PATH =              .obj
@@ -53,15 +54,9 @@ CPPFLAGS =              -I$(INCLUDE_PATH) -I$(LIBFTPRINTF_INC_PATH) \
 COMPILE.c =             $(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c
 DEPFLAGS =              -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 POSTCOMPILE =           @mv -f $(OBJ_PATH)/$*.Td $(OBJ_PATH)/$*.d && touch $@
-IS_CONV_SPEC_SRC_NAME = 00_launcher 01_test_d 02_test_i 03_test_no_spec \
-						04_test_char_0 05_test_percent
-READ_FMT_SRC_NAME =     00_launcher 01_test_type_only \
-						02_test_type_width 03_test_type_width_precision \
-						04_test_type_len_mod_h 05_test_type_len_mod_hh \
-						06_test_hard_valid
-ASPRINTF_SRC_NAME =     00_launcher 01_basic_test
+PRINTF_SRC_NAME =       00_launcher 01_basic_test
 SRC_NAME =              main tests\
-                        $(addprefix asprintf/, $(ASPRINTF_SRC_NAME))
+                        $(addprefix printf/, $(PRINTF_SRC_NAME))
 SRC =                   $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =                   $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
 DEP =                   $(addprefix $(OBJ_PATH)/, $(SRC:.c=.d))
@@ -125,6 +120,9 @@ fclean: clean
 	@if [ -f $(NAME) ]; \
 		then echo "$(ERR_COLOR)-> Could not clean executable file.$(NC)";\
 		else echo "$(OK_COLOR)-> Executable file succesfully cleaned.$(NC)"; fi
+	$(ECHO) "Cleaning $(WARN_COLOR)$(TRACE)$(NC)..."
+	$(QUIET) $(RM) $(TRACE)
+
 
 .PHONY: re
 re: fclean all

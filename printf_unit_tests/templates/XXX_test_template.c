@@ -1,38 +1,41 @@
 #include "libunit.h"
 #include "tests.h"
+#include "ft_printf.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 # define ARGS TMPL_ARGS
 
 int		TMPL_FCT_NAME_TMPL_TEST_FCT_NAME(void)
 {
-	t_result	*result;
+	t_test_rslt	*test_rslt;
 	int			pfd[2];
+	int			nbytes_read;
+	int			ret_value;
 	int			save_out;
-	int			comp;
 	int			err;
 	int			fd_trace;
 
-	str = NULL;
+	test_rslt = {NULL, NULL, 0, 0};
 	fd_trace = get_fd(TRACE_FILE, OUTPUT_MODE, OP_APPEND);
 	if ((err = pipe_stdout(pfd, &save_out)))
-		return (err);
-	result.ref_ret = printf(ARGS);
-	if ((err = read_pipe(&result.ref_str, &ret, pfd, &save_out)))
-		return (err);
+		return (free_result(&test_rslt, err));
+	test_rslt.ref_ret = printf(ARGS);
+	if ((err = read_pipe(&test_rslt.ref_str, &nbytes_read, pfd, &save_out)))
+		return (free_result(&test_rslt, err));
 	if ((err = pipe_stdout(pfd, &save_out)))
-		return (err);
-	result.user_ret = ft_printf(ARGS);
-	if ((err = read_pipe(&result.user_str, &ret, pfd, &save_out)))
-		return (err);
-	if ((mresult.user_ret != result.ref_ret)
-			|| memcmp(result.user_str, result.ref_str, result.ref_ret))
+		return (free_result(&test_rslt, err));
+	test_rslt.user_ret = ft_printf(ARGS);
+	if ((err = read_pipe(&test_rslt.user_str, &nbytes_read, pfd, &save_out)))
+		return (free_result(&test_rslt, err));
+	if ((test_rslt.user_ret != test_rslt.ref_ret)
+			|| memcmp(test_rslt.user_str, test_rslt.ref_str, test_rslt.ref_ret))
 	{
-		print_test_result_values_trace(result, fd_trace);
-		free_result(result);
-		return (-1);
+		print_test_result_values_trace(&test_rslt, fd_trace);
+		ret_value = -1;
 	}
 	else
-		return (0);
+		ret_value = 0;
+	return (free_result(&test_rslt, ret_value));
 }
