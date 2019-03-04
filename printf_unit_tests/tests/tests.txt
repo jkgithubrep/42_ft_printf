@@ -1,4 +1,8 @@
 conv_d;zero;"%d", 0
 conv_d;zero_dot_only_precision;"%.d", 0
-conv_o;zero;"%o", 0
-conv_o;zero_dot_only_precision;"%.o", 0
+conv_d;zero_dot_3_precision;"%.3d", 0
+conv_d;random_int;"%d", 42
+conv_d;int_max;"%d", INT_MAX
+conv_s;null_pointer;"%s", NULL
+conv_s;random_strin;"%s", "Random string"
+

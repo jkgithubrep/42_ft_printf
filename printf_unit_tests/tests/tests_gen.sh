@@ -115,7 +115,7 @@ replace_args(){
 load_test(){
 	local fct_name="$1"
 	local test_fct="$2"
-	local test_name="$3"
+	local test_name=`echo "$3" | sed 's/"/\\\\\\\"/g'`
 	sed "s/\/\*LOAD_TEST_HERE\*\//if ((err = load_test(\&test_list, \"${test_name}\","$'\\\n\\\t\\\t\\\t'"\&${fct_name}_${test_fct}, SUCCESS)))"$'\\\n\\\t\\\t'"return (err);"$'\\\n\\\t'"&/" \
 		$fct_name/000_launcher.c > $fct_name/000_launcher_tmp.c
 	rm -f $fct_name/000_launcher.c
@@ -183,12 +183,12 @@ generate_tests(){
 		replace_fct_name $fct
 		save_file_path "$fct" "000_launcher"
 		add_fct_in_main "$fct"
-		tests=`grep -w $fct tests.txt | cut -d';' -f2 | sort | uniq`
-		local index=0
+		tests=`grep -w $fct tests.txt | cut -d';' -f2`
+		local index=1
 		for test_fct in $tests
 		do
 			local index_pref=`printf %03d $index`
-			test_name=`grep -w $fct tests.txt | grep -w $test_fct |  cut -d';' -f3 | sort | uniq`	
+			test_name=`grep -w $fct tests.txt | grep -w $test_fct |  cut -d';' -f3`	
 			create_test "$fct" "$test_fct" "$test_name" "$index_pref"
 			add_prototypes "$fct" "$test_fct"
 			load_test "$fct" "$test_fct" "$test_name"
@@ -208,8 +208,13 @@ clean_tests(){
 	remove_all $fcts
 }
 
+launch_tests(){
+	make test
+}
+
 if [ "$1" = "create" ]; then
 	generate_tests
+	launch_tests
 fi
 
 if [ "$1" = "clean" ]; then

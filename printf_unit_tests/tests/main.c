@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 21:34:44 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/04 11:27:34 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/04 20:54:59 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <string.h>
 #include "libunit.h"
 #include "main.h"
+#include "tests.h"
 
 int		main(int ac, char **av)
 {

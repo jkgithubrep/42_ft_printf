@@ -1,6 +1,9 @@
 SRC_NAME += conv_d/000_launcher \
-conv_d/000_zero \
-conv_d/001_zero_dot_only_precision \
-conv_o/000_launcher \
-conv_o/000_zero \
-conv_o/001_zero_dot_only_precision
+conv_d/001_zero \
+conv_d/002_zero_dot_only_precision \
+conv_d/003_zero_dot_3_precision \
+conv_d/004_random_int \
+conv_d/005_int_max \
+conv_s/000_launcher \
+conv_s/001_null_pointer \
+conv_s/002_random_strin
