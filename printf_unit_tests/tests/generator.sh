@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
+RED='\033[0;31;01m'
+GREEN='\033[0;32;01m'
+YELLOW='\033[0;33;01m'
+BLUE='\033[0;34;01m'
+MAGENTA='\033[0;35;01m'
 NC='\033[0m'
 
 # Parameters
@@ -37,10 +37,12 @@ print_warn(){
     printf "${YELLOW}%s${NC}\n" "$1"
 }
 
+# Check if folder given as argument exits
 folder_exists(){
 	[ -d "$1" ] && return 1 || return 0
 }
 
+# Save folder content in the backup folder
 save_folder(){
 	echo "Saving ${BLUE}$1${NC} folder in ${BLUE}$BAK_FOLDER${NC} folder..."
 	cp -R $1 $BAK_FOLDER
@@ -52,17 +54,13 @@ save_folder(){
 
 create_folder(){
 	echo "Making ${BLUE}$1${NC} folder..."
-	if [ ! -d $1 ]; then
-		mkdir $1
-		folder_exists $1
-		if [ "$?" -eq 1 ]; then
-			print_ok "$1 folder succesfully created" 
-		else
-			print_err "Error: could not create $1."
-			return -1
-		fi
+	mkdir $1
+	folder_exists $1
+	if [ "$?" -eq 1 ]; then
+		print_ok "$1 folder succesfully created" 
 	else
-		print_warn "$1 folder already exists."
+		print_err "Error: could not create $1."
+		return -1
 	fi
 	return 0
 }
@@ -118,6 +116,10 @@ load_test(){
 	local test_name=`echo "$3" | sed 's/"/\\\\\\\"/g'`
 	sed "s/\/\*LOAD_TEST_HERE\*\//if ((err = load_test(\&test_list, \"${test_name}\","$'\\\n\\\t\\\t\\\t'"\&${fct_name}_${test_fct}, SUCCESS)))"$'\\\n\\\t\\\t'"return (err);"$'\\\n\\\t'"&/" \
 		$fct_name/000_launcher.c > $fct_name/000_launcher_tmp.c
+	if [ "$?" -ne 0 ]; then
+		print_err "Sed error with ${fct_name}/${test_fct}.c"
+		exit
+	fi
 	rm -f $fct_name/000_launcher.c
 	mv $fct_name/000_launcher_tmp.c $fct_name/000_launcher.c
 }
@@ -172,37 +174,94 @@ add_fct_in_main(){
 	mv main_tmp.h main.h
 }
 
+test_exists(){
+	[ -f "$1" ] && return 1 || return 0
+}
+
+is_in_list(){
+	haystack="$1"
+	shift
+	local list="$@"
+	for elm in $list
+	do
+		if [ "$haystack" = ${elm} ]; then
+			return 1;
+		fi
+	done
+	return 0;
+}
+
+is_test_list_ok(){
+	TEST_LIST_ERRORS=""
+	list_ref=`cat $TESTS_FILE | cut -d';' -f1 | uniq`
+	for elm in "$@"
+	do
+		local save_elm=$elm
+		is_in_list $elm $list_ref
+		if [ "$?" -ne 1 ]; then
+			TEST_LIST_ERRORS=`echo $TEST_LIST_ERRORS $save_elm`
+		fi
+	done
+}
+
 generate_tests(){
-	local fcts=`cat $TESTS_FILE | cut -d';' -f1 | sort | uniq`
-	printf "" > ${MAKEFILE_FILE}
-	cp ${TMPL_MAIN} ./main.h
+	if $ALL; then
+		local fcts=`cat $TESTS_FILE | cut -d';' -f1 | uniq`
+	else
+		local fcts="$@"
+	fi
+	if $CREATE; then
+		printf "" > ${MAKEFILE_FILE}
+		cp ${TMPL_MAIN} ./main.h
+	else
+		sed '$ s/$/ \\/' ${MAKEFILE_FILE} > ${MAKEFILE_FILE}_tmp
+		rm -rf ${MAKEFILE_FILE}
+		mv ${MAKEFILE_FILE}_tmp ${MAKEFILE_FILE}
+	fi
 	for fct in $fcts
 	do
-		create_folder $fct
-		add_template_to_folder $fct
-		replace_fct_name $fct
-		save_file_path "$fct" "000_launcher"
-		add_fct_in_main "$fct"
-		tests=`grep -w $fct tests.txt | cut -d';' -f2`
+		if [ ! -d $fct ]; then
+			create_folder $fct
+		fi
+		if [ ! -f ${fct}/000_launcher.c ] || $CREATE; then
+			add_template_to_folder $fct
+			replace_fct_name $fct
+			save_file_path "$fct" "000_launcher"
+			add_fct_in_main "$fct"
+		fi
+		tests=`grep -w $fct ${TESTS_FILE} | cut -d';' -f2`
 		local index=1
 		for test_fct in $tests
 		do
 			local index_pref=`printf %03d $index`
-			test_name=`grep -w $fct tests.txt | grep -w $test_fct |  cut -d';' -f3`	
-			create_test "$fct" "$test_fct" "$test_name" "$index_pref"
-			add_prototypes "$fct" "$test_fct"
-			load_test "$fct" "$test_fct" "$test_name"
-			save_file_path "$fct" "${index_pref}_${test_fct}"
+			if [ ! -f ${fct}/${index_pref}_${test_fct}.c ] || $CREATE; then
+				test_name=`grep -w $fct ${TESTS_FILE} | grep -w $test_fct |  cut -d';' -f3`	
+				create_test "$fct" "$test_fct" "$test_name" "$index_pref"
+				add_prototypes "$fct" "$test_fct"
+				load_test "$fct" "$test_fct" "$test_name"
+				save_file_path "$fct" "${index_pref}_${test_fct}"
+			else
+				echo "${BLUE}${index_pref}_${test_fct}.c${NC} already exists."
+			fi
 			((index++))
 		done
 	done
-	sed -e "1s/^/SRC_NAME += /" -e "$ s/ \\\//" ${MAKEFILE_FILE} > ${MAKEFILE_FILE}_tmp
+	if $CREATE; then
+		sed -e "1s/^/SRC_NAME += /" ${MAKEFILE_FILE} > ${MAKEFILE_FILE}_tmp
+		rm -rf ${MAKEFILE_FILE}
+		mv ${MAKEFILE_FILE}_tmp ${MAKEFILE_FILE}
+	fi	
+	sed "$ s/ \\\//" ${MAKEFILE_FILE} > ${MAKEFILE_FILE}_tmp
 	rm -rf ${MAKEFILE_FILE}
 	mv ${MAKEFILE_FILE}_tmp ${MAKEFILE_FILE}
 }
 
 clean_tests(){
-	local fcts=`cat $TESTS_FILE | cut -d';' -f1 | sort | uniq`
+	if $ALL; then
+		local fcts=`cat $TESTS_FILE | cut -d';' -f1 | sort | uniq`
+	else
+		local fcts="$@"
+	fi
 	echo "Removing ${BLUE}$BAK_FOLDER${NC}..."
 	rm -rf $BAK_FOLDER
 	remove_all $fcts
@@ -212,11 +271,76 @@ launch_tests(){
 	make test
 }
 
-if [ "$1" = "create" ]; then
-	generate_tests
+parse_args(){
+	if [ "$#" -lt 2 ]; then
+		ERR=true
+		return -1
+	fi
+	local action=$1
+	if [ $action = "create" ]; then
+		CREATE=true
+	elif [ $action = "update" ]; then
+		UPDATE=true
+	elif [ $action = "clean" ]; then
+		CLEAN=true
+	else
+		ERR=true
+		return -1
+	fi
+	shift
+	while [ "$#" -gt 0 ]
+	do
+		if [ "$1" = "all" ]; then
+			ALL=true
+			return 0
+		else
+			TESTS_LIST=`echo $TESTS_LIST $1`
+		fi
+		shift
+	done
+	return 0
+}
+
+display_usage(){
+	printf "Usage: ./generator.sh [action] [all | functions]\n"
+	printf "> Actions:\n"
+	printf "%s\n" "    - create                  Create tests."
+	printf "%s\n" "    - update                  Update tests (add new ones)."
+	printf "%s\n" "    - clean                   Clean tests."
+	printf "> Functions:\n"
+	printf "%s\n" "    - all                     All tests are affected."
+	printf "%s\n" "    - functions               Only named functions after action keyword are affected."
+}
+
+# ----- SCRIPT -----
+
+ARGS_LIST="$@"
+ERR=false
+ALL=false
+CREATE=false
+CLEAN=false
+UPDATE=false
+MANDATORY=false
+
+parse_args $ARGS_LIST
+
+if $ERR; then
+	display_usage
+	exit
+fi
+
+is_test_list_ok $TESTS_LIST
+if [ "$TEST_LIST_ERRORS" != "" ]; then
+	echo "The following tests could not be found in ${BLUE}${TESTS_FILE}${NC}:"
+	echo $TEST_LIST_ERRORS
+	exit
+fi
+
+if $CREATE || $UPDATE; then
+	generate_tests $TESTS_LIST
 	launch_tests
 fi
 
-if [ "$1" = "clean" ]; then
-	clean_tests
+if $CLEAN; then
+	clean_tests $TESTS_LIST
 fi

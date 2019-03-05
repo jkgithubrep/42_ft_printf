@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/01 21:34:44 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/04 20:54:59 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/05 17:57:39 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int		main(int ac, char **av)
 			{
 				if (!strcmp(g_launchtab[j].fct_name, av[i]))
 				{
-					if ((err == (g_launchtab[j].launcher)()) > 0)
+					if ((err = (g_launchtab[j].launcher)()) > 0)
 						print_error_fd(err, fd);
 					dprintf(fd, "\n");
 					break ;
