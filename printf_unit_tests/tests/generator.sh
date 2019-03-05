@@ -205,12 +205,14 @@ is_test_list_ok(){
 }
 
 generate_tests(){
+	local no_makefile=false
 	if $ALL; then
 		local fcts=`cat $TESTS_FILE | cut -d';' -f1 | uniq`
 	else
 		local fcts="$@"
 	fi
-	if $CREATE; then
+	if $CREATE || [ ! -f ${MAKEFILE_FILE} ]; then
+		no_makefile=true
 		printf "" > ${MAKEFILE_FILE}
 		cp ${TMPL_MAIN} ./main.h
 	else
@@ -246,7 +248,7 @@ generate_tests(){
 			((index++))
 		done
 	done
-	if $CREATE; then
+	if $CREATE || $no_makefile; then
 		sed -e "1s/^/SRC_NAME += /" ${MAKEFILE_FILE} > ${MAKEFILE_FILE}_tmp
 		rm -rf ${MAKEFILE_FILE}
 		mv ${MAKEFILE_FILE}_tmp ${MAKEFILE_FILE}
@@ -265,6 +267,8 @@ clean_tests(){
 	echo "Removing ${BLUE}$BAK_FOLDER${NC}..."
 	rm -rf $BAK_FOLDER
 	remove_all $fcts
+	echo "Removing ${BLUE}${MAKEFILE_FILE}${NC}"
+	rm -f ${MAKEFILE_FILE}
 }
 
 launch_tests(){
