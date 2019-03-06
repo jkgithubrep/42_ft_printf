@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/01 13:43:38 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 11:35:14 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define ARGS "%#023yo\n", 233
+#define ARGS "%#b\n", 42
 
 int		main(int ac, char **av)
 {

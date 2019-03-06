@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/28 10:58:24 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 11:01:04 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void			save_type(const char c, t_format *conv_params);
 const char		*parse_conv_spec(const char *fmt, t_format *conv_params);
 intmax_t		get_int_arg_val(t_format *conv_params, va_list args);
 char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params);
-void			init_variables(t_buf *binf, t_result *result);
+void			init_variables(t_worker *work);
 int				parse_fmt(char **str, const char *fmt, va_list args);
 t_ints			convert_imax_to_ints(intmax_t arg_val, t_format *conv_params);
 char			*int_arg_val_to_str_conv(intmax_t arg_val, const char *base,
@@ -51,6 +51,9 @@ char			*get_formatted_str_int(t_format *conv_params, va_list args);
 char			*format_str(char *val_str, t_format *conv_params);
 char			*format_char_str(char *val_str, t_format *conv_params);
 char			*char_arg_val_to_str(t_uchar arg_val);
-void			build_final_str(t_result *result, char *append, int len);
+void			build_final_str(t_worker *work, char *append, int len);
+void			add_to_buff(t_worker *work, char *val_str, int len);
+void			conv_handler(t_worker *work, const char **fmt, va_list args,
+								t_format *conv_params);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 10:00:14 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 11:22:45 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,12 +71,12 @@ typedef union				u_dbls{
 ** Length modifiers j and z not handled
 */
 
-# define TYPES             "dDiuUoOxXfeEgGaAcsp"
+# define TYPES             "dDiuUoOxXfeEgGaAcspb"
 # define SIGNED_TYPES      "di"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
-# define NUM_TYPES         "douxXi"
-# define TYPE_PREFIX       "xX"
+# define NUM_TYPES         "douxXib"
+# define TYPE_PREFIX       "xXb"
 
 /*
 ** DOLLAR and ASTERISK unused.
@@ -93,6 +93,7 @@ typedef union				u_dbls{
 # define HASH              '#'
 # define ZERO              '0'
 
+# define BIN_BASE          "01"
 # define DEC_BASE          "0123456789"
 # define OCT_BASE          "01234567"
 # define L_HEX_BASE        "0123456789abcdef"
@@ -101,6 +102,7 @@ typedef union				u_dbls{
 # define PREF_OCT          "0"
 # define PREF_L_HEX        "0x"
 # define PREF_U_HEX        "0X"
+# define PREF_BIN          "0b"
 
 typedef enum				e_sign_type{
 	UNSIGNED = 0x0,
@@ -142,21 +144,11 @@ typedef struct				s_format{
 }							t_format;
 
 typedef struct				s_worker{
-	char					*final_str;
+	char					*str;
 	char					buf[BUF_SIZE];
 	int						count;
 	int						i;
 }							t_worker;
-
-typedef struct				s_result{
-	char					*str;
-	int						count;
-}							t_result;
-
-typedef struct				s_buf{
-	char					buf[BUF_SIZE];
-	int						i;
-}							t_buf;
 
 int							ft_printf(const char *fmt, ...);
 int							ft_dprintf(int d, const char *fmt, ...);

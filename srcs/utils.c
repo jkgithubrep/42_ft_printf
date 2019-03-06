@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 10:00:24 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 11:37:56 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,6 +253,8 @@ char			*int_arg_val_to_str(intmax_t arg_val, t_format *conv_params)
 		str = int_arg_val_to_str_conv(arg_val, U_HEX_BASE, conv_params);
 	else if (conv_params->type_char == 'u')
 		str = int_arg_val_to_str_conv(arg_val, DEC_BASE, conv_params);
+	else if (conv_params->type_char == 'b')
+		str = int_arg_val_to_str_conv(arg_val, BIN_BASE, conv_params);
 	else
 		str = int_arg_val_to_str_conv(arg_val, DEC_BASE, conv_params);
 	return (str);
@@ -395,6 +397,8 @@ char			*prepend_prefix(char **val_str, t_format *conv_params)
 		ft_strprepend(PREF_L_HEX, val_str);
 	else if (conv_params->type_char == 'X')
 		ft_strprepend(PREF_U_HEX, val_str);
+	else if (conv_params->type_char == 'b')
+		ft_strprepend(PREF_BIN, val_str);
 	return (*val_str);
 }
 
@@ -520,80 +524,84 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
-void			build_final_str(t_result *result, char *append, int len)
+void			build_final_str(t_worker *work, char *append, int len)
 {
 	char		*tmp;
 
-	if (!result->str)
+	if (!work->str)
 		tmp = (char *)ft_memjoin("", 0, append, len);
 	else
-		tmp = (char	*)ft_memjoin(result->str, result->count, append, len);
-	if (result->str)
-		ft_strdel(&result->str);
-	result->str = tmp;
-	result->count += len;
+		tmp = (char	*)ft_memjoin(work->str, work->count, append, len);
+	if (work->str)
+		ft_strdel(&work->str);
+	work->str = tmp;
+	work->count += len;
 }
 
-void			save_buf(t_buf *binf, t_result *result)
+void			save_buf(t_worker *work)
 {
-	build_final_str(result, binf->buf, binf->i);
-	binf->i = 0;
+	build_final_str(work, work->buf, work->i);
+	work->i = 0;
 }
 
-void			add_to_buff(t_buf *binf, t_result *result,
-						t_format *conv_params, char *val_str)
+void			add_to_buff(t_worker *work, char *val_str, int len)
 {
-	int		len;
 	int		i;
 
 	if (!val_str)
 		return ;
-	len = ft_strlen(val_str);
-	if (conv_params->type_char == 'c' && (conv_params->flags & FL_NULL))
-		++len;
-	if (len > BUF_SIZE || (binf->i + len > BUF_SIZE))
-		save_buf(binf, result);
+	if (len > BUF_SIZE || (work->i + len > BUF_SIZE))
+		save_buf(work);
 	if (len > BUF_SIZE)
-		build_final_str(result, val_str, len);
+		build_final_str(work, val_str, len);
 	else
 	{
 		i = 0;
 		while (len--)
-			binf->buf[(binf->i)++] = val_str[i++];
+			work->buf[(work->i)++] = val_str[i++];
 	}
 	ft_strdel(&val_str);
 }
 
-void			init_variables(t_buf *binf, t_result *result)
+void			conv_handler(t_worker *work, const char **fmt, va_list args,
+								t_format *conv_params)
 {
-	binf->i = 0;
-	result->str = NULL;
-	result->count = 0;
+	char 	*formatted_str;
+	char	*tmp;
+	int		len;
+
+	*conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
+	*fmt = parse_conv_spec(*fmt + 1, conv_params);
+	formatted_str = get_formatted_str(conv_params, args);
+	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL)
+			&& (conv_params->flags & FL_MINUS))
+	{
+		tmp = ft_strnew(1);
+		add_to_buff(work, tmp, 1);
+	}
+	len = ft_strlen(formatted_str);
+	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL) &&
+			!(conv_params->flags & FL_MINUS))
+		len++;
+	add_to_buff(work, formatted_str, len);
 }
 
 int				parse_fmt(char **str, const char *fmt, va_list args)
 {
-	t_buf		binf;
-	t_worker    work;
+	t_worker	work;
 	t_format	conv_params;
-	t_result	result;
 
-	init_variables(&binf, &result);
+	work = (t_worker){NULL, {0}, 0, 0};
 	while (*fmt)
 	{
-		if (binf.i > BUF_SIZE - 1)
-			save_buf(&binf, &result);
+		if (work.i > BUF_SIZE - 1)
+			save_buf(&work);
 		if (*fmt == PERCENT)
-		{
-			conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
-			fmt = parse_conv_spec(fmt + 1, &conv_params);
-			add_to_buff(&binf, &result, &conv_params,
-									get_formatted_str(&conv_params, args));
-		}
+			conv_handler(&work, &fmt, args, &conv_params);
 		else
-			binf.buf[binf.i++] = *fmt++;
+			work.buf[work.i++] = *fmt++;
 	}
-	save_buf(&binf, &result);
-	*str = result.str;
-	return (result.count);
+	save_buf(&work);
+	*str = work.str;
+	return (work.count);
 }
