@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/02/28 17:30:37 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/06 11:56:45 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -143,7 +143,10 @@ fclean: clean
 	@if [ -f $(NAME) ]; \
 		then echo "$(ERR_COLOR)-> Could not clean $(NAME).$(NC)"; \
 		else echo "$(OK_COLOR)-> $(NAME) succesfully cleaned.$(NC)"; fi
+	$(ECHO) "Cleaning ${WARN_COLOR}$(TEST)${NC}..."
 	$(QUIET) $(RM) $(TEST)
+	$(ECHO) "Cleaning ${WARN_COLOR}$(TEST_PRINTF)${NC}..."
+	$(QUIET) $(RM) $(TEST_PRINTF)
 
 .PHONY: re
 re: fclean all
