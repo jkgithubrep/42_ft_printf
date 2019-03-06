@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/02 10:41:15 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 10:00:14 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,12 +141,12 @@ typedef struct				s_format{
 	t_sign_type				is_signed;
 }							t_format;
 
-typedef struct				s_work{
+typedef struct				s_worker{
 	char					*final_str;
 	char					buf[BUF_SIZE];
 	int						count;
 	int						i;
-}							t_work;
+}							t_worker;
 
 typedef struct				s_result{
 	char					*str;

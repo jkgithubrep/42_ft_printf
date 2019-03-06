@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/02 10:37:05 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 10:00:24 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -574,6 +574,7 @@ void			init_variables(t_buf *binf, t_result *result)
 int				parse_fmt(char **str, const char *fmt, va_list args)
 {
 	t_buf		binf;
+	t_worker    work;
 	t_format	conv_params;
 	t_result	result;
 

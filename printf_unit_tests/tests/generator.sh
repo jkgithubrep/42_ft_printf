@@ -78,13 +78,6 @@ remove_folder(){
 	fi
 }
 
-create_all_folders(){
-	for fct in "$@"
-	do
-		create_folder $fct
-	done
-}
-
 remove_all(){
 	echo "Removing all folders..."
 	create_folder $BAK_FOLDER
@@ -98,14 +91,6 @@ remove_all(){
 replace_fct_name(){
 	local fct_name="$1"
 	sed "s/TMPL_FCT_NAME/${fct_name}/" $fct_name/000_launcher.c > $fct_name/000_launcher_tmp.c
-	rm -f $fct_name/000_launcher.c
-	mv $fct_name/000_launcher_tmp.c $fct_name/000_launcher.c
-}
-
-replace_args(){
-	local fct_name="$1"
-	local args="$2"
-	sed "s/TMPL_FCT_NAME/${args}/" $fct_name/000_launcher.c > $fct_name/000_launcher_tmp.c
 	rm -f $fct_name/000_launcher.c
 	mv $fct_name/000_launcher_tmp.c $fct_name/000_launcher.c
 }
@@ -316,6 +301,16 @@ display_usage(){
 	printf "%s\n" "    - functions               Only named functions after action keyword are affected."
 }
 
+check_test_file(){
+	nb_duplicates=`cat $TESTS_FILE | cut -d';' -f-2 | uniq -d | wc -l | bc`
+	if [ "$nb_duplicates" -gt 0 ]; then
+		print_err "Error: duplicated tests found:"
+		echo "  >" `cat $TESTS_FILE | cut -d';' -f-2 | uniq -d`
+		print_err "Change one of the test name or delete it."
+		exit
+	fi
+}
+
 # ----- SCRIPT -----
 
 ARGS_LIST="$@"
@@ -332,6 +327,8 @@ if $ERR; then
 	display_usage
 	exit
 fi
+
+check_test_file
 
 is_test_list_ok $TESTS_LIST
 if [ "$TEST_LIST_ERRORS" != "" ]; then
