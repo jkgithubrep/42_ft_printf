@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/06 11:56:45 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/06 22:12:50 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ DEPFLAGS =         -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 LIBFLAGS =         -L$(LIB_PATH) -lftprintf
 COMPILE.c =        $(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c
 POSTCOMPILE =      @mv -f $(OBJ_PATH)/$*.Td $(OBJ_PATH)/$*.d && touch $@
-SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
+SRC_NAME_LFT =     str/ft_strcdup str/ft_strdel print/ft_putstr \
 				   print/ft_putstr_fd str/ft_strlen print/ft_putnbr \
 				   print/ft_putnbr_fd print/ft_putchar_fd \
 				   print/ft_print_bytes print/ft_putchar print/ft_putnbr_base \
@@ -68,7 +68,7 @@ SRC_NAME_LFT =     str/ft_strdup_c str/ft_strdel print/ft_putstr \
 				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
 				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat char/ft_tolower \
 				   char/ft_isupper
-SRC_NAME =     	   ft_printf utils dbg_utils \
+SRC_NAME =     	   ft_printf utils dbg_utils print_bigint_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))

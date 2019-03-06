@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 11:01:04 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 20:37:24 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,11 @@ void			build_final_str(t_worker *work, char *append, int len);
 void			add_to_buff(t_worker *work, char *val_str, int len);
 void			conv_handler(t_worker *work, const char **fmt, va_list args,
 								t_format *conv_params);
+int				bigint_compare(const t_bigint *bigint1,
+								const t_bigint *bigint2);
+void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
+					const t_bigint **small_nb, const t_bigint **large_nb);
+void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
+							t_bigint *result);
 
 #endif

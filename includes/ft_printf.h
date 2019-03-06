@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 11:22:45 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 22:12:03 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,25 @@ typedef union				u_ints{
 }							t_ints;
 
 /*
+** Structure to store the different parts of a double. The element are in
+** reverse order assuming little-endian format.
+*/
+
+typedef struct				s_dbl_parts{
+	t_ulint					mantissa : 52;
+	t_ulint					exponent : 11;
+	t_ulint					sign : 1;
+}							t_dbl_parts;
+
+/*
 ** Union to store the different double types
 */
+
 typedef union				u_dbls{
 	t_float					fl;
 	t_double				dbl;
 	t_ldouble				ldbl;
+	t_dbl_parts				dbl_parts;
 }							t_dbls;
 
 # define EXIT_FAIL          -1
@@ -75,7 +88,8 @@ typedef union				u_dbls{
 # define SIGNED_TYPES      "di"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
-# define NUM_TYPES         "douxXib"
+# define INT_TYPES         "douxXib"
+# define DBL_TYPES         "f"
 # define TYPE_PREFIX       "xXb"
 
 /*
@@ -103,6 +117,8 @@ typedef union				u_dbls{
 # define PREF_L_HEX        "0x"
 # define PREF_U_HEX        "0X"
 # define PREF_BIN          "0b"
+
+# define BIGINT_SIZE       4
 
 typedef enum				e_sign_type{
 	UNSIGNED = 0x0,
@@ -149,6 +165,11 @@ typedef struct				s_worker{
 	int						count;
 	int						i;
 }							t_worker;
+
+typedef struct				s_bigint{
+	int						length;
+	t_uint					blocks[BIGINT_SIZE];
+}							t_bigint;
 
 int							ft_printf(const char *fmt, ...);
 int							ft_dprintf(int d, const char *fmt, ...);

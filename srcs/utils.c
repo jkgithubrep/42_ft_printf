@@ -6,13 +6,14 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 11:37:56 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/06 22:12:19 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.h"
 #include "libft.h"
 #include <stdio.h>
+#include "print_bigint_utils.h"
 
 /*
 ** Take a string starting with a digit as argument, extract the number as an int
@@ -412,7 +413,7 @@ char			*add_padding(char **val_str, int padding, t_format *conv_params)
 {
 	if (conv_params->flags & FL_MINUS)
 		ft_strpad_right(val_str, ' ', padding);
-	else if (!ft_instr(conv_params->type_char, NUM_TYPES)
+	else if (!ft_instr(conv_params->type_char, INT_TYPES)
 			&& (conv_params->flags & FL_ZERO))
 		ft_strpad_left(val_str, '0', padding);
 	else
@@ -515,7 +516,7 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	char		*val_str;
 
 	val_str = NULL;
-	if (ft_instr(conv_params->type_char, NUM_TYPES))
+	if (ft_instr(conv_params->type_char, INT_TYPES))
 		val_str = get_formatted_str_int(conv_params, args);
 	else if (conv_params->type_char == 'c' || conv_params->flags & FL_ERR)
 		val_str = get_formatted_str_char(conv_params, args);
@@ -561,6 +562,74 @@ void			add_to_buff(t_worker *work, char *val_str, int len)
 			work->buf[(work->i)++] = val_str[i++];
 	}
 	ft_strdel(&val_str);
+}
+
+/*
+** First compare bigint lenghts and return the difference if they are not equal.
+** Otherwise, compare blocks one by one from high to low. If blocks are not
+** equal, return 1 if block 1 is greater than block 2, else return -1.
+** If all blocks are equal, return 0.
+*/
+
+int				bigint_compare(const t_bigint *bigint1, const t_bigint *bigint2)
+{
+	int			i; 
+
+	if (bigint1->length != bigint2->length)
+		return (bigint1->length - bigint2->length);
+	i = bigint1->length;
+	while (i--)
+		if (bigint1->blocks[i] != bigint2->blocks[i])
+			return ((bigint1->blocks[i] > bigint2->blocks[i]) ? 1 : -1);
+	return (0);
+}
+
+void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
+					const t_bigint **small_nb, const t_bigint **large_nb)
+{
+	if (bigint1->length > bigint2->length)
+	{
+		*large_nb = bigint1;
+		*small_nb = bigint2;
+	}
+	else
+	{
+		*large_nb = bigint2;
+		*small_nb = bigint1;
+	}
+}
+
+void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
+							t_bigint *result)
+{
+	const t_bigint	*large_nb;
+	const t_bigint	*small_nb;
+	t_ulint			sum;
+	t_ulint			carry;
+	int				i;
+
+	order_bigints(bigint1, bigint2, &small_nb, &large_nb);
+	sum = 0lu;
+	carry = 0lu;
+	i = 0;
+	while (i < small_nb->length)
+	{
+		sum = carry + (t_ulint)small_nb->blocks[i]
+					+ (t_ulint)large_nb->blocks[i];
+		result->blocks[i] = (sum & 0xFFFFFFFF);
+		carry = sum >> 32;
+		i++;
+	}
+	while (i < large_nb->length)
+	{
+		sum = carry + (t_ulint)large_nb->blocks[i];
+		result->blocks[i]  = (sum & 0xFFFFFFFF);
+		carry = sum >> 32;
+		i++;
+	}
+	if (carry && (i < BIGINT_SIZE))
+		result->blocks[i] = (carry & 0xFFFFFFFF);
+	result->length = (carry) ? large_nb->length + 1 : large_nb->length;
 }
 
 void			conv_handler(t_worker *work, const char **fmt, va_list args,
