@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 22:12:19 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/07 18:41:37 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -599,6 +599,17 @@ void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
 	}
 }
 
+int				bigint_size(const t_bigint *bigint)
+{
+	int			i;
+
+	i = BIGINT_SIZE;
+	while (i--)
+		if (bigint->blocks[i])
+			return (i + 1);
+	return (0);
+}
+
 void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 							t_bigint *result)
 {
@@ -609,8 +620,8 @@ void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 	int				i;
 
 	order_bigints(bigint1, bigint2, &small_nb, &large_nb);
-	sum = 0lu;
-	carry = 0lu;
+	sum = 0LU;
+	carry = 0LU;
 	i = 0;
 	while (i < small_nb->length)
 	{
@@ -632,12 +643,159 @@ void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 	result->length = (carry) ? large_nb->length + 1 : large_nb->length;
 }
 
+void			bigint_substract(const t_bigint *bigint1,
+									const t_bigint *bigint2, t_bigint *result)
+{
+	const t_bigint	*large_nb;
+	const t_bigint	*small_nb;
+	t_ulint			rem;
+	t_ulint			carry;
+	t_ulint			tmp;
+	int				i;
+
+	if (bigint_compare(bigint1, bigint2) >= 0)
+	{
+		large_nb = bigint1;
+		small_nb = bigint2;
+	}
+	else
+	{
+		large_nb = bigint2;
+		small_nb = bigint1;
+	}
+	rem = 0LU;
+	carry = 0LU;
+	i = 0;
+	while (i < small_nb->length)
+	{
+		tmp = (t_ulint)large_nb->blocks[i] - carry;
+		if (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry)) 
+				&& (tmp >= (t_ulint)small_nb->blocks[i]))
+			rem = tmp - (t_ulint)small_nb->blocks[i];
+		else
+			rem = tmp + (1LU << 32) - (t_ulint)small_nb->blocks[i];
+		carry = (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry))
+					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0LU : 1LU;
+		result->blocks[i] = (rem & 0xFFFFFFFF);
+		i++;
+	}
+	while (i < large_nb->length)
+	{
+		if (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry))
+			rem = (t_ulint)large_nb->blocks[i] - carry;
+		else
+			rem = (t_ulint)large_nb->blocks[i] + (1LU << 32) - carry;
+		carry = (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry)) ?
+					0LU : 1LU;
+		result->blocks[i] = (rem & 0xFFFFFFFF);
+		i++;
+	}
+	result->length = bigint_size(result);
+}
+
+void			uimax_to_bigint(uintmax_t nb, t_bigint *result)
+{
+	int			i;
+
+	i = -1;
+	while (nb && ++i < BIGINT_SIZE)
+	{
+		result->blocks[i] = (nb & 0xFFFFFFFF);
+		nb >>= BIGINT_BLOCK_SIZE;
+	}
+	result->length = bigint_size(result);
+}
+
+void			bigint_shiftleft(t_bigint *result, t_uint shift)
+{
+	t_uint		i;
+	int			block_size;
+
+	i = BIGINT_SIZE;
+	block_size = BIGINT_BLOCK_SIZE;
+	while (--i >= (shift/block_size + 1))
+	{
+		result->blocks[i] = (result->blocks[i - (shift/block_size + 1)]
+								>> (block_size - shift % block_size))
+								| (result->blocks[i - shift/block_size]
+									<< (shift % block_size));
+	}
+	result->blocks[i] = result->blocks[i - shift/block_size]
+							<< (shift % block_size);
+	while (i--)
+		result->blocks[i] = 0;
+}
+
+void			bigint_multiply_nb(t_bigint *result, t_uint nb)
+{
+	int			i;
+	t_ulint		carry;
+	t_ulint		res;
+
+	i = 0;
+	carry = 0LU;
+	while (i < result->length)
+	{
+		result->blocks[i] = (((t_ulint)result->blocks[i] + carry) * (t_ulint)nb)
+	}
+}
+
+int				get_exponent(double value)
+{
+	int			exp;
+
+	exp = 0;
+	if (value > 1)
+	{
+		while (value >= 10)
+		{
+			value /= 10;
+			++exp;
+		}
+		return (exp);
+	}
+	while (value < 1)
+	{
+		value *= 10;
+		++exp;
+	}
+	return (-exp);
+}
+
+void			dragon_4(t_dbls *value)
+{
+	t_bigint	val_num;
+	t_bigint	val_den;
+	t_ulint		val_mantissa;
+	int			digit_exp;
+	int			val_exponent;
+	
+	val_mantissa = (t_ulint)value->dbl_parts.mantissa + 1LU << 51;
+	val_exponent = (int)value->dbl_parts.exponent - 1075;
+	val_num = (t_bigint){0, {0} };
+	val_den = (t_bigint){0, {0} };
+	uimax_to_bigint(val_mantissa, &val_num);
+	if (val_exponent > 0)
+	{
+		bigint_shiftleft(&val_num, val_exponent);
+		uimax_to_bigint(1, &val_den);
+	}
+	else
+	{
+		uimax_to_bigint(1, &val_den);
+		bigint_shiftleft(&val_den, -val_exponent);
+	}
+	digit_exp = get_exponent(value.dbl);
+	if (digit_exp > 0)
+
+}
+
 void			conv_handler(t_worker *work, const char **fmt, va_list args,
 								t_format *conv_params)
 {
-	char 	*formatted_str;
-	char	*tmp;
-	int		len;
+	char 		*formatted_str;
+	char		*tmp;
+	int			len;
 
 	*conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
 	*fmt = parse_conv_spec(*fmt + 1, conv_params);

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 20:37:24 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/07 16:46:49 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,5 +61,11 @@ void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
 					const t_bigint **small_nb, const t_bigint **large_nb);
 void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 							t_bigint *result);
+void			bigint_substract(const t_bigint *bigint1,
+									const t_bigint *bigint2, t_bigint *result);
+int				bigint_size(const t_bigint *bigint);
+void			uimax_to_bigint(uintmax_t nb, t_bigint *result);
+void			bigint_shiftleft(t_bigint *result, t_uint shift);
+int				get_exponent(double value);
 
 #endif
