@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/08 16:02:26 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/08 22:27:33 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -726,6 +726,7 @@ void			bigint_shiftleft(t_bigint *result, t_uint shift)
 							<< (shift % block_size);
 	while (i--)
 		result->blocks[i] = 0;
+	result->length = bigint_size(result);
 }
 
 void			bigint_multiply_nb(t_bigint *result, t_uint nb)
@@ -745,7 +746,7 @@ void			bigint_multiply_nb(t_bigint *result, t_uint nb)
 	}
 	if (carry && i < BIGINT_SIZE)
 		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFLU);
-	result->length = (carry) ? i + 1 : i;
+	result->length = bigint_size(result);
 }
 
 void			bigint_cpy(t_bigint *dest, const t_bigint *src)
@@ -779,6 +780,8 @@ void			bigint_multiply(const t_bigint *bigint1,
 	}
 	i = 0;
 	shift = 0;
+//	print_bigint(large_nb, "large_nb");
+//	print_bigint(small_nb, "small_nb");
 	while (i < small_nb->length)
 	{
 		bigint_tmp = (t_bigint){0, {0}};
@@ -827,13 +830,13 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 		0xcf4a6e70, 0xd595d80f, 0x26b2716e, 0xadc666b0, 0x1d153624, 0x3c42d35a,
 		0x63ff540e, 0xcc5573c0, 0x65f9ef17, 0x55bc28f2, 0x80dcc7f7, 0xf46eeddc,
 		0x5fdcefce, 0x000553f7}}};
+//	t_bigint		lookup_tbl[2] = {{1, {100000000}}, {2, {0x6fc10000, 0x002386f2}}};
 	t_bigint		bigint_tmp;
 	t_uint			tbl_index;
 	
-	first_pow10 = (t_uint[9]){1, 10, 100, 1000, 1000, 10000, 100000, 1000000,
-							10000000};
+	first_pow10 = (t_uint[8]){1, 10, 100, 1000, 10000, 100000, 1000000, 10000000};
 	if (exponent & 0x7)
-		uimax_to_bigint(exponent & 0x7, result);
+		uimax_to_bigint(first_pow10[exponent & 0x7], result);
 	else
 		uimax_to_bigint(1U, result);
 	exponent >>= 3;
@@ -851,33 +854,116 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 	}
 }
 
-//void			dragon_4(t_dbls *value)
-//{
-//	t_bigint	val_num;
-//	t_bigint	val_den;
-//	t_ulint		val_mantissa;
-//	int			digit_exp;
-//	int			val_exponent;
-//	
-//	val_mantissa = (t_ulint)value->dbl_parts.mantissa + 1LU << 51;
-//	val_exponent = (int)value->dbl_parts.exponent - 1075;
-//	val_num = (t_bigint){0, {0} };
-//	val_den = (t_bigint){0, {0} };
-//	uimax_to_bigint(val_mantissa, &val_num);
-//	if (val_exponent > 0)
-//	{
-//		bigint_shiftleft(&val_num, val_exponent);
-//		uimax_to_bigint(1, &val_den);
-//	}
-//	else
-//	{
-//		uimax_to_bigint(1, &val_den);
-//		bigint_shiftleft(&val_den, -val_exponent);
-//	}
-//	digit_exp = get_exponent(value.dbl);
-//	if (digit_exp > 0)
-//
-//}
+int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
+{
+	int				res;
+	t_bigint		bigint_tmp;
+
+	res = 5;
+	bigint_tmp = (t_bigint){0, {0}};
+	bigint_cpy(&bigint_tmp, divisor);
+	bigint_multiply_nb(&bigint_tmp, res);
+	if (bigint_compare(dividend, &bigint_tmp) > 0)
+	{
+		while (bigint_compare(dividend, &bigint_tmp) > 0)
+		{
+			bigint_add(&bigint_tmp, divisor, &bigint_tmp);
+			++res;	
+		}
+	}
+	else if (bigint_compare(dividend, &bigint_tmp) < 0)
+	{
+		res = 1;
+		bigint_tmp = (t_bigint){0, {0}};
+		bigint_cpy(&bigint_tmp, divisor);
+		while (bigint_compare(dividend, &bigint_tmp) > 0)
+		{
+			bigint_add(&bigint_tmp, divisor, &bigint_tmp);
+			++res;	
+		}
+	}
+	else
+		return (res);
+	return (res - 1);
+}
+
+void			dragon4(t_dbls *value)
+{
+	char		string[256] = {0};
+	t_bigint	val_num;
+	t_bigint	val_den;
+	t_bigint	bigint_tmp;
+	t_bigint	pow10;
+	t_ullint	val_mantissa;
+	int			digit_exp;
+	int			val_exponent;
+	int			i;
+	int			digit;
+	
+	val_mantissa = (t_ullint)value->dbl_parts.mantissa + (1LLU << 52);
+	val_exponent = (int)value->dbl_parts.exponent - 1075;
+	printf("val_mantissa: %llu\n", val_mantissa);
+	printf("val_exponent: %d\n", val_exponent);
+	val_num = (t_bigint){0, {0}};
+	val_den = (t_bigint){0, {0}};
+	uimax_to_bigint(val_mantissa, &val_num);
+	print_bigint(&val_num, "val_mantissa converted to val_num");
+	if (val_exponent > 0)
+	{
+		bigint_shiftleft(&val_num, val_exponent);
+		uimax_to_bigint(1, &val_den);
+	}
+	else
+	{
+		uimax_to_bigint(1, &val_den);
+		bigint_shiftleft(&val_den, -val_exponent);
+	}
+	print_bigint(&val_num, "val_num after exponent");
+	print_bigint(&val_den, "val_den after exponent");
+	digit_exp = get_exponent(value->dbl);
+	printf("first_digit_exponent: %d\n", digit_exp);
+	bigint_tmp = (t_bigint){0, {0}};
+	pow10 = (t_bigint){0, {0}};
+	if (digit_exp > 0)
+	{
+		bigint_pow10(&pow10, digit_exp);
+		print_bigint(&pow10, "power 10");
+		bigint_multiply(&val_den, &pow10, &bigint_tmp);
+		print_bigint(&bigint_tmp, "bigint tmp");
+		val_den = (t_bigint){0, {0}};
+		bigint_cpy(&val_den, &bigint_tmp);
+	}
+	else if (digit_exp < 0)
+	{
+		bigint_pow10(&pow10, -digit_exp);
+		print_bigint(&pow10, "power 10");
+		bigint_multiply(&val_num, &pow10, &bigint_tmp);
+		val_num = (t_bigint){0, {0}};
+		bigint_cpy(&val_num, &bigint_tmp);
+	}
+	print_bigint(&val_num, "BIGINT NUM");
+	print_bigint(&val_den, "BIGINT DEN");
+	i = 0;
+	while (val_num.length > 0 && i < 255)
+	{
+		if (i == 0)
+		{
+			print_bigint(&val_num, "val_num");
+			print_bigint(&val_den, "val_den");
+		}
+		digit = bigint_divide(&val_num, &val_den);
+		if (i == 0)
+			printf("digit: %d\n", digit);
+		string[i] = '0' + digit;
+		bigint_tmp = (t_bigint){0, {0}};
+		bigint_cpy(&bigint_tmp, &val_den);
+		bigint_multiply_nb(&bigint_tmp, digit);
+		bigint_substract(&val_num, &bigint_tmp, &val_num);
+		bigint_multiply_nb(&val_num, 10);
+		++i;
+	}
+	printf("%s\n", string);
+}
 
 void			conv_handler(t_worker *work, const char **fmt, va_list args,
 								t_format *conv_params)

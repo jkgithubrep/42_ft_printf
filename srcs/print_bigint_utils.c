@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_bigints_utils.c                              :+:      :+:    :+:   */
+/*   print_bigint_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/06 21:33:09 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 22:00:39 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/08 18:00:58 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,11 +85,11 @@ void	print_bigint(const t_bigint *bigint, const char *name)
 	i = 0;
 	printf(">>> %s <<<\n", name);
 	printf("length: %d\n", bigint->length);
-	print_separation();
-	print_bigint_header();
-	print_separation();
-	print_blocks_dec(bigint);
-	print_separation();
+//	print_separation();
+//	print_bigint_header();
+//	print_separation();
+//	print_blocks_dec(bigint);
+//	print_separation();
 	print_blocks_bin(bigint);
-	print_separation();
+//	print_separation();
 }

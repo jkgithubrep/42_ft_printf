@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/08 16:06:05 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/08 17:54:37 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ typedef union				u_ints{
 */
 
 typedef struct				s_dbl_parts{
-	t_ulint					mantissa : 52;
-	t_ulint					exponent : 11;
-	t_ulint					sign : 1;
+	t_ullint				mantissa : 52;
+	t_ullint				exponent : 11;
+	t_ullint				sign : 1;
 }							t_dbl_parts;
 
 /*
@@ -118,7 +118,7 @@ typedef union				u_dbls{
 # define PREF_U_HEX        "0X"
 # define PREF_BIN          "0b"
 
-# define BIGINT_SIZE       4
+# define BIGINT_SIZE       35
 # define BIGINT_BLOCK_SIZE 32
 
 typedef enum				e_sign_type{
