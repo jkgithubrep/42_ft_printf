@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/07 18:41:37 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/08 12:31:59 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -627,19 +627,19 @@ void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 	{
 		sum = carry + (t_ulint)small_nb->blocks[i]
 					+ (t_ulint)large_nb->blocks[i];
-		result->blocks[i] = (sum & 0xFFFFFFFF);
-		carry = sum >> 32;
+		result->blocks[i] = (t_uint)(sum & 0xFFFFFFFFLU);
+		carry = sum >> BIGINT_BLOCK_SIZE;
 		i++;
 	}
 	while (i < large_nb->length)
 	{
 		sum = carry + (t_ulint)large_nb->blocks[i];
-		result->blocks[i]  = (sum & 0xFFFFFFFF);
-		carry = sum >> 32;
+		result->blocks[i]  = (t_uint)(sum & 0xFFFFFFFFLU);
+		carry = sum >> BIGINT_BLOCK_SIZE;
 		i++;
 	}
 	if (carry && (i < BIGINT_SIZE))
-		result->blocks[i] = (carry & 0xFFFFFFFF);
+		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFLU);
 	result->length = (carry) ? large_nb->length + 1 : large_nb->length;
 }
 
@@ -676,7 +676,7 @@ void			bigint_substract(const t_bigint *bigint1,
 			rem = tmp + (1LU << 32) - (t_ulint)small_nb->blocks[i];
 		carry = (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry))
 					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0LU : 1LU;
-		result->blocks[i] = (rem & 0xFFFFFFFF);
+		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFLU);
 		i++;
 	}
 	while (i < large_nb->length)
@@ -687,7 +687,7 @@ void			bigint_substract(const t_bigint *bigint1,
 			rem = (t_ulint)large_nb->blocks[i] + (1LU << 32) - carry;
 		carry = (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry)) ?
 					0LU : 1LU;
-		result->blocks[i] = (rem & 0xFFFFFFFF);
+		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFLU);
 		i++;
 	}
 	result->length = bigint_size(result);
@@ -700,7 +700,7 @@ void			uimax_to_bigint(uintmax_t nb, t_bigint *result)
 	i = -1;
 	while (nb && ++i < BIGINT_SIZE)
 	{
-		result->blocks[i] = (nb & 0xFFFFFFFF);
+		result->blocks[i] = (t_uint)(nb & 0xFFFFFFFFLU);
 		nb >>= BIGINT_BLOCK_SIZE;
 	}
 	result->length = bigint_size(result);
@@ -711,6 +711,8 @@ void			bigint_shiftleft(t_bigint *result, t_uint shift)
 	t_uint		i;
 	int			block_size;
 
+	if (!shift)
+		return ;
 	i = BIGINT_SIZE;
 	block_size = BIGINT_BLOCK_SIZE;
 	while (--i >= (shift/block_size + 1))
@@ -736,7 +738,56 @@ void			bigint_multiply_nb(t_bigint *result, t_uint nb)
 	carry = 0LU;
 	while (i < result->length)
 	{
-		result->blocks[i] = (((t_ulint)result->blocks[i] + carry) * (t_ulint)nb)
+		res = (t_ulint)result->blocks[i] * (t_ulint)nb + carry;
+		result->blocks[i] = (t_uint)(res & 0xFFFFFFFFLU);
+		carry = res >> 32;
+		i++;
+	}
+	if (carry && i < BIGINT_SIZE)
+		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFLU);
+	result->length = (carry) ? i + 1 : i;
+}
+
+void			bigint_cpy(t_bigint *dest, const t_bigint *src)
+{
+	int			i;
+	
+	i = -1;
+	while (++i < src->length)
+		dest->blocks[i] = src->blocks[i];
+	dest->length = src->length;
+}
+
+void			bigint_multiply(const t_bigint *bigint1, 
+									const t_bigint *bigint2, t_bigint *result)
+{
+	const t_bigint	*large_nb;
+	const t_bigint	*small_nb;
+	t_bigint		bigint_tmp;
+	int				i;
+	int				shift;
+
+	if (bigint_compare(bigint1, bigint2) >= 0)
+	{
+		large_nb = bigint1;
+		small_nb = bigint2;
+	}
+	else
+	{
+		large_nb = bigint2;
+		small_nb = bigint1;
+	}
+	i = 0;
+	shift = 0;
+	while (i < small_nb->length)
+	{
+		bigint_tmp = (t_bigint){0, {0}};
+		bigint_cpy(&bigint_tmp, large_nb);
+		bigint_multiply_nb(&bigint_tmp, small_nb->blocks[i]);		
+		bigint_shiftleft(&bigint_tmp, shift * BIGINT_BLOCK_SIZE);
+		bigint_add(result, &bigint_tmp, result);	
+		++i;
+		++shift;
 	}
 }
 
@@ -762,33 +813,33 @@ int				get_exponent(double value)
 	return (-exp);
 }
 
-void			dragon_4(t_dbls *value)
-{
-	t_bigint	val_num;
-	t_bigint	val_den;
-	t_ulint		val_mantissa;
-	int			digit_exp;
-	int			val_exponent;
-	
-	val_mantissa = (t_ulint)value->dbl_parts.mantissa + 1LU << 51;
-	val_exponent = (int)value->dbl_parts.exponent - 1075;
-	val_num = (t_bigint){0, {0} };
-	val_den = (t_bigint){0, {0} };
-	uimax_to_bigint(val_mantissa, &val_num);
-	if (val_exponent > 0)
-	{
-		bigint_shiftleft(&val_num, val_exponent);
-		uimax_to_bigint(1, &val_den);
-	}
-	else
-	{
-		uimax_to_bigint(1, &val_den);
-		bigint_shiftleft(&val_den, -val_exponent);
-	}
-	digit_exp = get_exponent(value.dbl);
-	if (digit_exp > 0)
-
-}
+//void			dragon_4(t_dbls *value)
+//{
+//	t_bigint	val_num;
+//	t_bigint	val_den;
+//	t_ulint		val_mantissa;
+//	int			digit_exp;
+//	int			val_exponent;
+//	
+//	val_mantissa = (t_ulint)value->dbl_parts.mantissa + 1LU << 51;
+//	val_exponent = (int)value->dbl_parts.exponent - 1075;
+//	val_num = (t_bigint){0, {0} };
+//	val_den = (t_bigint){0, {0} };
+//	uimax_to_bigint(val_mantissa, &val_num);
+//	if (val_exponent > 0)
+//	{
+//		bigint_shiftleft(&val_num, val_exponent);
+//		uimax_to_bigint(1, &val_den);
+//	}
+//	else
+//	{
+//		uimax_to_bigint(1, &val_den);
+//		bigint_shiftleft(&val_den, -val_exponent);
+//	}
+//	digit_exp = get_exponent(value.dbl);
+//	if (digit_exp > 0)
+//
+//}
 
 void			conv_handler(t_worker *work, const char **fmt, va_list args,
 								t_format *conv_params)

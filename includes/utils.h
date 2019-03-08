@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/07 16:46:49 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/08 11:45:49 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,5 +67,6 @@ int				bigint_size(const t_bigint *bigint);
 void			uimax_to_bigint(uintmax_t nb, t_bigint *result);
 void			bigint_shiftleft(t_bigint *result, t_uint shift);
 int				get_exponent(double value);
+void			bigint_cpy(t_bigint *dest, const t_bigint *src);
 
 #endif
