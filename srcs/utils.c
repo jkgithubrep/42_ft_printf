@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/08 22:27:33 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/09 17:09:42 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -715,15 +715,28 @@ void			bigint_shiftleft(t_bigint *result, t_uint shift)
 		return ;
 	i = BIGINT_SIZE;
 	block_size = BIGINT_BLOCK_SIZE;
-	while (--i >= (shift/block_size + 1))
+	if (!(shift % block_size))
+		while (--i >= (shift / block_size))
+			result->blocks[i] = result->blocks[i - (shift / block_size)];
+	else
 	{
-		result->blocks[i] = (result->blocks[i - (shift/block_size + 1)]
-								>> (block_size - shift % block_size))
-								| (result->blocks[i - shift/block_size]
-									<< (shift % block_size));
+		while (--i >= (shift/block_size + 1))
+		{
+	//		printf("result->blocks[i - (shift/block_size + 1)]=%u\n", result->blocks[i - (shift/block_size + 1)]);
+	//		printf("block_size - shift %% block_size = %d\n", block_size - shift % block_size);
+	//		printf("i - (shift/block_size + 1) >> (block_size - shift %% block_size) = %d\n", result->blocks[i - (shift/block_size + 1)] >> (block_size - shift % block_size));
+			result->blocks[i] = (result->blocks[i - (shift / block_size + 1)]
+									>> (block_size - (shift % block_size)))
+									| (result->blocks[i - shift / block_size]
+										<< (shift % block_size));
+			//printf("i=%d\n", i);
+			//print_bigint(result, "result");
+		}
+		result->blocks[i] = result->blocks[i - shift/block_size]
+								<< (shift % block_size);
+		--i;
 	}
-	result->blocks[i] = result->blocks[i - shift/block_size]
-							<< (shift % block_size);
+	++i;
 	while (i--)
 		result->blocks[i] = 0;
 	result->length = bigint_size(result);
@@ -765,6 +778,7 @@ void			bigint_multiply(const t_bigint *bigint1,
 	const t_bigint	*large_nb;
 	const t_bigint	*small_nb;
 	t_bigint		bigint_tmp;
+	t_bigint		bigint_tmp2;
 	int				i;
 	int				shift;
 
@@ -780,15 +794,22 @@ void			bigint_multiply(const t_bigint *bigint1,
 	}
 	i = 0;
 	shift = 0;
-//	print_bigint(large_nb, "large_nb");
-//	print_bigint(small_nb, "small_nb");
+	print_bigint(large_nb, "multi: large_nb");
+	print_bigint(small_nb, "multi: small_nb");
 	while (i < small_nb->length)
 	{
 		bigint_tmp = (t_bigint){0, {0}};
 		bigint_cpy(&bigint_tmp, large_nb);
 		bigint_multiply_nb(&bigint_tmp, small_nb->blocks[i]);		
+		printf("small_nb[%d]=%u\n", i, small_nb->blocks[i]);
+		print_bigint(&bigint_tmp, "multi: bigint tmp after multiply by n");
 		bigint_shiftleft(&bigint_tmp, shift * BIGINT_BLOCK_SIZE);
-		bigint_add(result, &bigint_tmp, result);	
+		print_bigint(&bigint_tmp, "multi: bigint tmp shifted");
+		bigint_tmp2 = (t_bigint){0, {0}};
+		bigint_add(result, &bigint_tmp, &bigint_tmp2);	
+		*result = (t_bigint){0, {0}};
+		bigint_cpy(result, &bigint_tmp2);
+		print_bigint(result, "multi: result");
 		++i;
 		++shift;
 	}
@@ -830,7 +851,6 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 		0xcf4a6e70, 0xd595d80f, 0x26b2716e, 0xadc666b0, 0x1d153624, 0x3c42d35a,
 		0x63ff540e, 0xcc5573c0, 0x65f9ef17, 0x55bc28f2, 0x80dcc7f7, 0xf46eeddc,
 		0x5fdcefce, 0x000553f7}}};
-//	t_bigint		lookup_tbl[2] = {{1, {100000000}}, {2, {0x6fc10000, 0x002386f2}}};
 	t_bigint		bigint_tmp;
 	t_uint			tbl_index;
 	
@@ -845,9 +865,16 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 	{
 		if (exponent & 1U)
 		{
+			printf("index: %d\n", tbl_index);
 			bigint_tmp = (t_bigint){0, {0}};
+			print_bigint(result, "pow10: result before multi");
+			print_bigint(&lookup_tbl[tbl_index], "pow10: lookup");
 			bigint_multiply(result, &lookup_tbl[tbl_index], &bigint_tmp);
+			print_bigint(&bigint_tmp, "pow10: bigint tmp");
+			*result = (t_bigint){0, {0}};
 			bigint_cpy(result, &bigint_tmp);
+//			if (tbl_index == 2)
+//				break ;
 		}
 		exponent >>= 1;
 		++tbl_index;
@@ -889,7 +916,7 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 
 void			dragon4(t_dbls *value)
 {
-	char		string[256] = {0};
+	char		string[10000] = {0};
 	t_bigint	val_num;
 	t_bigint	val_den;
 	t_bigint	bigint_tmp;
@@ -944,7 +971,7 @@ void			dragon4(t_dbls *value)
 	print_bigint(&val_num, "BIGINT NUM");
 	print_bigint(&val_den, "BIGINT DEN");
 	i = 0;
-	while (val_num.length > 0 && i < 255)
+	while (val_num.length > 0 && i < 10000)
 	{
 		if (i == 0)
 		{
