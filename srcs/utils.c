@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 17:08:12 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 23:14:23 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -866,30 +866,22 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 
 	res = 5;
 	bigint_tmp = (t_bigint){0, {0}};
-	bigint_cpy(&bigint_tmp, divisor);
-	bigint_multiply_nb(&bigint_tmp, res);
+	bigint_multiply_nb(bigint_cpy(&bigint_tmp, divisor), res);
 	if (bigint_compare(dividend, &bigint_tmp) > 0)
 	{
-		while (bigint_compare(dividend, &bigint_tmp) > 0)
-		{
-			bigint_add(&bigint_tmp, divisor, &bigint_tmp);
+		while (bigint_compare(dividend, bigint_add(&bigint_tmp, divisor,
+														&bigint_tmp)) > 0)
 			++res;	
-		}
+		return (!bigint_compare(dividend, &bigint_tmp) ? res + 1 : res);
 	}
-	else if (bigint_compare(dividend, &bigint_tmp) < 0)
+	if (bigint_compare(dividend, &bigint_tmp) < 0)
 	{
-		res = 1;
-		bigint_tmp = (t_bigint){0, {0}};
-		bigint_cpy(&bigint_tmp, divisor);
-		while (bigint_compare(dividend, &bigint_tmp) > 0)
-		{
-			bigint_add(&bigint_tmp, divisor, &bigint_tmp);
-			++res;	
-		}
+		while (bigint_compare(dividend, bigint_substract(&bigint_tmp, divisor,
+														&bigint_tmp)) < 0)
+			--res;	
+		return (res - 1);
 	}
-	else
-		return (res);
-	return (res - 1);
+	return (res);
 }
 
 void			dragon4(t_dbls *value)
@@ -937,6 +929,8 @@ void			dragon4(t_dbls *value)
 		val_num = (t_bigint){0, {0}};
 		bigint_cpy(&val_num, &bigint_tmp);
 	}
+	print_bigint(&val_num, "val_num");
+	print_bigint(&val_den, "val_den");
 	i = 0;
 	while (val_num.length > 0 && i < 400)
 	{
