@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 22:01:16 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 23:22:50 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int		main(int ac, char **av)
 	print_diff(&value);
 	value.dbl = DBL_MIN;
 	print_diff(&value);
-	value.dbl = 2;
+	value.dbl = 500;
 	print_diff(&value);
 	return (0);
 }

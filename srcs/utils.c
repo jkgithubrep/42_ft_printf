@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 23:14:23 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 23:44:55 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -884,53 +884,66 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 	return (res);
 }
 
-void			dragon4(t_dbls *value)
+void			initialize_fraction(t_dbls *value, t_bigint *val_num,
+													t_bigint *val_den)
 {
-	char		string[400] = {0};
-	t_bigint	val_num;
-	t_bigint	val_den;
-	t_bigint	bigint_tmp;
-	t_bigint	pow10;
 	t_ullint	val_mantissa;
-	int			digit_exp;
 	int			val_exponent;
-	int			i;
-	int			digit;
-	
+
 	val_mantissa = (t_ullint)value->dbl_parts.mantissa + (1ULL << 52);
 	val_exponent = (int)value->dbl_parts.exponent - 1075;
-	val_num = (t_bigint){0, {0}};
-	val_den = (t_bigint){0, {0}};
-	uimax_to_bigint(val_mantissa, &val_num);
+	uimax_to_bigint(val_mantissa, val_num);
 	if (val_exponent > 0)
 	{
-		bigint_shiftleft(&val_num, val_exponent);
-		uimax_to_bigint(1, &val_den);
+		bigint_shiftleft(val_num, val_exponent);
+		uimax_to_bigint(1, val_den);
 	}
 	else
 	{
-		uimax_to_bigint(1, &val_den);
-		bigint_shiftleft(&val_den, -val_exponent);
+		uimax_to_bigint(1, val_den);
+		bigint_shiftleft(val_den, -val_exponent);
 	}
+}
+
+void			scale_fraction(t_dbls *value, t_bigint *val_num, t_bigint 
+																	*val_den)
+{
+	t_bigint	bigint_tmp;
+	t_bigint	pow10;
+	int			digit_exp;
+
 	digit_exp = get_exponent(value->dbl);
 	bigint_tmp = (t_bigint){0, {0}};
 	pow10 = (t_bigint){0, {0}};
 	if (digit_exp > 0)
 	{
 		bigint_pow10(&pow10, digit_exp);
-		bigint_multiply(&val_den, &pow10, &bigint_tmp);
-		val_den = (t_bigint){0, {0}};
-		bigint_cpy(&val_den, &bigint_tmp);
+		bigint_multiply(val_den, &pow10, &bigint_tmp);
+		*val_den = (t_bigint){0, {0}};
+		bigint_cpy(val_den, &bigint_tmp);
 	}
 	else if (digit_exp < 0)
 	{
 		bigint_pow10(&pow10, -digit_exp);
-		bigint_multiply(&val_num, &pow10, &bigint_tmp);
-		val_num = (t_bigint){0, {0}};
-		bigint_cpy(&val_num, &bigint_tmp);
+		bigint_multiply(val_num, &pow10, &bigint_tmp);
+		*val_num = (t_bigint){0, {0}};
+		bigint_cpy(val_num, &bigint_tmp);
 	}
-	print_bigint(&val_num, "val_num");
-	print_bigint(&val_den, "val_den");
+}
+
+void			dragon4(t_dbls *value)
+{
+	char		string[400] = {0};
+	t_bigint	val_num;
+	t_bigint	val_den;
+	t_bigint	bigint_tmp;
+	int			i;
+	int			digit;
+	
+	val_num = (t_bigint){0, {0}};
+	val_den = (t_bigint){0, {0}};
+	initialize_fraction(value, &val_num, &val_den);
+	scale_fraction(value, &val_num, &val_den);
 	i = 0;
 	while (val_num.length > 0 && i < 400)
 	{
