@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 15:22:22 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 15:57:29 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
 					const t_bigint **small_nb, const t_bigint **large_nb);
 t_bigint		*bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 							t_bigint *result);
-void			bigint_substract(const t_bigint *bigint1,
+t_bigint		*bigint_substract(const t_bigint *bigint1,
 									const t_bigint *bigint2, t_bigint *result);
 size_t			bigint_size(const t_bigint *bigint);
 void			uimax_to_bigint(uintmax_t nb, t_bigint *result);

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 15:34:09 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 16:11:52 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -589,7 +589,7 @@ int				bigint_compare(const t_bigint *bigint1, const t_bigint *bigint2)
 void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
 					const t_bigint **small_nb, const t_bigint **large_nb)
 {
-	if (bigint1->length > bigint2->length)
+	if (bigint_compare(bigint1, bigint2) >= 0)
 	{
 		*large_nb = bigint1;
 		*small_nb = bigint2;
@@ -647,54 +647,29 @@ t_bigint		*bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 	return (result);
 }
 
-void			bigint_substract(const t_bigint *bigint1,
+t_bigint		*bigint_substract(const t_bigint *bigint1,
 									const t_bigint *bigint2, t_bigint *result)
 {
 	const t_bigint	*large_nb;
 	const t_bigint	*small_nb;
-	t_ulint			rem;
 	t_ulint			carry;
 	t_ulint			tmp;
 	size_t			i;
 
-	if (bigint_compare(bigint1, bigint2) >= 0)
-	{
-		large_nb = bigint1;
-		small_nb = bigint2;
-	}
-	else
-	{
-		large_nb = bigint2;
-		small_nb = bigint1;
-	}
-	rem = 0UL;
 	carry = 0UL;
 	i = 0;
-	while (i < small_nb->length)
-	{
-		tmp = (t_ulint)large_nb->blocks[i] - carry;
-		if (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry)) 
-				&& (tmp >= (t_ulint)small_nb->blocks[i]))
-			rem = tmp - (t_ulint)small_nb->blocks[i];
-		else
-			rem = tmp + (1UL << 32) - (t_ulint)small_nb->blocks[i];
-		carry = (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry))
-					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0UL : 1UL;
-		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFUL);
-		i++;
-	}
+	order_bigints(bigint1, bigint2, &small_nb, &large_nb);
 	while (i < large_nb->length)
 	{
-		if (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry))
-			rem = (t_ulint)large_nb->blocks[i] - carry;
-		else
-			rem = (t_ulint)large_nb->blocks[i] + (1UL << 32) - carry;
-		carry = (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry)) ?
-					0UL : 1UL;
-		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFUL);
+		tmp = (t_ulint)large_nb->blocks[i] - carry;
+		carry = (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry))
+					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0UL : 1UL;
+		result->blocks[i] = (t_uint)((tmp + ((carry) ? (1UL << 32) : 0UL)
+					- (t_ulint)small_nb->blocks[i]) & 0xFFFFFFFFUL);
 		i++;
 	}
 	result->length = bigint_size(result);
+	return (result);
 }
 
 void			uimax_to_bigint(uintmax_t nb, t_bigint *result)
