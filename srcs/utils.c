@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 16:11:52 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 16:51:23 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -647,6 +647,12 @@ t_bigint		*bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 	return (result);
 }
 
+/*
+** Substract the smallest number from `bigint1' and `bigint2' to the biggest
+** from `bigint1` and `bigint2' and store the difference in `result'.
+** Return a pointer to `result'.
+*/
+
 t_bigint		*bigint_substract(const t_bigint *bigint1,
 									const t_bigint *bigint2, t_bigint *result)
 {
@@ -672,7 +678,13 @@ t_bigint		*bigint_substract(const t_bigint *bigint1,
 	return (result);
 }
 
-void			uimax_to_bigint(uintmax_t nb, t_bigint *result)
+/*
+** Convert a uintmax_t number to a bigint and store the obtained bigint in
+** `result'.
+** Return a pointer to `result'.
+*/
+
+t_bigint		*uimax_to_bigint(uintmax_t nb, t_bigint *result)
 {
 	int			i;
 
@@ -683,15 +695,20 @@ void			uimax_to_bigint(uintmax_t nb, t_bigint *result)
 		nb >>= BIGINT_BLOCK_SIZE;
 	}
 	result->length = bigint_size(result);
+	return (result);
 }
 
-void			bigint_shiftleft(t_bigint *result, t_uint shift)
+/*
+** Shift the bigint to the left.
+*/
+
+t_bigint		*bigint_shiftleft(t_bigint *result, t_uint shift)
 {
 	t_uint		i;
 	int			block_size;
 
 	if (!shift)
-		return ;
+		return (result);
 	i = BIGINT_SIZE;
 	block_size = BIGINT_BLOCK_SIZE;
 	if (!(shift % block_size))
@@ -700,28 +717,32 @@ void			bigint_shiftleft(t_bigint *result, t_uint shift)
 	else
 	{
 		while (--i >= (shift/block_size + 1))
-		{
 			result->blocks[i] = (result->blocks[i - (shift / block_size + 1)]
-									>> (block_size - (shift % block_size)))
-									| (result->blocks[i - shift / block_size]
-										<< (shift % block_size));
-		}
+				>> (block_size - (shift % block_size))) 
+				| (result->blocks[i - shift / block_size] 
+					<< (shift % block_size));
 		result->blocks[i] = result->blocks[i - shift/block_size]
 								<< (shift % block_size);
-		--i;
 	}
-	++i;
+	i = !(shift % block_size) ? i + 1 : i;
 	while (i--)
 		result->blocks[i] = 0;
 	result->length = bigint_size(result);
+	return (result);
 }
 
-void			bigint_multiply_nb(t_bigint *result, t_uint nb)
+/*
+** Multiply a bigint by an unsigned int.
+*/
+
+t_bigint		*bigint_multiply_nb(t_bigint *result, t_uint nb)
 {
 	size_t		i;
 	t_ulint		carry;
 	t_ulint		res;
 
+	if (nb == 1)
+		return (result);
 	i = 0;
 	carry = 0UL;
 	while (i < result->length)
@@ -734,9 +755,10 @@ void			bigint_multiply_nb(t_bigint *result, t_uint nb)
 	if (carry && i < BIGINT_SIZE)
 		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFUL);
 	result->length = bigint_size(result);
+	return (result);
 }
 
-void			bigint_cpy(t_bigint *dest, const t_bigint *src)
+t_bigint		*bigint_cpy(t_bigint *dest, const t_bigint *src)
 {
 	size_t		i;
 	
@@ -747,9 +769,10 @@ void			bigint_cpy(t_bigint *dest, const t_bigint *src)
 		i++;
 	}
 	dest->length = src->length;
+	return (dest);
 }
 
-void			bigint_multiply(const t_bigint *bigint1, 
+t_bigint		*bigint_multiply(const t_bigint *bigint1, 
 									const t_bigint *bigint2, t_bigint *result)
 {
 	const t_bigint	*large_nb;
@@ -759,18 +782,9 @@ void			bigint_multiply(const t_bigint *bigint1,
 	size_t			i;
 	int				shift;
 
-	if (bigint_compare(bigint1, bigint2) >= 0)
-	{
-		large_nb = bigint1;
-		small_nb = bigint2;
-	}
-	else
-	{
-		large_nb = bigint2;
-		small_nb = bigint1;
-	}
 	i = 0;
 	shift = 0;
+	order_bigints(bigint1, bigint2, &small_nb, &large_nb);
 	while (i < small_nb->length)
 	{
 		bigint_tmp = (t_bigint){0, {0}};
@@ -784,6 +798,7 @@ void			bigint_multiply(const t_bigint *bigint1,
 		++i;
 		++shift;
 	}
+	return (result);
 }
 
 int				get_exponent(double value)
