@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 16:51:23 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 17:00:33 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -778,7 +778,6 @@ t_bigint		*bigint_multiply(const t_bigint *bigint1,
 	const t_bigint	*large_nb;
 	const t_bigint	*small_nb;
 	t_bigint		bigint_tmp;
-	t_bigint		bigint_tmp2;
 	size_t			i;
 	int				shift;
 
@@ -791,10 +790,7 @@ t_bigint		*bigint_multiply(const t_bigint *bigint1,
 		bigint_cpy(&bigint_tmp, large_nb);
 		bigint_multiply_nb(&bigint_tmp, small_nb->blocks[i]);		
 		bigint_shiftleft(&bigint_tmp, shift * BIGINT_BLOCK_SIZE);
-		bigint_tmp2 = (t_bigint){0, {0}};
-		bigint_add(result, &bigint_tmp, &bigint_tmp2);	
-		*result = (t_bigint){0, {0}};
-		bigint_cpy(result, &bigint_tmp2);
+		bigint_add(result, &bigint_tmp, result);	
 		++i;
 		++shift;
 	}
