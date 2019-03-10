@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/06 21:33:09 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/08 18:00:58 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 15:26:28 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void	print_bigint(const t_bigint *bigint, const char *name)
 
 	i = 0;
 	printf(">>> %s <<<\n", name);
-	printf("length: %d\n", bigint->length);
+	printf("length: %zu\n", bigint->length);
 //	print_separation();
 //	print_bigint_header();
 //	print_separation();

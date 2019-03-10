@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/09 17:09:42 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/10 15:34:09 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -565,18 +565,20 @@ void			add_to_buff(t_worker *work, char *val_str, int len)
 }
 
 /*
-** First compare bigint lenghts and return the difference if they are not equal.
-** Otherwise, compare blocks one by one from high to low. If blocks are not
-** equal, return 1 if block 1 is greater than block 2, else return -1.
+** First compare bigint lengths, and return 1 if length of bigint1 is greater
+** than length of bigint2.
+** If lengths are equal, compare blocks one by one from high to low. 
+** If blocks values are not equal, return 1 if block of bigint1 is greater than 
+** block of bigint2, else return -1.
 ** If all blocks are equal, return 0.
 */
 
 int				bigint_compare(const t_bigint *bigint1, const t_bigint *bigint2)
 {
-	int			i; 
+	size_t		i; 
 
 	if (bigint1->length != bigint2->length)
-		return (bigint1->length - bigint2->length);
+		return ((bigint1->length > bigint2->length) ? 1 : -1);
 	i = bigint1->length;
 	while (i--)
 		if (bigint1->blocks[i] != bigint2->blocks[i])
@@ -599,9 +601,13 @@ void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
 	}
 }
 
-int				bigint_size(const t_bigint *bigint)
+/*
+** Return the number of blocks used to store the bigint.
+*/
+
+size_t			bigint_size(const t_bigint *bigint)
 {
-	int			i;
+	size_t		i;
 
 	i = BIGINT_SIZE;
 	while (i--)
@@ -610,37 +616,35 @@ int				bigint_size(const t_bigint *bigint)
 	return (0);
 }
 
-void			bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
+/*
+** Add `bigint1' and `bigint2' and store the sum in `result'.
+** Return a pointer to `result'.
+*/
+
+t_bigint		*bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
 							t_bigint *result)
 {
-	const t_bigint	*large_nb;
-	const t_bigint	*small_nb;
 	t_ulint			sum;
 	t_ulint			carry;
-	int				i;
+	size_t			i;
+	size_t			max_len;
 
-	order_bigints(bigint1, bigint2, &small_nb, &large_nb);
-	sum = 0LU;
-	carry = 0LU;
+	sum = 0UL;
+	carry = 0UL;
 	i = 0;
-	while (i < small_nb->length)
+	max_len = (size_t)ft_max(bigint1->length, bigint2->length);
+	while (i < max_len)
 	{
-		sum = carry + (t_ulint)small_nb->blocks[i]
-					+ (t_ulint)large_nb->blocks[i];
-		result->blocks[i] = (t_uint)(sum & 0xFFFFFFFFLU);
-		carry = sum >> BIGINT_BLOCK_SIZE;
-		i++;
-	}
-	while (i < large_nb->length)
-	{
-		sum = carry + (t_ulint)large_nb->blocks[i];
-		result->blocks[i]  = (t_uint)(sum & 0xFFFFFFFFLU);
+		sum = carry + (t_ulint)bigint1->blocks[i]
+					+ (t_ulint)bigint2->blocks[i];
+		result->blocks[i] = (t_uint)(sum & 0xFFFFFFFFUL);
 		carry = sum >> BIGINT_BLOCK_SIZE;
 		i++;
 	}
 	if (carry && (i < BIGINT_SIZE))
-		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFLU);
-	result->length = (carry) ? large_nb->length + 1 : large_nb->length;
+		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFUL);
+	result->length = (carry) ? max_len + 1 : max_len;
+	return (result);
 }
 
 void			bigint_substract(const t_bigint *bigint1,
@@ -651,7 +655,7 @@ void			bigint_substract(const t_bigint *bigint1,
 	t_ulint			rem;
 	t_ulint			carry;
 	t_ulint			tmp;
-	int				i;
+	size_t			i;
 
 	if (bigint_compare(bigint1, bigint2) >= 0)
 	{
@@ -663,8 +667,8 @@ void			bigint_substract(const t_bigint *bigint1,
 		large_nb = bigint2;
 		small_nb = bigint1;
 	}
-	rem = 0LU;
-	carry = 0LU;
+	rem = 0UL;
+	carry = 0UL;
 	i = 0;
 	while (i < small_nb->length)
 	{
@@ -673,10 +677,10 @@ void			bigint_substract(const t_bigint *bigint1,
 				&& (tmp >= (t_ulint)small_nb->blocks[i]))
 			rem = tmp - (t_ulint)small_nb->blocks[i];
 		else
-			rem = tmp + (1LU << 32) - (t_ulint)small_nb->blocks[i];
+			rem = tmp + (1UL << 32) - (t_ulint)small_nb->blocks[i];
 		carry = (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry))
-					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0LU : 1LU;
-		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFLU);
+					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0UL : 1UL;
+		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFUL);
 		i++;
 	}
 	while (i < large_nb->length)
@@ -684,10 +688,10 @@ void			bigint_substract(const t_bigint *bigint1,
 		if (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry))
 			rem = (t_ulint)large_nb->blocks[i] - carry;
 		else
-			rem = (t_ulint)large_nb->blocks[i] + (1LU << 32) - carry;
+			rem = (t_ulint)large_nb->blocks[i] + (1UL << 32) - carry;
 		carry = (large_nb->blocks[i] || (!large_nb->blocks[i] && !carry)) ?
-					0LU : 1LU;
-		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFLU);
+					0UL : 1UL;
+		result->blocks[i] = (t_uint)(rem & 0xFFFFFFFFUL);
 		i++;
 	}
 	result->length = bigint_size(result);
@@ -700,7 +704,7 @@ void			uimax_to_bigint(uintmax_t nb, t_bigint *result)
 	i = -1;
 	while (nb && ++i < BIGINT_SIZE)
 	{
-		result->blocks[i] = (t_uint)(nb & 0xFFFFFFFFLU);
+		result->blocks[i] = (t_uint)(nb & 0xFFFFFFFFUL);
 		nb >>= BIGINT_BLOCK_SIZE;
 	}
 	result->length = bigint_size(result);
@@ -722,15 +726,10 @@ void			bigint_shiftleft(t_bigint *result, t_uint shift)
 	{
 		while (--i >= (shift/block_size + 1))
 		{
-	//		printf("result->blocks[i - (shift/block_size + 1)]=%u\n", result->blocks[i - (shift/block_size + 1)]);
-	//		printf("block_size - shift %% block_size = %d\n", block_size - shift % block_size);
-	//		printf("i - (shift/block_size + 1) >> (block_size - shift %% block_size) = %d\n", result->blocks[i - (shift/block_size + 1)] >> (block_size - shift % block_size));
 			result->blocks[i] = (result->blocks[i - (shift / block_size + 1)]
 									>> (block_size - (shift % block_size)))
 									| (result->blocks[i - shift / block_size]
 										<< (shift % block_size));
-			//printf("i=%d\n", i);
-			//print_bigint(result, "result");
 		}
 		result->blocks[i] = result->blocks[i - shift/block_size]
 								<< (shift % block_size);
@@ -744,31 +743,34 @@ void			bigint_shiftleft(t_bigint *result, t_uint shift)
 
 void			bigint_multiply_nb(t_bigint *result, t_uint nb)
 {
-	int			i;
+	size_t		i;
 	t_ulint		carry;
 	t_ulint		res;
 
 	i = 0;
-	carry = 0LU;
+	carry = 0UL;
 	while (i < result->length)
 	{
 		res = (t_ulint)result->blocks[i] * (t_ulint)nb + carry;
-		result->blocks[i] = (t_uint)(res & 0xFFFFFFFFLU);
+		result->blocks[i] = (t_uint)(res & 0xFFFFFFFFUL);
 		carry = res >> 32;
 		i++;
 	}
 	if (carry && i < BIGINT_SIZE)
-		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFLU);
+		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFUL);
 	result->length = bigint_size(result);
 }
 
 void			bigint_cpy(t_bigint *dest, const t_bigint *src)
 {
-	int			i;
+	size_t		i;
 	
-	i = -1;
-	while (++i < src->length)
+	i = 0;
+	while (i < src->length)
+	{
 		dest->blocks[i] = src->blocks[i];
+		i++;
+	}
 	dest->length = src->length;
 }
 
@@ -779,7 +781,7 @@ void			bigint_multiply(const t_bigint *bigint1,
 	const t_bigint	*small_nb;
 	t_bigint		bigint_tmp;
 	t_bigint		bigint_tmp2;
-	int				i;
+	size_t			i;
 	int				shift;
 
 	if (bigint_compare(bigint1, bigint2) >= 0)
@@ -794,22 +796,16 @@ void			bigint_multiply(const t_bigint *bigint1,
 	}
 	i = 0;
 	shift = 0;
-	print_bigint(large_nb, "multi: large_nb");
-	print_bigint(small_nb, "multi: small_nb");
 	while (i < small_nb->length)
 	{
 		bigint_tmp = (t_bigint){0, {0}};
 		bigint_cpy(&bigint_tmp, large_nb);
 		bigint_multiply_nb(&bigint_tmp, small_nb->blocks[i]);		
-		printf("small_nb[%d]=%u\n", i, small_nb->blocks[i]);
-		print_bigint(&bigint_tmp, "multi: bigint tmp after multiply by n");
 		bigint_shiftleft(&bigint_tmp, shift * BIGINT_BLOCK_SIZE);
-		print_bigint(&bigint_tmp, "multi: bigint tmp shifted");
 		bigint_tmp2 = (t_bigint){0, {0}};
 		bigint_add(result, &bigint_tmp, &bigint_tmp2);	
 		*result = (t_bigint){0, {0}};
 		bigint_cpy(result, &bigint_tmp2);
-		print_bigint(result, "multi: result");
 		++i;
 		++shift;
 	}
@@ -865,16 +861,10 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 	{
 		if (exponent & 1U)
 		{
-			printf("index: %d\n", tbl_index);
 			bigint_tmp = (t_bigint){0, {0}};
-			print_bigint(result, "pow10: result before multi");
-			print_bigint(&lookup_tbl[tbl_index], "pow10: lookup");
 			bigint_multiply(result, &lookup_tbl[tbl_index], &bigint_tmp);
-			print_bigint(&bigint_tmp, "pow10: bigint tmp");
 			*result = (t_bigint){0, {0}};
 			bigint_cpy(result, &bigint_tmp);
-//			if (tbl_index == 2)
-//				break ;
 		}
 		exponent >>= 1;
 		++tbl_index;
@@ -916,7 +906,7 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 
 void			dragon4(t_dbls *value)
 {
-	char		string[10000] = {0};
+	char		string[400] = {0};
 	t_bigint	val_num;
 	t_bigint	val_den;
 	t_bigint	bigint_tmp;
@@ -927,14 +917,11 @@ void			dragon4(t_dbls *value)
 	int			i;
 	int			digit;
 	
-	val_mantissa = (t_ullint)value->dbl_parts.mantissa + (1LLU << 52);
+	val_mantissa = (t_ullint)value->dbl_parts.mantissa + (1ULL << 52);
 	val_exponent = (int)value->dbl_parts.exponent - 1075;
-	printf("val_mantissa: %llu\n", val_mantissa);
-	printf("val_exponent: %d\n", val_exponent);
 	val_num = (t_bigint){0, {0}};
 	val_den = (t_bigint){0, {0}};
 	uimax_to_bigint(val_mantissa, &val_num);
-	print_bigint(&val_num, "val_mantissa converted to val_num");
 	if (val_exponent > 0)
 	{
 		bigint_shiftleft(&val_num, val_exponent);
@@ -945,42 +932,27 @@ void			dragon4(t_dbls *value)
 		uimax_to_bigint(1, &val_den);
 		bigint_shiftleft(&val_den, -val_exponent);
 	}
-	print_bigint(&val_num, "val_num after exponent");
-	print_bigint(&val_den, "val_den after exponent");
 	digit_exp = get_exponent(value->dbl);
-	printf("first_digit_exponent: %d\n", digit_exp);
 	bigint_tmp = (t_bigint){0, {0}};
 	pow10 = (t_bigint){0, {0}};
 	if (digit_exp > 0)
 	{
 		bigint_pow10(&pow10, digit_exp);
-		print_bigint(&pow10, "power 10");
 		bigint_multiply(&val_den, &pow10, &bigint_tmp);
-		print_bigint(&bigint_tmp, "bigint tmp");
 		val_den = (t_bigint){0, {0}};
 		bigint_cpy(&val_den, &bigint_tmp);
 	}
 	else if (digit_exp < 0)
 	{
 		bigint_pow10(&pow10, -digit_exp);
-		print_bigint(&pow10, "power 10");
 		bigint_multiply(&val_num, &pow10, &bigint_tmp);
 		val_num = (t_bigint){0, {0}};
 		bigint_cpy(&val_num, &bigint_tmp);
 	}
-	print_bigint(&val_num, "BIGINT NUM");
-	print_bigint(&val_den, "BIGINT DEN");
 	i = 0;
-	while (val_num.length > 0 && i < 10000)
+	while (val_num.length > 0 && i < 400)
 	{
-		if (i == 0)
-		{
-			print_bigint(&val_num, "val_num");
-			print_bigint(&val_den, "val_den");
-		}
 		digit = bigint_divide(&val_num, &val_den);
-		if (i == 0)
-			printf("digit: %d\n", digit);
 		string[i] = '0' + digit;
 		bigint_tmp = (t_bigint){0, {0}};
 		bigint_cpy(&bigint_tmp, &val_den);

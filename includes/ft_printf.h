@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/08 17:54:37 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/09 19:22:27 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ typedef struct				s_worker{
 }							t_worker;
 
 typedef struct				s_bigint{
-	int						length;
+	size_t					length;
 	t_uint					blocks[BIGINT_SIZE];
 }							t_bigint;
 
