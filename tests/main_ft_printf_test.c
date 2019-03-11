@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/11 18:08:57 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 19:04:53 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,53 +16,30 @@
 #include <math.h>
 #include <float.h>
 
-//void	print_diff(t_dbls *value)
-//{
-//	printf("dragon:\n");
-//	dragon4(value);
-//	printf("printf:\n%.300f\n", value->dbl);
-//}
-//
-//int		main(int ac, char **av)
-//{
-//	t_dbls			value;
-//
-//	(void)ac;
-//	(void)av;
-//	value.dbl = DBL_MAX;
-//	print_diff(&value);
-//	value.dbl = 0.1;
-//	print_diff(&value);
-//	value.dbl = DBL_MIN;
-//	print_diff(&value);
-//	value.dbl = 500;
-//	print_diff(&value);
-//	return (0);
-//}
-
-//int		main(int ac, char **av)
-//{
-//	t_bigint	bigint1;
-//	t_bigint	bigint2;
-//	t_bigint	result;
-//
-//	(void)ac;
-//	(void)av;
-//	bigint1 = (t_bigint){2, {1, 2}};
-//	bigint2 = (t_bigint){1, {1, 0}};
-//	result = (t_bigint){0, {0}};
-//	print_bigint(&bigint1, "bigint 1");
-//	print_bigint(&bigint2, "bigint 2");
-//	bigint_substract(&bigint1, &bigint2, &result);
-//	print_bigint(&result, "result");
-//	return (0);
-//}
-
-int		main(void)
+void	print_diff_dbl(double value)
 {
-	double	val;
+	printf("%9s: %.1350f\n", "printf", value);
+	ft_printf("%9s: %.1350f\n", "ft_printf", value);
+}
 
-	val = 84.5;
-	printf("%.f\n", val);
-	ft_printf("%.f\n", val);
+void	print_diff_ldbl(long double value)
+{
+	printf("%9s: %Lf\n", "printf", value);
+	ft_printf("%9s: %Lf\n", "ft_printf", value);
+}
+
+int		main(int ac, char **av)
+{
+	double		value;
+
+	(void)ac;
+	(void)av;
+	value = DBL_MIN;
+	print_diff_dbl(value);
+	value = DBL_MAX;
+	print_diff_dbl(value);
+	value = 0.1;
+	print_diff_dbl(value);
+	value = 9999.9999;
+	return (0);
 }

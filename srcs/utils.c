@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/11 18:08:17 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 18:59:34 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -530,9 +530,11 @@ char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 
 	exponent = 0;
 	val_str = NULL;
+	printf("exponent: %d\n", arg_val->dbl_parts.exponent);
+	printf("mantissa: %llu\n", arg_val->dbl_parts.mantissa);
 	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
 		return (NULL);
-	dragon4(arg_val, digits, &exponent);
+	dragon4(arg_val, digits, &exponent, conv_params);
 	if (exponent < 0)
 		ft_strpad_left(&digits, '0', -exponent);
 	round_nb(digits, &exponent, conv_params);
@@ -970,13 +972,25 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 }
 
 void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
-													t_bigint *val_den)
+									t_bigint *val_den, t_format *conv_params)
 {
 	t_ullint	val_mantissa;
 	int			val_exponent;
 
-	val_mantissa = (t_ullint)arg_val->dbl_parts.mantissa + (1ULL << 52);
-	val_exponent = (int)arg_val->dbl_parts.exponent - 1075;
+	if (conv_params->len_mod == LEN_MOD_CAP_L)
+	{
+		val_mantissa = (t_ullint)(arg_val->ldbl_parts.mantissa >> 1)
+					+ ((arg_val->ldbl_parts.exponent) ? (1ULL << 63) : 0ULL);
+		val_exponent = (int)arg_val->ldbl_parts.exponent - 16446
+					+ ((arg_val->ldbl_parts.exponent) ? 0 : 1);
+	}
+	else
+	{
+		val_mantissa = (t_ullint)arg_val->dbl_parts.mantissa 
+						+ ((arg_val->dbl_parts.exponent) ? (1ULL << 52) : 0ULL);
+		val_exponent = (int)arg_val->dbl_parts.exponent - 1075
+						+ ((arg_val->dbl_parts.exponent) ? 0 : 1);
+	}
 	uimax_to_bigint(val_mantissa, val_num);
 	if (val_exponent > 0)
 	{
@@ -1015,7 +1029,8 @@ void			scale_fraction(t_dbls *arg_val, t_bigint *val_num, t_bigint
 	}
 }
 
-void			dragon4(t_dbls *arg_val, char *digits, int *exponent)
+void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format 
+																*conv_params)
 {
 	t_bigint	val_num;
 	t_bigint	val_den;
@@ -1025,10 +1040,10 @@ void			dragon4(t_dbls *arg_val, char *digits, int *exponent)
 	
 	val_num = (t_bigint){0, {0}};
 	val_den = (t_bigint){0, {0}};
-	initialize_fraction(arg_val, &val_num, &val_den);
+	initialize_fraction(arg_val, &val_num, &val_den, conv_params);
 	scale_fraction(arg_val, &val_num, &val_den, exponent);
 	i = 0;
-	while (val_num.length > 0 && i < 400)
+	while (val_num.length > 0 && i < BUF_DIGITS_SIZE)
 	{
 		digit = bigint_divide(&val_num, &val_den);
 		digits[i] = '0' + digit;
