@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/09 19:22:27 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 18:03:44 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ typedef unsigned int		t_uint;
 typedef unsigned long		t_ulint;
 typedef unsigned long long	t_ullint;
 typedef float				t_float;
-typedef double				t_double;
-typedef long double			t_ldouble;
+typedef double				t_dbl;
+typedef long double			t_ldbl;
 
 /*
 ** Union to store the different int types
@@ -67,14 +67,28 @@ typedef struct				s_dbl_parts{
 }							t_dbl_parts;
 
 /*
-** Union to store the different double types
+** Structure to store the different parts of a long double (x86 extended 
+** precision format on 80 bits).
+** The element are in reverse order assuming little-endian format.
+*/
+
+typedef struct				s_ldbl_parts{
+	t_ullint				mantissa : 64;
+	t_uint					exponent : 15;
+	t_uint					sign : 1;
+}							t_ldbl_parts;
+
+
+/*
+** Union to store the different double types and there constitutive parts in the
+** exponent/mantissa format.
 */
 
 typedef union				u_dbls{
-	t_float					fl;
-	t_double				dbl;
-	t_ldouble				ldbl;
+	t_dbl					dbl;
+	t_ldbl					ldbl;
 	t_dbl_parts				dbl_parts;
+	t_ldbl_parts			ldbl_parts;
 }							t_dbls;
 
 # define EXIT_FAIL          -1
@@ -120,6 +134,7 @@ typedef union				u_dbls{
 
 # define BIGINT_SIZE       35
 # define BIGINT_BLOCK_SIZE 32
+# define BUF_DIGITS_SIZE   1000
 
 typedef enum				e_sign_type{
 	UNSIGNED = 0x0,

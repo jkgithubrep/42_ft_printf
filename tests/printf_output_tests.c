@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/06 22:12:41 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 14:53:26 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -838,19 +838,6 @@ int		main(int ac, char **av)
 		printf("%s\n", "Wrong number of arguments, 0 or 1 expected");
 	}
 	printf("\n");
-//	printf("|%s%c\0%s|\n", "Hello", 0, ", ça va ?");
-	printf("%a\n", 55.);
-	printf("%.a\n", 55.);
-	printf("%.0a\n", 55.);
-	printf("%.1a\n", 55.);
-	printf("%a\n", 155.);
-	printf("%.a\n", 155.);
-	printf("%.0a\n", 155.);
-	printf("%.1a\n", 155.);
-	printf("%.a\n", DBL_MAX);
-	printf("%.1a\n", DBL_MAX);
-	printf("%a\n", 1.7976931348623157e308);
-	printf("%.a\n", DBL_MAX);
-	printf("%zu\n", sizeof(unsigned int));
+	printf("%.f", 4.5);
 	return (0);
 }

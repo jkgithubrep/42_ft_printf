@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 23:22:50 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 18:08:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,29 +16,29 @@
 #include <math.h>
 #include <float.h>
 
-void	print_diff(t_dbls *value)
-{
-	printf("dragon:\n");
-	dragon4(value);
-	printf("printf:\n%.300f\n", value->dbl);
-}
-
-int		main(int ac, char **av)
-{
-	t_dbls			value;
-
-	(void)ac;
-	(void)av;
-	value.dbl = DBL_MAX;
-	print_diff(&value);
-	value.dbl = 0.1;
-	print_diff(&value);
-	value.dbl = DBL_MIN;
-	print_diff(&value);
-	value.dbl = 500;
-	print_diff(&value);
-	return (0);
-}
+//void	print_diff(t_dbls *value)
+//{
+//	printf("dragon:\n");
+//	dragon4(value);
+//	printf("printf:\n%.300f\n", value->dbl);
+//}
+//
+//int		main(int ac, char **av)
+//{
+//	t_dbls			value;
+//
+//	(void)ac;
+//	(void)av;
+//	value.dbl = DBL_MAX;
+//	print_diff(&value);
+//	value.dbl = 0.1;
+//	print_diff(&value);
+//	value.dbl = DBL_MIN;
+//	print_diff(&value);
+//	value.dbl = 500;
+//	print_diff(&value);
+//	return (0);
+//}
 
 //int		main(int ac, char **av)
 //{
@@ -57,3 +57,12 @@ int		main(int ac, char **av)
 //	print_bigint(&result, "result");
 //	return (0);
 //}
+
+int		main(void)
+{
+	double	val;
+
+	val = 84.5;
+	printf("%.f\n", val);
+	ft_printf("%.f\n", val);
+}

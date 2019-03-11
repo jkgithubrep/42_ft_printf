@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 23:44:55 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 18:08:17 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,16 @@ intmax_t		get_int_arg_val(t_format *conv_params, va_list args)
 		arg_val = (ssize_t)va_arg(args, ssize_t);
 	else
 		arg_val = (int)va_arg(args, int);
+	return (arg_val);
+}
+
+t_dbls			*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
+															va_list args)
+{
+	if (conv_params->len_mod == LEN_MOD_CAP_L)
+		arg_val->ldbl = (long double)va_arg(args, long double);
+	else
+		arg_val->dbl = (double)va_arg(args, double);
 	return (arg_val);
 }
 
@@ -483,6 +493,79 @@ char			*get_formatted_str_int(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
+char			*round_nb(char *digits, int *exponent, t_format *conv_params)
+{
+	size_t		i;
+	t_uint		carry;
+
+	i = ft_max(*exponent, 0) + conv_params->prec;
+	if (digits[i + 1]  < '5' || ((digits[i + 1] == '5') 
+									&& !((digits[i] - '0') & 1U)))
+		return (digits);
+	carry = 1U;
+	while (i && carry)
+	{
+		if ((digits[i] = (digits[i] == '9') ? '0' : digits[i] + 1) != '0')
+			carry = 0U;
+		--i;
+	}
+	if (i)
+		return (digits);
+	if (digits[i] == '9')
+	{
+		digits[i] = '1';
+		digits[ft_max((*exponent)++, 0) + conv_params->prec + 1] = '0';
+	}
+	else
+		digits[i]++;
+	return (digits);
+}
+
+char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
+{
+	char		*digits;
+	char		*val_str;
+	char		*fraction;
+	int			exponent;
+
+	exponent = 0;
+	val_str = NULL;
+	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
+		return (NULL);
+	dragon4(arg_val, digits, &exponent);
+	if (exponent < 0)
+		ft_strpad_left(&digits, '0', -exponent);
+	round_nb(digits, &exponent, conv_params);
+	val_str = ft_strndup(digits, ft_max(exponent, 0) + 1);
+	if ((conv_params->flags & FL_HASH) || !((conv_params->flags & FL_PREC)
+										&& !(conv_params->prec)))
+		ft_strappend(&val_str, ".");
+	if (!(conv_params->flags & FL_PREC))
+		conv_params->prec = 6;
+	if (conv_params->prec)
+	{
+		fraction = ft_strndup(digits + ft_max(exponent, 0) + 1,
+													conv_params->prec);
+		ft_strpad_right(&fraction, '0', conv_params->prec - ft_strlen(fraction));
+		ft_strappend(&val_str, fraction);
+		ft_strdel(&fraction);
+	}
+	return (val_str);
+}
+
+char			*get_formatted_str_dbl(t_format *conv_params, va_list args)
+{
+	t_dbls		arg_val;
+	char		*val_str;
+
+	arg_val.ldbl = 0.L;
+	get_dbl_arg_val(&arg_val, conv_params, args);
+	if (!arg_val.ldbl)
+		conv_params->flags |= FL_NULL;
+	val_str = dbl_arg_val_to_str(&arg_val, conv_params);
+	return (val_str);
+}
+
 char			*get_formatted_str_char(t_format *conv_params, va_list args)
 {
 	t_uchar		arg_val;
@@ -518,6 +601,8 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	val_str = NULL;
 	if (ft_instr(conv_params->type_char, INT_TYPES))
 		val_str = get_formatted_str_int(conv_params, args);
+	if (ft_instr(conv_params->type_char, DBL_TYPES))
+		val_str = get_formatted_str_dbl(conv_params, args);
 	else if (conv_params->type_char == 'c' || conv_params->flags & FL_ERR)
 		val_str = get_formatted_str_char(conv_params, args);
 	else if (conv_params->type_char == 's')
@@ -884,14 +969,14 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 	return (res);
 }
 
-void			initialize_fraction(t_dbls *value, t_bigint *val_num,
+void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 													t_bigint *val_den)
 {
 	t_ullint	val_mantissa;
 	int			val_exponent;
 
-	val_mantissa = (t_ullint)value->dbl_parts.mantissa + (1ULL << 52);
-	val_exponent = (int)value->dbl_parts.exponent - 1075;
+	val_mantissa = (t_ullint)arg_val->dbl_parts.mantissa + (1ULL << 52);
+	val_exponent = (int)arg_val->dbl_parts.exponent - 1075;
 	uimax_to_bigint(val_mantissa, val_num);
 	if (val_exponent > 0)
 	{
@@ -905,35 +990,33 @@ void			initialize_fraction(t_dbls *value, t_bigint *val_num,
 	}
 }
 
-void			scale_fraction(t_dbls *value, t_bigint *val_num, t_bigint 
-																	*val_den)
+void			scale_fraction(t_dbls *arg_val, t_bigint *val_num, t_bigint 
+												*val_den, int *exponent)
 {
 	t_bigint	bigint_tmp;
 	t_bigint	pow10;
-	int			digit_exp;
 
-	digit_exp = get_exponent(value->dbl);
+	*exponent = get_exponent(arg_val->dbl);
 	bigint_tmp = (t_bigint){0, {0}};
 	pow10 = (t_bigint){0, {0}};
-	if (digit_exp > 0)
+	if (*exponent > 0)
 	{
-		bigint_pow10(&pow10, digit_exp);
+		bigint_pow10(&pow10, *exponent);
 		bigint_multiply(val_den, &pow10, &bigint_tmp);
 		*val_den = (t_bigint){0, {0}};
 		bigint_cpy(val_den, &bigint_tmp);
 	}
-	else if (digit_exp < 0)
+	else if (*exponent < 0)
 	{
-		bigint_pow10(&pow10, -digit_exp);
+		bigint_pow10(&pow10, -*exponent);
 		bigint_multiply(val_num, &pow10, &bigint_tmp);
 		*val_num = (t_bigint){0, {0}};
 		bigint_cpy(val_num, &bigint_tmp);
 	}
 }
 
-void			dragon4(t_dbls *value)
+void			dragon4(t_dbls *arg_val, char *digits, int *exponent)
 {
-	char		string[400] = {0};
 	t_bigint	val_num;
 	t_bigint	val_den;
 	t_bigint	bigint_tmp;
@@ -942,13 +1025,13 @@ void			dragon4(t_dbls *value)
 	
 	val_num = (t_bigint){0, {0}};
 	val_den = (t_bigint){0, {0}};
-	initialize_fraction(value, &val_num, &val_den);
-	scale_fraction(value, &val_num, &val_den);
+	initialize_fraction(arg_val, &val_num, &val_den);
+	scale_fraction(arg_val, &val_num, &val_den, exponent);
 	i = 0;
 	while (val_num.length > 0 && i < 400)
 	{
 		digit = bigint_divide(&val_num, &val_den);
-		string[i] = '0' + digit;
+		digits[i] = '0' + digit;
 		bigint_tmp = (t_bigint){0, {0}};
 		bigint_cpy(&bigint_tmp, &val_den);
 		bigint_multiply_nb(&bigint_tmp, digit);
@@ -956,7 +1039,6 @@ void			dragon4(t_dbls *value)
 		bigint_multiply_nb(&val_num, 10);
 		++i;
 	}
-	printf("%s\n", string);
 }
 
 void			conv_handler(t_worker *work, const char **fmt, va_list args,

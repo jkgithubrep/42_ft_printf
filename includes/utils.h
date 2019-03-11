@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 16:51:07 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/11 13:19:14 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,6 @@ t_bigint		*uimax_to_bigint(uintmax_t nb, t_bigint *result);
 t_bigint		*bigint_shiftleft(t_bigint *result, t_uint shift);
 int				get_exponent(double value);
 t_bigint		*bigint_cpy(t_bigint *dest, const t_bigint *src);
+void			dragon4(t_dbls *arg_val, char *digits, int *exponent);
 
 #endif
