@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/11 18:59:34 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/12 17:39:55 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,6 +322,20 @@ int				get_nb_zeros_prec(int nb_digits, t_format *conv_params)
 	return (nb);
 }
 
+int				get_nb_zeros_prec_dbl(int nb_digits, t_format *conv_params)
+{
+	int			nb;
+
+	nb = 0;
+	if ((conv_params->flags & FL_ZERO) && !(conv_params->flags & FL_MINUS))
+		nb = (int)ft_max(conv_params->width
+				- (nb_digits + ((conv_params->is_neg)
+						|| (conv_params->flags & FL_PLUS)
+						|| (conv_params->flags & FL_SPACE))), 0);
+	return (nb);
+}
+
+
 /*
 ** Calculate the size of the padding.
 */
@@ -455,6 +469,25 @@ char			*format_int_str(char *val_str, t_format *conv_params)
 	return (val_str);
 }
 
+
+
+char			*format_dbl_str(char *val_str, t_format *conv_params)
+{
+	int		padding;
+	int		nb_digits;
+	int		nb_zeros_prec;
+
+	nb_digits = ft_strlen(val_str);
+	nb_zeros_prec = get_nb_zeros_prec_dbl(nb_digits, conv_params);
+	if (nb_zeros_prec)
+		prepend_prec(&val_str, nb_zeros_prec);
+	if (has_sign(1, conv_params))
+		prepend_sign(&val_str, conv_params);
+	if ((padding = get_nb_padding(ft_strlen(val_str), conv_params->width)) > 0)
+		add_padding(&val_str, padding, conv_params);
+	return (val_str);
+}
+
 char			*char_arg_val_to_str(t_uchar arg_val)
 {
 	char	*str;
@@ -521,37 +554,78 @@ char			*round_nb(char *digits, int *exponent, t_format *conv_params)
 	return (digits);
 }
 
-char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
+char			*handle_dbl_limit_values(t_dbls *arg_val, t_format *conv_params)
 {
-	char		*digits;
+	if (conv_params->len_mod == LEN_MOD_CAP_L)
+	{
+		if ((arg_val->ldbl_parts.exponent == 0x7FFF) 
+				&& !arg_val->ldbl_parts.mantissa)
+			return (ft_strdup("inf"));
+		if ((arg_val->ldbl_parts.exponent == 0x7FFF) 
+				&& arg_val->ldbl_parts.mantissa)
+			return (ft_strdup("nan"));
+	}
+	else
+	{
+		if ((arg_val->dbl_parts.exponent == 0x7FF) 
+				&& !arg_val->dbl_parts.mantissa)
+			return (ft_strdup("inf"));
+		if ((arg_val->dbl_parts.exponent == 0x7FF) 
+				&& arg_val->dbl_parts.mantissa)
+			return (ft_strdup("nan"));
+	}
+	return (NULL);
+}
+
+char			*handle_dbl_precision(char *digits, int exponent,
+										t_format *conv_params)
+{
 	char		*val_str;
 	char		*fraction;
-	int			exponent;
 
-	exponent = 0;
-	val_str = NULL;
-	printf("exponent: %d\n", arg_val->dbl_parts.exponent);
-	printf("mantissa: %llu\n", arg_val->dbl_parts.mantissa);
-	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
-		return (NULL);
-	dragon4(arg_val, digits, &exponent, conv_params);
 	if (exponent < 0)
 		ft_strpad_left(&digits, '0', -exponent);
+	if (exponent - ft_strlen(digits) + 1 > 0)
+		ft_strpad_right(&digits, '0', exponent - ft_strlen(digits) + 1);
+	if (!(conv_params->flags & FL_PREC))
+		conv_params->prec = 6;
 	round_nb(digits, &exponent, conv_params);
-	val_str = ft_strndup(digits, ft_max(exponent, 0) + 1);
+	if (!(val_str = ft_strndup(digits, ft_max(exponent, 0) + 1)))
+		return (NULL);
 	if ((conv_params->flags & FL_HASH) || !((conv_params->flags & FL_PREC)
 										&& !(conv_params->prec)))
 		ft_strappend(&val_str, ".");
-	if (!(conv_params->flags & FL_PREC))
-		conv_params->prec = 6;
 	if (conv_params->prec)
 	{
-		fraction = ft_strndup(digits + ft_max(exponent, 0) + 1,
-													conv_params->prec);
+		if (!(fraction = ft_strndup(digits + ft_max(exponent, 0) + 1,
+													conv_params->prec)))
+			return (NULL);
 		ft_strpad_right(&fraction, '0', conv_params->prec - ft_strlen(fraction));
 		ft_strappend(&val_str, fraction);
 		ft_strdel(&fraction);
 	}
+	return (val_str);
+}
+
+
+
+char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
+{
+	char		*digits;
+	char		*val_str;
+	int			exponent;
+
+	exponent = 0;
+	if ((val_str = handle_dbl_limit_values(arg_val, conv_params)))
+		return (val_str);
+	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
+		return (NULL);
+	if (!(conv_params->flags & FL_NULL))
+		dragon4(arg_val, digits, &exponent, conv_params);
+	else
+		digits[0] = '0';
+	val_str = handle_dbl_precision(digits, exponent, conv_params);
+//	ft_strdel(&digits);
 	return (val_str);
 }
 
@@ -562,9 +636,14 @@ char			*get_formatted_str_dbl(t_format *conv_params, va_list args)
 
 	arg_val.ldbl = 0.L;
 	get_dbl_arg_val(&arg_val, conv_params, args);
-	if (!arg_val.ldbl)
+	if (((conv_params->len_mod == LEN_MOD_CAP_L) && !arg_val.ldbl)
+			|| ((conv_params->len_mod == LEN_MOD_NA) && !arg_val.dbl))
 		conv_params->flags |= FL_NULL;
+	if (((conv_params->len_mod == LEN_MOD_CAP_L) && arg_val.ldbl_parts.sign)
+			|| ((conv_params->len_mod == LEN_MOD_NA) && arg_val.dbl_parts.sign))
+		conv_params->is_neg = 1;
 	val_str = dbl_arg_val_to_str(&arg_val, conv_params);
+	val_str = format_dbl_str(val_str, conv_params);
 	return (val_str);
 }
 
@@ -884,11 +963,13 @@ t_bigint		*bigint_multiply(const t_bigint *bigint1,
 	return (result);
 }
 
-int				get_exponent(double value)
+int				get_exponent(t_ldbl value)
 {
 	int			exp;
 
 	exp = 0;
+	if (value < 0)
+		value *= -1;
 	if (value > 1)
 	{
 		while (value >= 10)
@@ -910,21 +991,27 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 {
 	const t_uint	first_pow10[8] = {1, 10, 100, 1000, 10000, 100000, 1000000, 
 										10000000};
-	const t_bigint	lookup_tbl[6] = {{1, {100000000}}, {2, {0x6fc10000,
-					0x002386f2}}, {4, {0x00000000, 0x85acef81, 0x2d6d415b,
-					0x000004ee}}, {7, {0x00000000, 0x00000000, 0xbf6a1f01, 
-					0x6e38ed64, 0xdaa797ed, 0xe93ff9f4, 0x00184f03}}, {14,
-					{0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x2e953e01,
-					0x03df9909, 0x0f1538fd, 0x2374e42f, 0xd3cff5ec, 0xc404dc08,
-					0xbccdb0da, 0xa6337f19, 0xe91f2603, 0x0000024e}}, {27, 
-					{0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
-					0x00000000, 0x00000000, 0x00000000, 0x982e7c01, 0xbed3875b,
-					0xd8d99f72, 0x12152f87, 0x6bde50c6, 0xcf4a6e70, 0xd595d80f,
-					0x26b2716e, 0xadc666b0, 0x1d153624, 0x3c42d35a, 0x63ff540e,
-					0xcc5573c0, 0x65f9ef17, 0x55bc28f2, 0x80dcc7f7, 0xf46eeddc,
-					0x5fdcefce, 0x000553f7}}};
+	const t_bigint	lookup_tbl[6] = 
+					{{1, {100000000}},
+					{2, {0x6fc10000, 0x002386f2}},
+					{4, {0x00000000, 0x85acef81, 0x2d6d415b, 0x000004ee}},
+					{7, {0x00000000, 0x00000000, 0xbf6a1f01, 0x6e38ed64,
+						0xdaa797ed, 0xe93ff9f4, 0x00184f03}},
+					{14, {0x00000000, 0x00000000, 0x00000000, 0x00000000, 
+							0x2e953e01, 0x03df9909, 0x0f1538fd, 0x2374e42f, 
+							0xd3cff5ec, 0xc404dc08, 0xbccdb0da, 0xa6337f19, 
+							0xe91f2603, 0x0000024e}},
+					{27, {0x00000000, 0x00000000, 0x00000000, 0x00000000,
+							0x00000000,0x00000000, 0x00000000, 0x00000000, 
+							0x982e7c01, 0xbed3875b, 0xd8d99f72, 0x12152f87, 
+							0x6bde50c6, 0xcf4a6e70, 0xd595d80f, 0x26b2716e, 
+							0xadc666b0, 0x1d153624, 0x3c42d35a, 0x63ff540e, 
+							0xcc5573c0, 0x65f9ef17, 0x55bc28f2, 0x80dcc7f7, 
+							0xf46eeddc, 0x5fdcefce, 0x000553f7}}};
 	t_bigint		bigint_tmp;
 	t_uint			tbl_index;
+	t_uint			count;
+	t_uint			i;
 	
 	if (exponent & 0x7)
 		uimax_to_bigint(first_pow10[exponent & 0x7], result);
@@ -932,7 +1019,7 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 		uimax_to_bigint(1U, result);
 	exponent >>= 3;
 	tbl_index = 0;
-	while (exponent)
+	while (exponent && tbl_index < 6)
 	{
 		if (exponent & 1U)
 		{
@@ -943,6 +1030,24 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 		}
 		exponent >>= 1;
 		++tbl_index;
+	}
+	count = 1U << 1;
+	while (exponent)
+	{
+		if (exponent & 1U)
+		{
+			i = 0;
+			while (i < count)
+			{
+				bigint_tmp = (t_bigint){0, {0}};
+				bigint_multiply(result, &lookup_tbl[5], &bigint_tmp);
+				*result = (t_bigint){0, {0}};
+				bigint_cpy(result, &bigint_tmp);
+				i++;
+			}
+		}
+		exponent >>= 1;
+		count <<= 1;
 	}
 }
 
@@ -971,26 +1076,35 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 	return (res);
 }
 
+void			init_mantissa_exponent(t_dbls *arg_val, t_ullint *val_mantissa, 
+					int *val_exponent, t_format *conv_params)
+{
+	if (conv_params->len_mod == LEN_MOD_CAP_L)
+	{
+		*val_mantissa = (t_ullint)arg_val->ldbl_parts.mantissa
+					+ ((arg_val->ldbl_parts.exponent) ? (1ULL << 63) : 0ULL);
+		*val_exponent = (int)arg_val->ldbl_parts.exponent - 16446
+					+ ((arg_val->ldbl_parts.exponent) ? 0 : 1);
+	}
+	else
+	{
+		*val_mantissa = (t_ullint)arg_val->dbl_parts.mantissa 
+						+ ((arg_val->dbl_parts.exponent) ? (1ULL << 52) : 0ULL);
+		*val_exponent = (int)arg_val->dbl_parts.exponent - 1075
+						+ ((arg_val->dbl_parts.exponent) ? 0 : 1);
+	}
+}
+					
+
 void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 									t_bigint *val_den, t_format *conv_params)
 {
 	t_ullint	val_mantissa;
 	int			val_exponent;
 
-	if (conv_params->len_mod == LEN_MOD_CAP_L)
-	{
-		val_mantissa = (t_ullint)(arg_val->ldbl_parts.mantissa >> 1)
-					+ ((arg_val->ldbl_parts.exponent) ? (1ULL << 63) : 0ULL);
-		val_exponent = (int)arg_val->ldbl_parts.exponent - 16446
-					+ ((arg_val->ldbl_parts.exponent) ? 0 : 1);
-	}
-	else
-	{
-		val_mantissa = (t_ullint)arg_val->dbl_parts.mantissa 
-						+ ((arg_val->dbl_parts.exponent) ? (1ULL << 52) : 0ULL);
-		val_exponent = (int)arg_val->dbl_parts.exponent - 1075
-						+ ((arg_val->dbl_parts.exponent) ? 0 : 1);
-	}
+	val_mantissa = 0ULL;
+	val_exponent = 0;
+	init_mantissa_exponent(arg_val, &val_mantissa, &val_exponent, conv_params);
 	uimax_to_bigint(val_mantissa, val_num);
 	if (val_exponent > 0)
 	{
@@ -1005,12 +1119,15 @@ void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 }
 
 void			scale_fraction(t_dbls *arg_val, t_bigint *val_num, t_bigint 
-												*val_den, int *exponent)
+								*val_den, int *exponent, t_format *conv_params)
 {
 	t_bigint	bigint_tmp;
 	t_bigint	pow10;
 
-	*exponent = get_exponent(arg_val->dbl);
+	if (conv_params->len_mod == LEN_MOD_CAP_L)
+		*exponent = get_exponent(arg_val->ldbl);
+	else
+		*exponent = get_exponent(arg_val->dbl);
 	bigint_tmp = (t_bigint){0, {0}};
 	pow10 = (t_bigint){0, {0}};
 	if (*exponent > 0)
@@ -1041,7 +1158,7 @@ void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format
 	val_num = (t_bigint){0, {0}};
 	val_den = (t_bigint){0, {0}};
 	initialize_fraction(arg_val, &val_num, &val_den, conv_params);
-	scale_fraction(arg_val, &val_num, &val_den, exponent);
+	scale_fraction(arg_val, &val_num, &val_den, exponent, conv_params);
 	i = 0;
 	while (val_num.length > 0 && i < BUF_DIGITS_SIZE)
 	{

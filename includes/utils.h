@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/11 18:27:29 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/12 11:31:42 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ t_bigint		*bigint_substract(const t_bigint *bigint1,
 size_t			bigint_size(const t_bigint *bigint);
 t_bigint		*uimax_to_bigint(uintmax_t nb, t_bigint *result);
 t_bigint		*bigint_shiftleft(t_bigint *result, t_uint shift);
-int				get_exponent(double value);
+int				get_exponent(t_ldbl value);
 t_bigint		*bigint_cpy(t_bigint *dest, const t_bigint *src);
 void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format
 													*conv_params);

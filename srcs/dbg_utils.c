@@ -6,7 +6,7 @@
 /*   By: apion <apion@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/19 18:20:30 by apion             #+#    #+#             */
-/*   Updated: 2019/02/26 15:01:24 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/12 10:05:26 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,5 +57,8 @@ void	dbg_print_conv_params(t_format *conv_params)
 	ft_putendl(0);
 	ft_putstr("flags: ");
 	ft_putnbr_base(conv_params->flags, 2);
+	ft_putendl(0);
+	ft_putstr("len_modif: ");
+	ft_putnbr(conv_params->len_mod);
 	ft_putendl(0);
 }

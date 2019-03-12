@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/11 14:53:26 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/12 16:51:31 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -838,6 +838,6 @@ int		main(int ac, char **av)
 		printf("%s\n", "Wrong number of arguments, 0 or 1 expected");
 	}
 	printf("\n");
-	printf("%.f", 4.5);
+	printf("%+010.f\n", 4.5);
 	return (0);
 }
