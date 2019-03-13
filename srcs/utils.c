@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/13 13:02:39 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/13 18:22:16 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -550,14 +550,32 @@ char			*get_formatted_str_int(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
+/*
+** Check that from index `begin' to then end of `digits', there are only zeros.
+*/
+
+int				check_end_digits(char *digits, size_t begin)
+{
+	size_t		i;
+
+	i = begin;
+	while (digits[i])
+	{
+		if (digits[i] != '0')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 char			*round_nb(char *digits, int *exponent, t_format *conv_params)
 {
 	size_t		i;
 	t_uint		carry;
 
 	i = ft_max(*exponent, 0) + conv_params->prec;
-	if (digits[i + 1]  < '5' || ((digits[i + 1] == '5') 
-									&& !((digits[i] - '0') & 1U)))
+	if (!digits[i + 1] || digits[i + 1]  < '5' || ((digits[i + 1] == '5') 
+			&& !((digits[i] - '0') & 1U) && check_end_digits(digits, i + 2)))
 		return (digits);
 	carry = 1U;
 	while (i && carry)
@@ -611,27 +629,34 @@ char			*handle_dbl_limit_values(t_dbls *arg_val, t_format *conv_params)
 	return (NULL);
 }
 
-char			*handle_dbl_precision(char *digits, int exponent,
+/*
+** Convert the digits extracted to a final value by rounding the number and 
+** inserting a `.' at the right place.
+** If exponent < 0, missing zeros must be added (ex: from 0.0142 only 142 digits
+** would be extracted, 2 zeros must be prepended).
+*/
+
+char			*handle_dbl_precision(char **digits, int exponent,
 										t_format *conv_params)
 {
 	char		*val_str;
 	char		*fraction;
 
 	if (exponent < 0)
-		ft_strpad_left(&digits, '0', -exponent);
-	if (exponent - ft_strlen(digits) + 1 > 0)
-		ft_strpad_right(&digits, '0', exponent - ft_strlen(digits) + 1);
+		ft_strpad_left(digits, '0', -exponent);
+	if (exponent > (int)ft_strlen(*digits) - 1)
+		ft_strpad_right(digits, '0', exponent - (ft_strlen(*digits) - 1));
 	if (!(conv_params->flags & FL_PREC))
 		conv_params->prec = 6;
-	round_nb(digits, &exponent, conv_params);
-	if (!(val_str = ft_strndup(digits, ft_max(exponent, 0) + 1)))
+	round_nb(*digits, &exponent, conv_params);
+	if (!(val_str = ft_strndup(*digits, ft_max(exponent, 0) + 1)))
 		return (NULL);
 	if ((conv_params->flags & FL_HASH) || !((conv_params->flags & FL_PREC)
 										&& !(conv_params->prec)))
 		ft_strappend(&val_str, ".");
 	if (conv_params->prec)
 	{
-		if (!(fraction = ft_strndup(digits + ft_max(exponent, 0) + 1,
+		if (!(fraction = ft_strndup(*digits + ft_max(exponent, 0) + 1,
 													conv_params->prec)))
 			return (NULL);
 		ft_strpad_right(&fraction, '0', conv_params->prec - ft_strlen(fraction));
@@ -661,8 +686,8 @@ char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 		dragon4(arg_val, digits, &exponent, conv_params);
 	else
 		digits[0] = '0';
-	val_str = handle_dbl_precision(digits, exponent, conv_params);
-//	ft_strdel(&digits);
+	val_str = handle_dbl_precision(&digits, exponent, conv_params);
+	ft_strdel(&digits);
 	return (val_str);
 }
 
@@ -782,6 +807,11 @@ int				bigint_compare(const t_bigint *bigint1, const t_bigint *bigint2)
 			return ((bigint1->blocks[i] > bigint2->blocks[i]) ? 1 : -1);
 	return (0);
 }
+
+/*
+** Make `large_nb' point on the biggest big int, and `small_nb` on the
+** smallest.
+*/
 
 void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
 					const t_bigint **small_nb, const t_bigint **large_nb)
@@ -1172,7 +1202,7 @@ void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 }
 
 /*
-** Scale the fraction so that 0 <= val_num / val_den < 10, ie first digit is in
+** Scale the fraction so that 0 <= val_num / val_den < 10, ie. first digit is in
 ** the ones place.
 ** Example: 
 **   - 142.5 would become 1.425 --> val_num / (val_den * 10^2)
@@ -1231,7 +1261,8 @@ int				get_exponent(t_ldbl value)
 }
 
 /*
-** Get the power of ten of the float written in scientific notation.
+** Get the power of ten of the floating-point number written in scientific 
+** notation.
 ** Example: 142.5 = 1.425 * 10 ^ 2 --> exponent = 2
 */
 
@@ -1243,6 +1274,17 @@ void			get_first_digit_exponent(t_dbls *arg_val, int *exponent,
 	else
 		*exponent = get_exponent(arg_val->dbl);
 }
+
+/*
+** Get the representation of the floating-point number as a fraction of 2 big
+** ints which is superior to 0 and strictly inferior to 10.
+** Extract the digits as the integer division of the numerator by the
+** denominator.
+** Compute the remainder by substracting the digit extracted
+** (ex: 1.425 - 1 --> 0.425).
+** Scale the next digit in the first place (ex: 0.425 * 10 --> 4.25).
+** Repeat until numerator equals 0.
+*/
 
 void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format 
 																*conv_params)
