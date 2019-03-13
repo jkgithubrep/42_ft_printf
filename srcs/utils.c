@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/13 18:22:16 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/13 19:02:35 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,9 @@ t_dbls			*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
 				&& !(arg_val->dbl_parts.exponent == 0x7FF 
 					&& arg_val->dbl_parts.mantissa))
 			conv_params->is_neg = 1;
-	}
+	}	
+	if (!(conv_params->flags & FL_PREC))
+		conv_params->prec = 6;
 	return (arg_val);
 }
 
@@ -644,10 +646,14 @@ char			*handle_dbl_precision(char **digits, int exponent,
 
 	if (exponent < 0)
 		ft_strpad_left(digits, '0', -exponent);
-	if (exponent > (int)ft_strlen(*digits) - 1)
-		ft_strpad_right(digits, '0', exponent - (ft_strlen(*digits) - 1));
-	if (!(conv_params->flags & FL_PREC))
-		conv_params->prec = 6;
+	if (exponent <= 0)
+		ft_strpad_right(digits, '0',
+				ft_max(conv_params->prec - (ft_strlen(*digits) - 1), 0));
+	else
+		ft_strpad_right(digits, '0', 
+			ft_max(exponent - (ft_strlen(*digits) - 1), 0) 
+			+ conv_params->prec - ((exponent > (int)ft_strlen(*digits) - 1) ?
+			0 : ft_strlen(*digits + exponent + 1)));
 	round_nb(*digits, &exponent, conv_params);
 	if (!(val_str = ft_strndup(*digits, ft_max(exponent, 0) + 1)))
 		return (NULL);
@@ -659,7 +665,6 @@ char			*handle_dbl_precision(char **digits, int exponent,
 		if (!(fraction = ft_strndup(*digits + ft_max(exponent, 0) + 1,
 													conv_params->prec)))
 			return (NULL);
-		ft_strpad_right(&fraction, '0', conv_params->prec - ft_strlen(fraction));
 		ft_strappend(&val_str, fraction);
 		ft_strdel(&fraction);
 	}
