@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/12 17:49:46 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/13 12:26:09 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,6 @@ int		main(int ac, char **av)
 {
 	(void)ac;
 	(void)av;
-	ft_printf("%.1300f\n", DBL_MIN);
+	ft_printf("%60.22Lf", (long double)4385077040);
 	return (0);
 }

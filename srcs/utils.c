@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/12 17:39:55 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/13 13:02:39 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,13 +155,37 @@ intmax_t		get_int_arg_val(t_format *conv_params, va_list args)
 	return (arg_val);
 }
 
+/*
+** Extract the next value in the va_list and update the right member of the
+** union based on the value of the length modifier:
+**   - LEN_MOD_CAP_L (`L'): long double
+**   - else: double
+** If the value equals zero, set the FL_NULL flag.
+** If the value is negative (sign bit equals 1), and the value is not `nan',
+** set the `is_neg` flag to 1.
+*/
+
 t_dbls			*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
 															va_list args)
 {
 	if (conv_params->len_mod == LEN_MOD_CAP_L)
-		arg_val->ldbl = (long double)va_arg(args, long double);
+	{
+		if (!(arg_val->ldbl = (long double)va_arg(args, long double)))
+			conv_params->flags |= FL_NULL;
+		if (arg_val->ldbl_parts.sign 
+				&& !(arg_val->ldbl_parts.exponent == 0x7FFF 
+					&& arg_val->ldbl_parts.mantissa))
+			conv_params->is_neg = 1;
+	}
 	else
-		arg_val->dbl = (double)va_arg(args, double);
+	{
+		if (!(arg_val->dbl = (double)va_arg(args, double)))
+			conv_params->flags |= FL_NULL;
+		if (arg_val->dbl_parts.sign
+				&& !(arg_val->dbl_parts.exponent == 0x7FF 
+					&& arg_val->dbl_parts.mantissa))
+			conv_params->is_neg = 1;
+	}
 	return (arg_val);
 }
 
@@ -554,25 +578,35 @@ char			*round_nb(char *digits, int *exponent, t_format *conv_params)
 	return (digits);
 }
 
+/*
+** Handle specific values `nan' and `inf':
+**  - `nan': exponent = 0x7FF (double) / exponent = 0x7FFF (long double)
+**           and mantissa > 0;
+**  - `inf': exponent = 0x7FF (double) / exponent = 0x7FFF (long double)
+**           and mantissa = 0;
+*/
+
 char			*handle_dbl_limit_values(t_dbls *arg_val, t_format *conv_params)
 {
 	if (conv_params->len_mod == LEN_MOD_CAP_L)
 	{
-		if ((arg_val->ldbl_parts.exponent == 0x7FFF) 
-				&& !arg_val->ldbl_parts.mantissa)
-			return (ft_strdup("inf"));
-		if ((arg_val->ldbl_parts.exponent == 0x7FFF) 
-				&& arg_val->ldbl_parts.mantissa)
-			return (ft_strdup("nan"));
+		if (arg_val->ldbl_parts.exponent == 0x7FFF)
+		{
+			if (!arg_val->ldbl_parts.mantissa)
+				return (ft_strdup("inf"));
+			else
+				return (ft_strdup("nan"));
+		}
 	}
-	else
+	else 
 	{
-		if ((arg_val->dbl_parts.exponent == 0x7FF) 
-				&& !arg_val->dbl_parts.mantissa)
-			return (ft_strdup("inf"));
-		if ((arg_val->dbl_parts.exponent == 0x7FF) 
-				&& arg_val->dbl_parts.mantissa)
-			return (ft_strdup("nan"));
+		if (arg_val->dbl_parts.exponent == 0x7FF)
+		{
+			if (!arg_val->dbl_parts.mantissa)
+				return (ft_strdup("inf"));
+			else
+				return (ft_strdup("nan"));
+		}
 	}
 	return (NULL);
 }
@@ -608,6 +642,9 @@ char			*handle_dbl_precision(char *digits, int exponent,
 }
 
 
+/*
+** Convert the double value to a string with the right precision.
+*/
 
 char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 {
@@ -615,11 +652,11 @@ char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 	char		*val_str;
 	int			exponent;
 
-	exponent = 0;
 	if ((val_str = handle_dbl_limit_values(arg_val, conv_params)))
 		return (val_str);
 	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
 		return (NULL);
+	exponent = 0;
 	if (!(conv_params->flags & FL_NULL))
 		dragon4(arg_val, digits, &exponent, conv_params);
 	else
@@ -636,12 +673,6 @@ char			*get_formatted_str_dbl(t_format *conv_params, va_list args)
 
 	arg_val.ldbl = 0.L;
 	get_dbl_arg_val(&arg_val, conv_params, args);
-	if (((conv_params->len_mod == LEN_MOD_CAP_L) && !arg_val.ldbl)
-			|| ((conv_params->len_mod == LEN_MOD_NA) && !arg_val.dbl))
-		conv_params->flags |= FL_NULL;
-	if (((conv_params->len_mod == LEN_MOD_CAP_L) && arg_val.ldbl_parts.sign)
-			|| ((conv_params->len_mod == LEN_MOD_NA) && arg_val.dbl_parts.sign))
-		conv_params->is_neg = 1;
 	val_str = dbl_arg_val_to_str(&arg_val, conv_params);
 	val_str = format_dbl_str(val_str, conv_params);
 	return (val_str);
@@ -963,29 +994,6 @@ t_bigint		*bigint_multiply(const t_bigint *bigint1,
 	return (result);
 }
 
-int				get_exponent(t_ldbl value)
-{
-	int			exp;
-
-	exp = 0;
-	if (value < 0)
-		value *= -1;
-	if (value > 1)
-	{
-		while (value >= 10)
-		{
-			value /= 10;
-			++exp;
-		}
-		return (exp);
-	}
-	while (value < 1)
-	{
-		value *= 10;
-		++exp;
-	}
-	return (-exp);
-}
 
 void				bigint_pow10(t_bigint *result, t_uint exponent)
 {
@@ -1051,6 +1059,11 @@ void				bigint_pow10(t_bigint *result, t_uint exponent)
 	}
 }
 
+/*
+** Assuming  0 <= dividend / divisor < 10, give the result of the integer
+** division of dividend by divisor.
+*/
+
 int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 {
 	int				res;
@@ -1076,6 +1089,29 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 	return (res);
 }
 
+/*
+** Calculate the value of val_exponent and val_mantissa for each representation
+** based on the following formulae:
+**  - normalized number:
+** ( 1 + mantissa / 2^(nb mantissa bits) ) * 2 ^ (exp + 1 - 2^(nb exp bits - 1))
+**  - denormalized number:
+** ( mantissa / 2^(nb of mantissa bits) ) * 2 ^ ( 1 + 1 - 2^(nb exp bits - 1) )
+** 
+**  Representations:
+**  - 64-bit denormalized:
+**          value = ( mantissa / 2^52 ) * 2 ^ (1 - 1023)
+**                = mantissa * 2 ^ ( 1 - 1023 - 52 )
+**  - 64-bit normalized:
+**			value = ( 1 + mantissa / 2^52 ) * 2 ^ ( exponent - 1023 )
+**                = ( 2^52 + mantissa ) * 2 ^ ( exponent - 1023 - 52 )
+**  - 80-bit denormalized:
+**          value = ( mantissa / 2^63 ) * 2 ^ (1 - 16383)
+**                - mantissa * 2 ^ ( 1 - 16383 - 63 )
+**  - 80-bit normalized:
+**          value = ( 1 + mantissa / 2^63 ) * 2 ^ ( exponent - 16383 )
+**                = ( 2^63 + mantissa ) * 2 ^ ( exponent - 16383 - 63 )
+*/
+
 void			init_mantissa_exponent(t_dbls *arg_val, t_ullint *val_mantissa, 
 					int *val_exponent, t_format *conv_params)
 {
@@ -1095,6 +1131,23 @@ void			init_mantissa_exponent(t_dbls *arg_val, t_ullint *val_mantissa,
 	}
 }
 					
+/*
+** First, represent the floating-point number as a pair of integers in the
+** equation: 
+**
+**                 val_mantissa * 2 ^ (val_exponent)
+**
+** Then, represent it as a fraction of two big int depending on the value of
+** val_exponent:
+**   - val_exponent >= 0:          val_mantissa * 2 ^ (val_exponent)
+**                                ---------------------------------
+**                                               1
+**
+**   - val_exponent < 0:                    val_mantissa
+**                                ---------------------------------
+**                                       2 ^ (-val_exponent)
+** 
+*/
 
 void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 									t_bigint *val_den, t_format *conv_params)
@@ -1106,7 +1159,7 @@ void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 	val_exponent = 0;
 	init_mantissa_exponent(arg_val, &val_mantissa, &val_exponent, conv_params);
 	uimax_to_bigint(val_mantissa, val_num);
-	if (val_exponent > 0)
+	if (val_exponent >= 0)
 	{
 		bigint_shiftleft(val_num, val_exponent);
 		uimax_to_bigint(1, val_den);
@@ -1118,32 +1171,77 @@ void			initialize_fraction(t_dbls *arg_val, t_bigint *val_num,
 	}
 }
 
-void			scale_fraction(t_dbls *arg_val, t_bigint *val_num, t_bigint 
-								*val_den, int *exponent, t_format *conv_params)
+/*
+** Scale the fraction so that 0 <= val_num / val_den < 10, ie first digit is in
+** the ones place.
+** Example: 
+**   - 142.5 would become 1.425 --> val_num / (val_den * 10^2)
+**   - 0.01425 would become 1.425 --> val_num / (val_den * 10^-2)
+**                                --> (val_num * 10^2) / val_den
+*/
+
+void			scale_fraction(t_bigint *val_num, t_bigint *val_den,
+									int exponent)
 {
 	t_bigint	bigint_tmp;
 	t_bigint	pow10;
 
-	if (conv_params->len_mod == LEN_MOD_CAP_L)
-		*exponent = get_exponent(arg_val->ldbl);
-	else
-		*exponent = get_exponent(arg_val->dbl);
 	bigint_tmp = (t_bigint){0, {0}};
 	pow10 = (t_bigint){0, {0}};
-	if (*exponent > 0)
+	if (exponent > 0)
 	{
-		bigint_pow10(&pow10, *exponent);
+		bigint_pow10(&pow10, exponent);
 		bigint_multiply(val_den, &pow10, &bigint_tmp);
 		*val_den = (t_bigint){0, {0}};
 		bigint_cpy(val_den, &bigint_tmp);
 	}
-	else if (*exponent < 0)
+	else if (exponent < 0)
 	{
-		bigint_pow10(&pow10, -*exponent);
+		bigint_pow10(&pow10, -exponent);
 		bigint_multiply(val_num, &pow10, &bigint_tmp);
 		*val_num = (t_bigint){0, {0}};
 		bigint_cpy(val_num, &bigint_tmp);
 	}
+}
+
+int				get_exponent(t_ldbl value)
+{
+	int			exp;
+
+	exp = 0;
+	if (value < 0)
+		value *= -1;
+	if (!value)
+		return (exp);
+	if (value > 1)
+	{
+		while (value >= 10)
+		{
+			value /= 10;
+			++exp;
+		}
+		return (exp);
+	}
+	while (value < 1)
+	{
+		value *= 10;
+		++exp;
+	}
+	return (-exp);
+}
+
+/*
+** Get the power of ten of the float written in scientific notation.
+** Example: 142.5 = 1.425 * 10 ^ 2 --> exponent = 2
+*/
+
+void			get_first_digit_exponent(t_dbls *arg_val, int *exponent,
+												t_format *conv_params)
+{
+	if (conv_params->len_mod == LEN_MOD_CAP_L)
+		*exponent = get_exponent(arg_val->ldbl);
+	else
+		*exponent = get_exponent(arg_val->dbl);
 }
 
 void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format 
@@ -1158,7 +1256,8 @@ void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format
 	val_num = (t_bigint){0, {0}};
 	val_den = (t_bigint){0, {0}};
 	initialize_fraction(arg_val, &val_num, &val_den, conv_params);
-	scale_fraction(arg_val, &val_num, &val_den, exponent, conv_params);
+	get_first_digit_exponent(arg_val, exponent, conv_params);
+	scale_fraction(&val_num, &val_den, *exponent);
 	i = 0;
 	while (val_num.length > 0 && i < BUF_DIGITS_SIZE)
 	{
