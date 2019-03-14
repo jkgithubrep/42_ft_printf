@@ -1,12 +1,12 @@
-
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/21 14:25:08 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/13 19:02:35 by jkettani         ###   ########.fr       */
+/*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
+/*   Updated: 2019/03/14 18:08:37 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,15 @@ const char		*save_value_skip_digits(const char *fmt, t_format *conv_params)
 	int		int_value;
 
 	int_value = ft_atoi(fmt);
-	if (conv_params->flags & FL_PREC)
-		conv_params->prec = int_value;
-	else
-		conv_params->width = int_value;
+	if (int_value >= 0)
+	{
+		if (conv_params->flags & FL_PREC)
+			conv_params->prec = int_value;
+		else
+			conv_params->width = int_value;
+	}
+	else if (conv_params->flags & FL_PREC)
+		conv_params->flags ^= FL_PREC;
 	fmt = ft_strskip(fmt, &ft_isdigit);
 	return (fmt);
 }
@@ -586,7 +591,7 @@ char			*round_nb(char *digits, int *exponent, t_format *conv_params)
 			carry = 0U;
 		--i;
 	}
-	if (i)
+	if (i || !carry)
 		return (digits);
 	if (digits[i] == '9')
 	{
@@ -683,7 +688,16 @@ char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 	int			exponent;
 
 	if ((val_str = handle_dbl_limit_values(arg_val, conv_params)))
+	{
+		if (conv_params->flags & FL_ZERO)
+			conv_params->flags ^= FL_ZERO;
+		if (!ft_strcmp(val_str, "nan"))
+		{
+			conv_params->flags |= (FL_PLUS | FL_SPACE);
+			conv_params->flags ^= (FL_PLUS | FL_SPACE);
+		}
 		return (val_str);
+	}
 	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
 		return (NULL);
 	exponent = 0;
@@ -743,12 +757,14 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	val_str = NULL;
 	if (ft_instr(conv_params->type_char, INT_TYPES))
 		val_str = get_formatted_str_int(conv_params, args);
-	if (ft_instr(conv_params->type_char, DBL_TYPES))
+	else if (ft_instr(conv_params->type_char, DBL_TYPES))
 		val_str = get_formatted_str_dbl(conv_params, args);
 	else if (conv_params->type_char == 'c' || conv_params->flags & FL_ERR)
 		val_str = get_formatted_str_char(conv_params, args);
 	else if (conv_params->type_char == 's')
 		val_str = get_formatted_str_str(conv_params, args);
+	else if (!conv_params->type_char)
+		val_str = ft_strnew(0);
 	return (val_str);
 }
 
@@ -1328,6 +1344,7 @@ void			conv_handler(t_worker *work, const char **fmt, va_list args,
 
 	*conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
 	*fmt = parse_conv_spec(*fmt + 1, conv_params);
+//	dbg_print_conv_params(conv_params);
 	formatted_str = get_formatted_str(conv_params, args);
 	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL)
 			&& (conv_params->flags & FL_MINUS))
