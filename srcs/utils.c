@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/16 21:54:40 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/16 23:03:32 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,24 +192,6 @@ t_dbls			*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
 	if (!(conv_params->flags & FL_PREC))
 		conv_params->prec = 6;
 	return (arg_val);
-}
-
-/*
-** Extract the next value in the va_list as a char *.
-*/
-
-char			*get_str_arg_val(va_list args)
-{
-	return ((char *)va_arg(args, char *));
-}
-
-/*
-** Extract the next value in the va_list as an unsigned char.
-*/
-
-t_uchar			get_char_arg_val(va_list args)
-{
-	return ((t_uchar)va_arg(args, int));
 }
 
 /*
@@ -543,7 +525,7 @@ char			*format_str(char *val_str, t_format *conv_params)
 	return (val_str);
 }
 
-char			*get_formatted_str_int(t_format *conv_params, va_list args)
+char			*get_formatted_str_from_int(t_format *conv_params, va_list args)
 {
 	intmax_t	arg_val;
 	char		*val_str;
@@ -708,7 +690,7 @@ char			*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 	return (val_str);
 }
 
-char			*get_formatted_str_dbl(t_format *conv_params, va_list args)
+char			*get_formatted_str_from_dbl(t_format *conv_params, va_list args)
 {
 	t_dbls		arg_val;
 	char		*val_str;
@@ -720,7 +702,8 @@ char			*get_formatted_str_dbl(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
-char			*get_formatted_str_char(t_format *conv_params, va_list args)
+char			*get_formatted_str_from_char(t_format *conv_params,
+																va_list args)
 {
 	t_uchar		arg_val;
 	char		*val_str;
@@ -728,7 +711,7 @@ char			*get_formatted_str_char(t_format *conv_params, va_list args)
 	if (conv_params->flags & FL_ERR)
 		arg_val = conv_params->type_char;
 	else
-		arg_val = get_char_arg_val(args);
+		arg_val = (t_uchar)va_arg(args, int);
 	if (!arg_val)
 		conv_params->flags |= FL_NULL;
 	val_str = char_arg_val_to_str(arg_val);
@@ -736,11 +719,11 @@ char			*get_formatted_str_char(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
-char			*get_formatted_str_str(t_format *conv_params, va_list args)
+char			*get_formatted_str_from_str(t_format *conv_params, va_list args)
 {
 	char		*val_str;
 
-	if (!(val_str = get_str_arg_val(args)))
+	if (!(val_str = (char *)va_arg(args, char *)))
 		val_str = ft_strdup("(null)");
 	else
 		val_str = ft_strdup(val_str);
@@ -754,13 +737,13 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 
 	val_str = NULL;
 	if (ft_instr(conv_params->type_char, INT_TYPES))
-		val_str = get_formatted_str_int(conv_params, args);
+		val_str = get_formatted_str_from_int(conv_params, args);
 	else if (ft_instr(conv_params->type_char, DBL_TYPES))
-		val_str = get_formatted_str_dbl(conv_params, args);
+		val_str = get_formatted_str_from_dbl(conv_params, args);
 	else if (conv_params->type_char == 'c' || conv_params->flags & FL_ERR)
-		val_str = get_formatted_str_char(conv_params, args);
+		val_str = get_formatted_str_from_char(conv_params, args);
 	else if (conv_params->type_char == 's')
-		val_str = get_formatted_str_str(conv_params, args);
+		val_str = get_formatted_str_from_str(conv_params, args);
 	else if (!conv_params->type_char)
 		val_str = ft_strnew(0);
 	return (val_str);

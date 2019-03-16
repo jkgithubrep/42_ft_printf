@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/12 11:31:42 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/16 22:15:47 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ int				has_prefix(t_format *conv_params);
 char			*get_formatted_str(t_format *conv_params, va_list args);
 char			*get_formatted_str_str(t_format *conv_params, va_list args);
 char			*get_formatted_str_char(t_format *conv_params, va_list args);
-char			*get_formatted_str_int(t_format *conv_params, va_list args);
+char			*get_formatted_str_from_int(t_format *conv_params,
+																va_list args);
 char			*format_str(char *val_str, t_format *conv_params);
 char			*format_char_str(char *val_str, t_format *conv_params);
 char			*char_arg_val_to_str(t_uchar arg_val);
