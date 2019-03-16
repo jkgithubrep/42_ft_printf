@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/14 18:08:37 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/16 21:54:40 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 #include "print_bigint_utils.h"
 
 /*
-** Take a string starting with a digit as argument, extract the number as an int
-** and return pointer to next non-digit character in the string.
-** Int value either is saved as a precision or a width depending on the value
-** of the flag FL_PREC.
+** Take a string starting with a digit, extract the number as an int and return
+** a pointer to the next non-digit character in the string.
+** The value is either saved as a precision or a width depending on the value
+** of the `FL_PREC' flag.
 */
 
 const char		*save_value_skip_digits(const char *fmt, t_format *conv_params)
@@ -41,8 +41,7 @@ const char		*save_value_skip_digits(const char *fmt, t_format *conv_params)
 }
 
 /*
-** Update the `flags` member in the t_format structure given as argument based
-** on the flag character given argument.
+** Update the `flags' member in the `t_format' structure.
 */
 
 void			save_flag(const char c, t_format *conv_params)
@@ -60,8 +59,7 @@ void			save_flag(const char c, t_format *conv_params)
 }
 
 /*
-** Update the `len_modif` member value in the t_format structure given as
-** argument.
+** Update the `len_modif' member value in the `t_format' structure.
 */
 
 void			save_len_modif(const char *fmt, t_format *conv_params)
@@ -100,7 +98,7 @@ void			save_type(const char c, t_format *conv_params)
 }
 
 /*
-** Parse a conversion specification (string portion starting after the `%`
+** Parse a conversion specification (string portion starting after the `%'
 ** character and ending with a conversion specifier) and extract the
 ** different parameters (flags, width, precision, length, type).
 */
@@ -135,7 +133,7 @@ const char		*parse_conv_spec(const char *fmt, t_format *conv_params)
 
 /*
 ** Extract the next value in the va_list as an intmax_t based on the
-** parameters in the t_format structure.
+** parameters in the `t_format' structure.
 */
 
 intmax_t		get_int_arg_val(t_format *conv_params, va_list args)
@@ -167,7 +165,7 @@ intmax_t		get_int_arg_val(t_format *conv_params, va_list args)
 **   - else: double
 ** If the value equals zero, set the FL_NULL flag.
 ** If the value is negative (sign bit equals 1), and the value is not `nan',
-** set the `is_neg` flag to 1.
+** set the `is_neg' flag to 1.
 */
 
 t_dbls			*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
