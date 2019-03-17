@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/21 14:30:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/16 22:15:47 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 09:08:09 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,9 @@ char			*get_formatted_str_from_int(t_format *conv_params,
 char			*format_str(char *val_str, t_format *conv_params);
 char			*format_char_str(char *val_str, t_format *conv_params);
 char			*char_arg_val_to_str(t_uchar arg_val);
-void			build_final_str(t_worker *work, char *append, int len);
+int				build_final_str(t_worker *work, char *append, int len);
 void			add_to_buff(t_worker *work, char *val_str, int len);
-void			conv_handler(t_worker *work, const char **fmt, va_list args,
+int				conv_handler(t_worker *work, const char **fmt, va_list args,
 								t_format *conv_params);
 int				bigint_compare(const t_bigint *bigint1,
 								const t_bigint *bigint2);

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/14 12:18:13 by jkettani          #+#    #+#             */
-/*   Updated: 2019/02/26 14:03:50 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 08:57:06 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int				ft_vdprintf(int d, const char *fmt, va_list args)
 	int			ret;
 
 	str = NULL;
-	if ((count = ft_vasprintf(&str, fmt, args)) == EXIT_FAIL)
+	if ((count = ft_vasprintf(&str, fmt, args)) < 0)
 		return (EXIT_FAIL);
 	ret = write(d, str, count);
 	ft_strdel(&str);

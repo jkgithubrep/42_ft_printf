@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/16 23:03:32 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 09:07:52 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -749,24 +749,33 @@ char			*get_formatted_str(t_format *conv_params, va_list args)
 	return (val_str);
 }
 
-void			build_final_str(t_worker *work, char *append, int len)
+int				build_final_str(t_worker *work, char *append, int len)
 {
 	char		*tmp;
 
 	if (!work->str)
-		tmp = (char *)ft_memjoin("", 0, append, len);
+	{
+		if (!(tmp = (char *)ft_memjoin("", 0, append, len)))
+			return (EXIT_FAIL);
+	}
 	else
-		tmp = (char	*)ft_memjoin(work->str, work->count, append, len);
+	{
+		if (!(tmp = (char	*)ft_memjoin(work->str, work->count, append, len)))
+			return (EXIT_FAIL);
+	}
 	if (work->str)
 		ft_strdel(&work->str);
 	work->str = tmp;
 	work->count += len;
+	return (EXIT_SUCCESS);
 }
 
-void			save_buf(t_worker *work)
+int				save_buf(t_worker *work)
 {
-	build_final_str(work, work->buf, work->i);
+	if (build_final_str(work, work->buf, work->i) < 0)
+		return (EXIT_FAIL);
 	work->i = 0;
+	return (EXIT_SUCCESS);
 }
 
 void			add_to_buff(t_worker *work, char *val_str, int len)
@@ -1316,7 +1325,7 @@ void			dragon4(t_dbls *arg_val, char *digits, int *exponent, t_format
 	}
 }
 
-void			conv_handler(t_worker *work, const char **fmt, va_list args,
+int				conv_handler(t_worker *work, const char **fmt, va_list args,
 								t_format *conv_params)
 {
 	char 		*formatted_str;
@@ -1325,12 +1334,12 @@ void			conv_handler(t_worker *work, const char **fmt, va_list args,
 
 	*conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
 	*fmt = parse_conv_spec(*fmt + 1, conv_params);
-//	dbg_print_conv_params(conv_params);
 	formatted_str = get_formatted_str(conv_params, args);
 	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL)
 			&& (conv_params->flags & FL_MINUS))
 	{
-		tmp = ft_strnew(1);
+		if (!(tmp = ft_strnew(1)))
+			return (EXIT_FAIL);
 		add_to_buff(work, tmp, 1);
 	}
 	len = ft_strlen(formatted_str);
@@ -1338,18 +1347,20 @@ void			conv_handler(t_worker *work, const char **fmt, va_list args,
 			!(conv_params->flags & FL_MINUS))
 		len++;
 	add_to_buff(work, formatted_str, len);
+	return (EXIT_SUCCESS);
 }
 
 int				parse_fmt(char **str, const char *fmt, va_list args)
 {
-	t_worker	work;
 	t_format	conv_params;
+	t_worker	work;
 
 	work = (t_worker){NULL, {0}, 0, 0};
 	while (*fmt)
 	{
 		if (work.i > BUF_SIZE - 1)
-			save_buf(&work);
+			if (save_buf(&work) < 0)
+				return (EXIT_FAIL);
 		if (*fmt == PERCENT)
 			conv_handler(&work, &fmt, args, &conv_params);
 		else

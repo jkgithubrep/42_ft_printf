@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/14 16:28:55 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 08:38:43 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ typedef union				u_dbls{
 }							t_dbls;
 
 # define EXIT_FAIL          -1
+# define EXIT_SUCCESS		0
 # define BUF_SIZE			4096
 
 /*
