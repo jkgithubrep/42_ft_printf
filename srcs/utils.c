@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/17 09:20:58 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 12:52:29 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -761,10 +761,7 @@ int				build_final_str(t_worker *work, char *append, int len)
 	else
 	{
 		if (!(tmp = (char	*)ft_memjoin(work->str, work->count, append, len)))
-		{
-			ft_strdel(&work->str);
 			return (EXIT_FAIL);
-		}
 	}
 	ft_strdel(&work->str);
 	work->str = tmp;
@@ -780,23 +777,27 @@ int				save_buf(t_worker *work)
 	return (EXIT_SUCCESS);
 }
 
-void			add_to_buff(t_worker *work, char *val_str, int len)
+int				add_to_buff(t_worker *work, char *val_str, int len)
 {
 	int		i;
 
 	if (!val_str)
-		return ;
+		return (EXIT_FAIL);
 	if (len > BUF_SIZE || (work->i + len > BUF_SIZE))
-		save_buf(work);
+		if (save_buf(work) < 0)
+			return (EXIT_FAIL);
 	if (len > BUF_SIZE)
-		build_final_str(work, val_str, len);
+	{
+		if (build_final_str(work, val_str, len) < 0)
+			return (EXIT_FAIL);
+	}
 	else
 	{
 		i = 0;
 		while (len--)
 			work->buf[(work->i)++] = val_str[i++];
 	}
-	ft_strdel(&val_str);
+	return (EXIT_SUCCESS);
 }
 
 /*
@@ -1341,15 +1342,17 @@ int				conv_handler(t_worker *work, const char **fmt, va_list args,
 			&& (conv_params->flags & FL_MINUS))
 	{
 		if (!(tmp = ft_strnew(1)))
-			return (EXIT_FAIL);
-		add_to_buff(work, tmp, 1);
+			return (ft_strdel_ret(&formatted_str, EXIT_FAIL));
+		if (add_to_buff(work, tmp, 1) < 0)
+			return (ft_strdel_ret(&formatted_str, EXIT_FAIL));
 	}
 	len = ft_strlen(formatted_str);
 	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL) &&
 			!(conv_params->flags & FL_MINUS))
 		len++;
-	add_to_buff(work, formatted_str, len);
-	return (EXIT_SUCCESS);
+	if (add_to_buff(work, formatted_str, len) < 0)
+		return (ft_strdel_ret(&formatted_str, EXIT_FAIL));
+	return (ft_strdel_ret(&formatted_str, EXIT_SUCCESS));
 }
 
 int				parse_fmt(char **str, const char *fmt, va_list args)
@@ -1362,13 +1365,17 @@ int				parse_fmt(char **str, const char *fmt, va_list args)
 	{
 		if (work.i > BUF_SIZE - 1)
 			if (save_buf(&work) < 0)
-				return (EXIT_FAIL);
+				return (ft_strdel_ret(&work.str, EXIT_FAIL));
 		if (*fmt == PERCENT)
-			conv_handler(&work, &fmt, args, &conv_params);
+		{
+			if (conv_handler(&work, &fmt, args, &conv_params) < 0)
+				return (ft_strdel_ret(&work.str, EXIT_FAIL));
+		}
 		else
 			work.buf[work.i++] = *fmt++;
 	}
-	save_buf(&work);
+	if (save_buf(&work) < 0)
+		return (ft_strdel_ret(&work.str, EXIT_FAIL));
 	*str = work.str;
 	return (work.count);
 }

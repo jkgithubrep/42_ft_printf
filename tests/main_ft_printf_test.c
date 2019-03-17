@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/17 09:31:03 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 12:48:51 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,5 +40,7 @@ int		main(int ac, char **av)
 	ret = ft_printf(ARGS);
 	printf("|\n");
 	printf("> ret = |%d|\n", ret);
+	while (1)
+		;
 	return (0);
 }
