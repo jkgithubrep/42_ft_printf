@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/17 09:07:52 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 09:20:58 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -761,10 +761,12 @@ int				build_final_str(t_worker *work, char *append, int len)
 	else
 	{
 		if (!(tmp = (char	*)ft_memjoin(work->str, work->count, append, len)))
+		{
+			ft_strdel(&work->str);
 			return (EXIT_FAIL);
+		}
 	}
-	if (work->str)
-		ft_strdel(&work->str);
+	ft_strdel(&work->str);
 	work->str = tmp;
 	work->count += len;
 	return (EXIT_SUCCESS);
