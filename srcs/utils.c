@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/14 10:44:52 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/17 12:52:29 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/17 22:51:31 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -800,204 +800,6 @@ int				add_to_buff(t_worker *work, char *val_str, int len)
 	return (EXIT_SUCCESS);
 }
 
-/*
-** First compare bigint lengths, and return 1 if length of bigint1 is greater
-** than length of bigint2.
-** If lengths are equal, compare blocks one by one from high to low. 
-** If blocks values are not equal, return 1 if block of bigint1 is greater than 
-** block of bigint2, else return -1.
-** If all blocks are equal, return 0.
-*/
-
-int				bigint_compare(const t_bigint *bigint1, const t_bigint *bigint2)
-{
-	size_t		i; 
-
-	if (bigint1->length != bigint2->length)
-		return ((bigint1->length > bigint2->length) ? 1 : -1);
-	i = bigint1->length;
-	while (i--)
-		if (bigint1->blocks[i] != bigint2->blocks[i])
-			return ((bigint1->blocks[i] > bigint2->blocks[i]) ? 1 : -1);
-	return (0);
-}
-
-/*
-** Make `large_nb' point on the biggest big int, and `small_nb` on the
-** smallest.
-*/
-
-void			order_bigints(const t_bigint *bigint1, const t_bigint *bigint2,
-					const t_bigint **small_nb, const t_bigint **large_nb)
-{
-	if (bigint_compare(bigint1, bigint2) >= 0)
-	{
-		*large_nb = bigint1;
-		*small_nb = bigint2;
-	}
-	else
-	{
-		*large_nb = bigint2;
-		*small_nb = bigint1;
-	}
-}
-
-/*
-** Return the number of blocks used to store the bigint.
-*/
-
-size_t			bigint_size(const t_bigint *bigint)
-{
-	size_t		i;
-
-	i = BIGINT_SIZE;
-	while (i--)
-		if (bigint->blocks[i])
-			return (i + 1);
-	return (0);
-}
-
-/*
-** Add `bigint1' and `bigint2' and store the sum in `result'.
-** Return a pointer to `result'.
-*/
-
-t_bigint		*bigint_add(const t_bigint *bigint1, const t_bigint *bigint2,
-							t_bigint *result)
-{
-	t_ulint			sum;
-	t_ulint			carry;
-	size_t			i;
-	size_t			max_len;
-
-	sum = 0UL;
-	carry = 0UL;
-	i = 0;
-	max_len = (size_t)ft_max(bigint1->length, bigint2->length);
-	while (i < max_len)
-	{
-		sum = carry + (t_ulint)bigint1->blocks[i]
-					+ (t_ulint)bigint2->blocks[i];
-		result->blocks[i] = (t_uint)(sum & 0xFFFFFFFFUL);
-		carry = sum >> BIGINT_BLOCK_SIZE;
-		i++;
-	}
-	if (carry && (i < BIGINT_SIZE))
-		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFUL);
-	result->length = (carry) ? max_len + 1 : max_len;
-	return (result);
-}
-
-/*
-** Substract the smallest number from `bigint1' and `bigint2' to the biggest
-** from `bigint1` and `bigint2' and store the difference in `result'.
-** Return a pointer to `result'.
-*/
-
-t_bigint		*bigint_substract(const t_bigint *bigint1,
-									const t_bigint *bigint2, t_bigint *result)
-{
-	const t_bigint	*large_nb;
-	const t_bigint	*small_nb;
-	t_ulint			carry;
-	t_ulint			tmp;
-	size_t			i;
-
-	carry = 0UL;
-	i = 0;
-	order_bigints(bigint1, bigint2, &small_nb, &large_nb);
-	while (i < large_nb->length)
-	{
-		tmp = (t_ulint)large_nb->blocks[i] - carry;
-		carry = (((large_nb->blocks[i] > 0) || (!large_nb->blocks[i] && !carry))
-					&& (tmp >= (t_ulint)small_nb->blocks[i])) ? 0UL : 1UL;
-		result->blocks[i] = (t_uint)((tmp + ((carry) ? (1UL << 32) : 0UL)
-					- (t_ulint)small_nb->blocks[i]) & 0xFFFFFFFFUL);
-		i++;
-	}
-	result->length = bigint_size(result);
-	return (result);
-}
-
-/*
-** Convert a uintmax_t number to a bigint and store the obtained bigint in
-** `result'.
-** Return a pointer to `result'.
-*/
-
-t_bigint		*uimax_to_bigint(uintmax_t nb, t_bigint *result)
-{
-	int			i;
-
-	i = -1;
-	while (nb && ++i < BIGINT_SIZE)
-	{
-		result->blocks[i] = (t_uint)(nb & 0xFFFFFFFFUL);
-		nb >>= BIGINT_BLOCK_SIZE;
-	}
-	result->length = bigint_size(result);
-	return (result);
-}
-
-/*
-** Shift the bigint to the left.
-*/
-
-t_bigint		*bigint_shiftleft(t_bigint *result, t_uint shift)
-{
-	t_uint		i;
-	int			block_size;
-
-	if (!shift)
-		return (result);
-	i = BIGINT_SIZE;
-	block_size = BIGINT_BLOCK_SIZE;
-	if (!(shift % block_size))
-		while (--i >= (shift / block_size))
-			result->blocks[i] = result->blocks[i - (shift / block_size)];
-	else
-	{
-		while (--i >= (shift/block_size + 1))
-			result->blocks[i] = (result->blocks[i - (shift / block_size + 1)]
-				>> (block_size - (shift % block_size))) 
-				| (result->blocks[i - shift / block_size] 
-					<< (shift % block_size));
-		result->blocks[i] = result->blocks[i - shift/block_size]
-								<< (shift % block_size);
-	}
-	i = !(shift % block_size) ? i + 1 : i;
-	while (i--)
-		result->blocks[i] = 0;
-	result->length = bigint_size(result);
-	return (result);
-}
-
-/*
-** Multiply a bigint by an unsigned int.
-*/
-
-t_bigint		*bigint_multiply_nb(t_bigint *result, t_uint nb)
-{
-	size_t		i;
-	t_ulint		carry;
-	t_ulint		res;
-
-	if (nb == 1)
-		return (result);
-	i = 0;
-	carry = 0UL;
-	while (i < result->length)
-	{
-		res = (t_ulint)result->blocks[i] * (t_ulint)nb + carry;
-		result->blocks[i] = (t_uint)(res & 0xFFFFFFFFUL);
-		carry = res >> 32;
-		i++;
-	}
-	if (carry && i < BIGINT_SIZE)
-		result->blocks[i] = (t_uint)(carry & 0xFFFFFFFFUL);
-	result->length = bigint_size(result);
-	return (result);
-}
 
 t_bigint		*bigint_cpy(t_bigint *dest, const t_bigint *src)
 {
@@ -1116,16 +918,16 @@ int				bigint_divide(const t_bigint *dividend, const t_bigint *divisor)
 	res = 5;
 	bigint_tmp = (t_bigint){0, {0}};
 	bigint_multiply_nb(bigint_cpy(&bigint_tmp, divisor), res);
-	if (bigint_compare(dividend, &bigint_tmp) > 0)
+	if (ft_bigint_comp(dividend, &bigint_tmp) > 0)
 	{
-		while (bigint_compare(dividend, bigint_add(&bigint_tmp, divisor,
+		while (ft_bigint_comp(dividend, bigint_add(&bigint_tmp, divisor,
 														&bigint_tmp)) > 0)
 			++res;	
-		return (!bigint_compare(dividend, &bigint_tmp) ? res + 1 : res);
+		return (!ft_bigint_comp(dividend, &bigint_tmp) ? res + 1 : res);
 	}
-	if (bigint_compare(dividend, &bigint_tmp) < 0)
+	if (ft_bigint_comp(dividend, &bigint_tmp) < 0)
 	{
-		while (bigint_compare(dividend, bigint_substract(&bigint_tmp, divisor,
+		while (ft_bigint_comp(dividend, bigint_substract(&bigint_tmp, divisor,
 														&bigint_tmp)) < 0)
 			--res;	
 		return (res - 1);
@@ -1248,32 +1050,6 @@ void			scale_fraction(t_bigint *val_num, t_bigint *val_den,
 	}
 }
 
-int				get_exponent(t_ldbl value)
-{
-	int			exp;
-
-	exp = 0;
-	if (value < 0)
-		value *= -1;
-	if (!value)
-		return (exp);
-	if (value > 1)
-	{
-		while (value >= 10)
-		{
-			value /= 10;
-			++exp;
-		}
-		return (exp);
-	}
-	while (value < 1)
-	{
-		value *= 10;
-		++exp;
-	}
-	return (-exp);
-}
-
 /*
 ** Get the power of ten of the floating-point number written in scientific 
 ** notation.
@@ -1284,9 +1060,9 @@ void			get_first_digit_exponent(t_dbls *arg_val, int *exponent,
 												t_format *conv_params)
 {
 	if (conv_params->len_mod == LEN_MOD_CAP_L)
-		*exponent = get_exponent(arg_val->ldbl);
+		*exponent = ft_exponent(arg_val->ldbl);
 	else
-		*exponent = get_exponent(arg_val->dbl);
+		*exponent = ft_exponent(arg_val->dbl);
 }
 
 /*
