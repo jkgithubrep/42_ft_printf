@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:27:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 16:21:59 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 19:55:32 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "libft.h"
 #include "conv_spec_parser.h"
 #include "get_formatted_str.h"
+#include "options_handler.h"
 
 static int		build_final_str(t_worker *work, char *append, int len)
 {
@@ -43,7 +44,7 @@ static int		save_buf(t_worker *work)
 	return (EXIT_SUCCESS);
 }
 
-static int		add_to_buff(t_worker *work, char *val_str, int len)
+int				add_to_buff(t_worker *work, char *val_str, int len)
 {
 	int			i;
 
@@ -107,6 +108,11 @@ int				parse_fmt(char **str, const char *fmt, va_list args)
 		if (*fmt == PERCENT)
 		{
 			if (conv_handler(&work, &fmt, args, &conv_params) < 0)
+				return (ft_strdel_ret(&work.str, EXIT_FAIL));
+		}
+		else if (*fmt == BRACE_OPEN)
+		{
+			if (formatting_handler(&work, &fmt) < 0)
 				return (ft_strdel_ret(&work.str, EXIT_FAIL));
 		}
 		else

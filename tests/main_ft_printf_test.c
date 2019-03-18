@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 12:43:55 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 19:52:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <limits.h>
 #include <stdio.h>
 
-#define ARGS "%.4147483650d", INT_MAX
+#define ARGS "{bold}{red}%s {green}%s {yellow}%s {blue}%s {magenta}%s {cyan}%s{eoc}", "Y", "a", "plein", "de", "couleurs", "!!!"
 
 int		main(int ac, char **av)
 {

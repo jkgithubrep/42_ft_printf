@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 16:37:30 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 19:09:21 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,95 @@
 # include <sys/types.h>
 
 /*
+** Defines
+*/
+
+# define EXIT_FAIL          -1
+# define EXIT_SUCCESS		0
+
+# define BUF_SIZE			4096
+
+# define BUF_DIGITS_SIZE    17000
+
+# define TYPES             "dDiuUoOxXfeEgGaAcspb"
+# define SIGNED_TYPES      "dif"
+# define FLAGS             "-+ 0#"
+# define LEN_MODIFS        "hlLjz"
+# define INT_TYPES         "douxXib"
+# define DBL_TYPES         "f"
+# define TYPE_PREFIX       "xXb"
+
+# define DOLLAR            '$'
+# define ASTERISK          '*'
+# define DOT               '.'
+# define PERCENT           '%'
+# define BRACE_OPEN        '{'
+
+# define MINUS             '-'
+# define PLUS              '+'
+# define SPACE             ' '
+# define HASH              '#'
+# define ZERO              '0'
+
+# define BIN_BASE          "01"
+# define DEC_BASE          "0123456789"
+# define OCT_BASE          "01234567"
+# define L_HEX_BASE        "0123456789abcdef"
+# define U_HEX_BASE        "0123456789ABCDEF"
+
+# define PREF_OCT          "0"
+# define PREF_L_HEX        "0x"
+# define PREF_U_HEX        "0X"
+# define PREF_BIN          "0b"
+
+# define BOLD			   "\x1b[1m"
+# define DIM               "\x1b[2m"
+# define ITALIC            "\x1b[3m"
+# define UNDERLINE		   "\x1b[4m"
+# define C_BLACK		   "\x1b[30m"
+# define C_RED			   "\x1b[31m"
+# define C_GREEN		   "\x1b[32m"
+# define C_YELLOW		   "\x1b[33m"
+# define C_BLUE		       "\x1b[34m"
+# define C_MAGENTA		   "\x1b[35m"
+# define C_CYAN		       "\x1b[36m"
+# define C_WHITE		   "\x1b[37m"
+# define BG_BLACK		   "\x1b[40m"
+# define BG_RED		       "\x1b[41m"
+# define BG_GREEN		   "\x1b[42m"
+# define BG_YELLOW		   "\x1b[43m"
+# define BG_BLUE		   "\x1b[44m"
+# define BG_MAGENTA	       "\x1b[45m"
+# define BG_CYAN		   "\x1b[46m"
+# define BG_WHITE		   "\x1b[47m"
+# define RESET			   "\x1b[0m"
+
+# define STR_BOLD		   "{bold}"
+# define STR_DIM           "{dim}"
+# define STR_ITALIC        "{italic}"
+# define STR_UNDERLINE	   "{underline}"
+# define STR_BLACK		   "{black}"
+# define STR_RED		   "{red}"
+# define STR_GREEN		   "{green}"
+# define STR_YELLOW	       "{yellow}"
+# define STR_BLUE		   "{blue}"
+# define STR_MAGENTA	   "{magenta}"
+# define STR_CYAN		   "{cyan}"
+# define STR_WHITE		   "{white}"
+# define STR_BG_BLACK	   "{black_bg}"
+# define STR_BG_RED	       "{red_bg}"
+# define STR_BG_GREEN	   "{green_bg}"
+# define STR_BG_YELLOW	   "{yellow_bg}"
+# define STR_BG_BLUE	   "{blue_bg}"
+# define STR_BG_MAGENTA    "{magenta_bg}"
+# define STR_BG_CYAN	   "{cyan_bg}"
+# define STR_BG_WHITE	   "{white_bg}"
+# define STR_RESET		   "{eoc}"
+
+/*
 ** Typedefs
 */
+
 typedef char				t_char;
 typedef	short				t_short;
 typedef int					t_int;
@@ -35,9 +122,15 @@ typedef float				t_float;
 typedef double				t_dbl;
 typedef long double			t_ldbl;
 
+typedef	struct				s_option_format{
+	char					*name;
+	char					*ansi_code;
+}							t_option_format;
+
 /*
 ** Union to store the different int types
 */
+
 typedef union				u_ints{
 	t_char					s_char;
 	t_short					s_short;
@@ -91,46 +184,6 @@ typedef union				u_dbls{
 	t_dbl_parts				dbl_parts;
 	t_ldbl_parts			ldbl_parts;
 }							t_dbls;
-
-# define EXIT_FAIL          -1
-# define EXIT_SUCCESS		0
-# define BUF_SIZE			4096
-
-# define TYPES             "dDiuUoOxXfeEgGaAcspb"
-# define SIGNED_TYPES      "dif"
-# define FLAGS             "-+ 0#"
-# define LEN_MODIFS        "hlLjz"
-# define INT_TYPES         "douxXib"
-# define DBL_TYPES         "f"
-# define TYPE_PREFIX       "xXb"
-
-/*
-** DOLLAR and ASTERISK unused.
-*/
-
-# define DOLLAR            '$'
-# define ASTERISK          '*'
-# define DOT               '.'
-# define PERCENT           '%'
-
-# define MINUS             '-'
-# define PLUS              '+'
-# define SPACE             ' '
-# define HASH              '#'
-# define ZERO              '0'
-
-# define BIN_BASE          "01"
-# define DEC_BASE          "0123456789"
-# define OCT_BASE          "01234567"
-# define L_HEX_BASE        "0123456789abcdef"
-# define U_HEX_BASE        "0123456789ABCDEF"
-
-# define PREF_OCT          "0"
-# define PREF_L_HEX        "0x"
-# define PREF_U_HEX        "0X"
-# define PREF_BIN          "0b"
-
-# define BUF_DIGITS_SIZE   17000
 
 typedef enum				e_sign_type{
 	UNSIGNED = 0x0,
