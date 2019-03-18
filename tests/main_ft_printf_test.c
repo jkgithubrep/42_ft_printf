@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 19:52:57 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 20:20:17 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 #define ARGS "{bold}{red}%s {green}%s {yellow}%s {blue}%s {magenta}%s {cyan}%s{eoc}", "Y", "a", "plein", "de", "couleurs", "!!!"
+//#define ARGS "{red}%%{eoc}"
 
 int		main(int ac, char **av)
 {

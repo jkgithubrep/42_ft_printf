@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/14 12:18:13 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 13:28:57 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 20:10:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,15 @@ int				ft_vdprintf(int d, const char *fmt, va_list args)
 
 int				ft_vasprintf(char **str, const char *fmt, va_list args)
 {
-	int			count;
+	t_format	conv_params;
+	t_worker	work;
 
-	count = parse_fmt(str, fmt, args);
-	return (count);
+	work = (t_worker){NULL, {0}, 0, 0};
+	while (*fmt)
+		if (parse_fmt(&work, &conv_params, &fmt, args) < 0)
+			return (ft_strdel_ret(&work.str, EXIT_FAIL));
+	if (save_buf(&work) < 0)
+		return (ft_strdel_ret(&work.str, EXIT_FAIL));
+	*str = work.str;
+	return (work.count);
 }

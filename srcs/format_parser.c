@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:27:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 19:55:32 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 20:16:16 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int		build_final_str(t_worker *work, char *append, int len)
 	return (EXIT_SUCCESS);
 }
 
-static int		save_buf(t_worker *work)
+int				save_buf(t_worker *work)
 {
 	if (build_final_str(work, work->buf, work->i) < 0)
 		return (EXIT_FAIL);
@@ -94,32 +94,26 @@ static int		conv_handler(t_worker *work, const char **fmt, va_list args,
 	return (ft_strdel_ret(&formatted_str, EXIT_SUCCESS));
 }
 
-int				parse_fmt(char **str, const char *fmt, va_list args)
+int				parse_fmt(t_worker *work, t_format *conv_params,
+										const char **fmt, va_list args)
 {
-	t_format	conv_params;
-	t_worker	work;
-
-	work = (t_worker){NULL, {0}, 0, 0};
-	while (*fmt)
+	if (work->i > BUF_SIZE - 1)
+		if (save_buf(work) < 0)
+			return (ft_strdel_ret(&work->str, EXIT_FAIL));
+	if (**fmt == PERCENT)
 	{
-		if (work.i > BUF_SIZE - 1)
-			if (save_buf(&work) < 0)
-				return (ft_strdel_ret(&work.str, EXIT_FAIL));
-		if (*fmt == PERCENT)
-		{
-			if (conv_handler(&work, &fmt, args, &conv_params) < 0)
-				return (ft_strdel_ret(&work.str, EXIT_FAIL));
-		}
-		else if (*fmt == BRACE_OPEN)
-		{
-			if (formatting_handler(&work, &fmt) < 0)
-				return (ft_strdel_ret(&work.str, EXIT_FAIL));
-		}
-		else
-			work.buf[work.i++] = *fmt++;
+		if (conv_handler(work, fmt, args, conv_params) < 0)
+			return (ft_strdel_ret(&work->str, EXIT_FAIL));
 	}
-	if (save_buf(&work) < 0)
-		return (ft_strdel_ret(&work.str, EXIT_FAIL));
-	*str = work.str;
-	return (work.count);
+	else if (**fmt == BRACE_OPEN)
+	{
+		if (formatting_handler(work, fmt) < 0)
+			return (ft_strdel_ret(&work->str, EXIT_FAIL));
+	}
+	else
+	{
+		work->buf[work->i++] = **fmt;
+		(*fmt)++;
+	}
+	return (EXIT_SUCCESS);
 }
