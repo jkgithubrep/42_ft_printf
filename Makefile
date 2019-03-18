@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/17 22:16:04 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/18 16:23:11 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -68,8 +68,17 @@ SRC_NAME_LFT =     str/ft_strcdup str/ft_strdel print/ft_putstr \
 				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
 				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat char/ft_tolower \
 				   char/ft_isupper str/ft_strndup str/ft_strcmp str/ft_strclcat\
-				   str/ft_strlcat str/ft_strdel_ret math/ft_exponent
-SRC_NAME =     	   ft_printf utils dbg_utils print_bigint_utils \
+				   str/ft_strlcat str/ft_strdel_ret math/ft_exponent \
+				   bigint/ft_bigint_comp bigint/ft_bigint_add \
+				   bigint/ft_bigint_subst bigint/ft_bigint_order \
+				   bigint/ft_bigint_size bigint/ft_uimax_to_bigint \
+				   bigint/ft_bigint_shiftleft bigint/ft_bigint_multiply_uint \
+				   bigint/ft_bigint_cpy bigint/ft_bigint_multiply \
+				   bigint/ft_bigint_divide bigint/ft_bigint_pow10
+SRC_NAME =     	   ft_printf get_formatted_str dbg_utils print_bigint_utils \
+				   dbl_to_str_conv format_parser conv_spec_parser \
+				   int_type_handler dbl_type_handler dbl_utils \
+				   int_to_str_conv formatting_utils int_formatting_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))

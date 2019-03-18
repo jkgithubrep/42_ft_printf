@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/17 08:38:43 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 16:37:30 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ typedef struct				s_dbl_parts{
 }							t_dbl_parts;
 
 /*
-** Structure to store the different parts of a long double (x86 extended 
+** Structure to store the different parts of a long double (x86 extended
 ** precision format on 80 bits).
 ** The element are in reverse order assuming little-endian format.
 */
@@ -78,7 +78,6 @@ typedef struct				s_ldbl_parts{
 	t_uint					exponent : 15;
 	t_uint					sign : 1;
 }							t_ldbl_parts;
-
 
 /*
 ** Union to store the different double types and there constitutive parts in the
@@ -96,10 +95,6 @@ typedef union				u_dbls{
 # define EXIT_FAIL          -1
 # define EXIT_SUCCESS		0
 # define BUF_SIZE			4096
-
-/*
-** Length modifiers j and z not handled
-*/
 
 # define TYPES             "dDiuUoOxXfeEgGaAcspb"
 # define SIGNED_TYPES      "dif"
@@ -135,8 +130,6 @@ typedef union				u_dbls{
 # define PREF_U_HEX        "0X"
 # define PREF_BIN          "0b"
 
-# define BIGINT_SIZE       515
-# define BIGINT_BLOCK_SIZE 32
 # define BUF_DIGITS_SIZE   17000
 
 typedef enum				e_sign_type{
@@ -184,11 +177,6 @@ typedef struct				s_worker{
 	int						count;
 	int						i;
 }							t_worker;
-
-typedef struct				s_bigint{
-	size_t					length;
-	t_uint					blocks[BIGINT_SIZE];
-}							t_bigint;
 
 int							ft_printf(const char *fmt, ...);
 int							ft_dprintf(int d, const char *fmt, ...);

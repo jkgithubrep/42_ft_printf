@@ -6,12 +6,12 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/06 21:33:09 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/10 16:05:04 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 16:26:07 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft.h"
 #include "ft_printf.h"
-#include "print_bigint_utils.h"
 #include <stdio.h>
 
 void	print_32bits(unsigned int nb)
@@ -22,7 +22,7 @@ void	print_32bits(unsigned int nb)
 	while (mask)
 	{
 		printf("%c", (nb & mask) ? '1' : '0');
-		mask >>= 1;	
+		mask >>= 1;
 	}
 }
 
@@ -85,11 +85,5 @@ void	print_bigint(const t_bigint *bigint, const char *name)
 	i = 0;
 	printf(">>> %s <<<\n", name);
 	printf("length: %zu\n", bigint->length);
-//	print_separation();
-//	print_bigint_header();
-//	print_separation();
-//	print_blocks_dec(bigint);
-//	print_separation();
 	print_blocks_bin(bigint);
-//	print_separation();
 }

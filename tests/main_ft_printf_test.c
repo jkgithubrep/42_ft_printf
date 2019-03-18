@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/17 12:48:51 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 12:43:55 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <limits.h>
 #include <stdio.h>
 
-#define ARGS "%"
+#define ARGS "%.4147483650d", INT_MAX
 
 int		main(int ac, char **av)
 {
@@ -40,7 +40,5 @@ int		main(int ac, char **av)
 	ret = ft_printf(ARGS);
 	printf("|\n");
 	printf("> ret = |%d|\n", ret);
-	while (1)
-		;
 	return (0);
 }
