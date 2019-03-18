@@ -6,38 +6,13 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:31:10 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 13:36:29 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 21:23:14 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 #include "libft.h"
-
-/*
-** Take a string starting with a digit, extract the number as an int and return
-** a pointer to the next non-digit character in the string.
-** The value is either saved as a precision or a width depending on the value
-** of the `FL_PREC' flag.
-*/
-
-static const char	*save_value_skip_digits(const char *fmt,
-													t_format *conv_params)
-{
-	int				int_value;
-
-	int_value = ft_atoi(fmt);
-	if (int_value >= 0)
-	{
-		if (conv_params->flags & FL_PREC)
-			conv_params->prec = int_value;
-		else
-			conv_params->width = int_value;
-	}
-	else if (conv_params->flags & FL_PREC)
-		conv_params->flags ^= FL_PREC;
-	fmt = ft_strskip(fmt, &ft_isdigit);
-	return (fmt);
-}
+#include "conv_spec_parser_utils.h"
 
 /*
 ** Update the `flags' member in the `t_format' structure.
@@ -102,18 +77,17 @@ static void			save_type(const char c, t_format *conv_params)
 ** different parameters (flags, width, precision, length, type).
 */
 
-const char			*parse_conv_spec(const char *fmt, t_format *conv_params)
+const char			*parse_conv_spec(const char *fmt, t_format *conv_params,
+														va_list args)
 {
 	while (*fmt && !ft_instr(*fmt, TYPES))
 	{
 		if (ft_isdigit(*fmt) && *fmt != ZERO)
 			fmt = save_value_skip_digits(fmt, conv_params) - 1;
+		else if (*fmt == ASTERISK)
+			save_width(conv_params, args);
 		else if (*fmt == DOT)
-		{
-			conv_params->flags |= FL_PREC;
-			if (ft_isdigit(*(fmt + 1)))
-				fmt = save_value_skip_digits(fmt + 1, conv_params) - 1;
-		}
+			fmt = save_prec(fmt, conv_params, args);
 		else if (ft_instr(*fmt, FLAGS))
 			save_flag(*fmt, conv_params);
 		else if (ft_instr(*fmt, LEN_MODIFS))

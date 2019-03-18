@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:27:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 20:16:16 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/18 20:36:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static int		conv_handler(t_worker *work, const char **fmt, va_list args,
 	int			len;
 
 	*conv_params = (t_format){0, 0, 0, 0, 0u, LEN_MOD_NA, UNSIGNED};
-	*fmt = parse_conv_spec(*fmt + 1, conv_params);
+	*fmt = parse_conv_spec(*fmt + 1, conv_params, args);
 	formatted_str = get_formatted_str(conv_params, args);
 	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL)
 			&& (conv_params->flags & FL_MINUS))
