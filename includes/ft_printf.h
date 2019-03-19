@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 12:02:35 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 12:43:15 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,12 @@
 
 # define BUF_DIGITS_SIZE    17000
 
-# define TYPES             "dDiuUoOxXfFcspb"
-# define SIGNED_TYPES      "difF"
+# define TYPES             "dDiuUoOxXfFeEcspb"
+# define SIGNED_TYPES      "difFeE"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
 # define INT_TYPES         "douxXib"
-# define DBL_TYPES         "fF"
+# define DBL_TYPES         "fFeE"
 # define TYPE_PREFIX       "xXb"
 
 # define DOLLAR            '$'

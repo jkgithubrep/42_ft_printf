@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/05 17:33:49 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/12 16:51:31 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 14:20:47 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -788,6 +788,7 @@ int		main(int ac, char **av)
 		&test_type_unsigned_hexadecimal_X,
 		&test_type_double_f,
 		&test_type_double_e,
+		&test_type_double_g,
 		&test_type_double_a,
 		&test_type_char,
 		&test_type_string,

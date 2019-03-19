@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 14:52:31 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 12:16:57 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 14:16:58 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ static char		*round_nb(char *digits, int *exponent, t_format *conv_params)
 	size_t		i;
 	t_uint		carry;
 
-	ft_putendl(digits);
-	i = ft_max(*exponent, 0) + conv_params->prec;
+	i = ft_max(ft_tolower(conv_params->type_char) == 'e' ? 0 : *exponent, 0)
+			+ conv_params->prec;
 	if (!digits[i + 1] || digits[i + 1] < '5' || ((digits[i + 1] == '5')
 			&& !((digits[i] - '0') & 1U) && check_end_digits(digits, i + 2)))
 		return (digits);
@@ -107,6 +107,27 @@ static char		*add_zeros_right(char **digits, int exponent,
 	return (*digits);
 }
 
+static char		*add_exponent_sign(char **val_str, int exponent,
+														t_format *conv_params)
+{
+	char	*append;
+	char	*nb_append;
+	long	u_exponent;
+
+	append = (exponent < 0) ? ft_strdup("e-") : ft_strdup("e+");
+	if (conv_params->type_char == 'E')
+		ft_strupper(append);
+	if (exponent > -10 && exponent < 10)
+		ft_strappend(&append, "0");
+	u_exponent = ft_abs(exponent);
+	nb_append = ft_uimaxtoa_base(u_exponent, DEC_BASE);
+	ft_strappend(&append, nb_append);
+	ft_strdel(&nb_append);
+	ft_strappend(val_str, append);
+	ft_strdel(&append);
+	return (*val_str);
+}
+
 /*
 ** Convert the digits extracted to a final value by rounding the number and
 ** inserting a `.' at the right place.
@@ -119,23 +140,27 @@ char			*handle_dbl_precision(char **digits, int exponent,
 {
 	char		*val_str;
 	char		*fraction;
+	int			exp_add;
 
-	if (exponent < 0)
+	if (exponent < 0 && ft_tolower(conv_params->type_char) == 'f')
 		ft_strpad_left(digits, '0', -exponent);
 	add_zeros_right(digits, exponent, conv_params);
 	round_nb(*digits, &exponent, conv_params);
-	if (!(val_str = ft_strndup(*digits, ft_max(exponent, 0) + 1)))
+	exp_add = ft_max(ft_tolower(conv_params->type_char) == 'e' ? 0 : exponent,
+																			0);
+	if (!(val_str = ft_strndup(*digits, exp_add + 1)))
 		return (NULL);
 	if ((conv_params->flags & FL_HASH) || !((conv_params->flags & FL_PREC)
 										&& !(conv_params->prec)))
 		ft_strappend(&val_str, ".");
 	if (conv_params->prec)
 	{
-		if (!(fraction = ft_strndup(*digits + ft_max(exponent, 0) + 1,
-													conv_params->prec)))
+		if (!(fraction = ft_strndup(*digits + exp_add + 1, conv_params->prec)))
 			return (NULL);
 		ft_strappend(&val_str, fraction);
 		ft_strdel(&fraction);
 	}
+	if (ft_tolower(conv_params->type_char) == 'e')
+		add_exponent_sign(&val_str, exponent, conv_params);
 	return (val_str);
 }

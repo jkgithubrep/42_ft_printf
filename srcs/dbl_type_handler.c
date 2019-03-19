@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:49:53 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 11:53:45 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 14:38:58 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static char		*update_flags_limit_values(char *val_str, t_format *conv_params)
 		conv_params->flags |= (FL_PLUS | FL_SPACE);
 		conv_params->flags ^= (FL_PLUS | FL_SPACE);
 	}
-	if (conv_params->type_char == 'F')
+	if (conv_params->type_char == 'F' || conv_params->type_char == 'E')
 		ft_strupper(val_str);
 	return (val_str);
 }
