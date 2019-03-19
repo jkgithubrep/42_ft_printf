@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:49:53 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 14:38:58 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:01:00 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static char		*update_flags_limit_values(char *val_str, t_format *conv_params)
 		conv_params->flags |= (FL_PLUS | FL_SPACE);
 		conv_params->flags ^= (FL_PLUS | FL_SPACE);
 	}
-	if (conv_params->type_char == 'F' || conv_params->type_char == 'E')
+	if (ft_isupper(conv_params->type_char))
 		ft_strupper(val_str);
 	return (val_str);
 }
@@ -85,6 +85,8 @@ static char		*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 		dragon4(arg_val, digits, &exponent, conv_params);
 	else
 		digits[0] = '0';
+	if (ft_tolower(conv_params->type_char) == 'g')
+		handle_g_conv_spec(exponent, conv_params);
 	val_str = handle_dbl_precision(&digits, exponent, conv_params);
 	ft_strdel(&digits);
 	return (val_str);

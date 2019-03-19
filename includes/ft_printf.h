@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 12:43:15 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 14:57:23 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,12 @@
 
 # define BUF_DIGITS_SIZE    17000
 
-# define TYPES             "dDiuUoOxXfFeEcspb"
-# define SIGNED_TYPES      "difFeE"
+# define TYPES             "dDiuUoOxXfFeEgGcspb"
+# define SIGNED_TYPES      "difFeEgG"
 # define FLAGS             "-+ 0#"
 # define LEN_MODIFS        "hlLjz"
 # define INT_TYPES         "douxXib"
-# define DBL_TYPES         "fFeE"
+# define DBL_TYPES         "fFeEgG"
 # define TYPE_PREFIX       "xXb"
 
 # define DOLLAR            '$'
@@ -201,6 +201,7 @@ enum						e_flags{
 	FL_NULL = 0x80,
 	FL_POINT = 0x100,
 	FL_ERR = 0x200,
+	FL_TRIM = 0x400
 };
 
 typedef enum				e_len_modifs{

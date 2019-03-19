@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 14:52:31 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 14:16:58 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 18:49:11 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,59 @@ static char		*add_exponent_sign(char **val_str, int exponent,
 	return (*val_str);
 }
 
+void		handle_g_conv_spec(int exponent, t_format *conv_params)
+{
+	conv_params->flags |= FL_TRIM;
+	if ((conv_params->flags & FL_PREC) && !conv_params->prec)
+		conv_params->prec = 1;
+	if ((exponent < conv_params->prec) && (exponent >= -4))
+	{
+		conv_params->type_char = ft_isupper(conv_params->type_char) ?
+			'F' : 'f';
+		conv_params->prec = conv_params->prec - 1 - exponent;
+	}
+	else
+	{
+		conv_params->type_char = ft_isupper(conv_params->type_char) ?
+			'E' : 'e';
+		conv_params->prec = conv_params->prec - 1;
+	}
+}
+
+char		*trim_zeros(char **val_str, int len)
+{
+	int			i;
+
+	i = len;
+	while (i && (*val_str)[i] == '0')
+		--i;
+	if ((*val_str)[i] == '.')
+		--i;
+	if (!ft_strcut(val_str, i + 1))
+		return (NULL);
+	return (*val_str);
+}
+
+char		*add_dbl_prec(char **val_str, char *frac_part,
+														t_format *conv_params)
+{
+	char		*fraction;
+
+	if (!(fraction = ft_strndup(frac_part, conv_params->prec)))
+		return (NULL);
+	ft_strappend(val_str, fraction);
+	ft_strdel(&fraction);
+	return (*val_str);
+}
+
+char		*handle_conv_switch(char **digits, int exponent,
+												t_format *conv_params)
+{
+	handle_g_conv_spec(exponent, conv_params);
+	ft_strpad_left(digits, '0', -exponent);
+	return (*digits);
+}
+
 /*
 ** Convert the digits extracted to a final value by rounding the number and
 ** inserting a `.' at the right place.
@@ -139,13 +192,15 @@ char			*handle_dbl_precision(char **digits, int exponent,
 										t_format *conv_params)
 {
 	char		*val_str;
-	char		*fraction;
 	int			exp_add;
 
 	if (exponent < 0 && ft_tolower(conv_params->type_char) == 'f')
 		ft_strpad_left(digits, '0', -exponent);
 	add_zeros_right(digits, exponent, conv_params);
 	round_nb(*digits, &exponent, conv_params);
+	if ((conv_params->flags & FL_TRIM) && exponent == -4
+			&& ft_tolower(conv_params->type_char) == 'e')
+		handle_conv_switch(digits, exponent, conv_params);
 	exp_add = ft_max(ft_tolower(conv_params->type_char) == 'e' ? 0 : exponent,
 																			0);
 	if (!(val_str = ft_strndup(*digits, exp_add + 1)))
@@ -154,12 +209,10 @@ char			*handle_dbl_precision(char **digits, int exponent,
 										&& !(conv_params->prec)))
 		ft_strappend(&val_str, ".");
 	if (conv_params->prec)
-	{
-		if (!(fraction = ft_strndup(*digits + exp_add + 1, conv_params->prec)))
-			return (NULL);
-		ft_strappend(&val_str, fraction);
-		ft_strdel(&fraction);
-	}
+		add_dbl_prec(&val_str, *digits + exp_add + 1, conv_params);
+	if ((conv_params->flags & FL_TRIM) && !(conv_params->flags & FL_HASH)
+			&& ft_instr('.', val_str))
+		trim_zeros(&val_str, exp_add + 1 + conv_params->prec);
 	if (ft_tolower(conv_params->type_char) == 'e')
 		add_exponent_sign(&val_str, exponent, conv_params);
 	return (val_str);
