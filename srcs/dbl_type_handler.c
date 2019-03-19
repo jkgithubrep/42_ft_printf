@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:49:53 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 16:21:16 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 11:53:45 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,20 @@ static t_dbls	*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
 	return (arg_val);
 }
 
+static char		*update_flags_limit_values(char *val_str, t_format *conv_params)
+{
+	if (conv_params->flags & FL_ZERO)
+		conv_params->flags ^= FL_ZERO;
+	if (!ft_strcmp(val_str, "nan"))
+	{
+		conv_params->flags |= (FL_PLUS | FL_SPACE);
+		conv_params->flags ^= (FL_PLUS | FL_SPACE);
+	}
+	if (conv_params->type_char == 'F')
+		ft_strupper(val_str);
+	return (val_str);
+}
+
 /*
 ** Convert the double value to a string with the right precision.
 */
@@ -63,16 +77,7 @@ static char		*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 	int			exponent;
 
 	if ((val_str = handle_dbl_limit_values(arg_val, conv_params)))
-	{
-		if (conv_params->flags & FL_ZERO)
-			conv_params->flags ^= FL_ZERO;
-		if (!ft_strcmp(val_str, "nan"))
-		{
-			conv_params->flags |= (FL_PLUS | FL_SPACE);
-			conv_params->flags ^= (FL_PLUS | FL_SPACE);
-		}
-		return (val_str);
-	}
+		return (update_flags_limit_values(val_str, conv_params));
 	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
 		return (NULL);
 	exponent = 0;

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 14:52:31 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 16:30:10 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/19 12:16:57 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ static char		*round_nb(char *digits, int *exponent, t_format *conv_params)
 	size_t		i;
 	t_uint		carry;
 
+	ft_putendl(digits);
 	i = ft_max(*exponent, 0) + conv_params->prec;
 	if (!digits[i + 1] || digits[i + 1] < '5' || ((digits[i + 1] == '5')
 			&& !((digits[i] - '0') & 1U) && check_end_digits(digits, i + 2)))

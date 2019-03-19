@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/18 21:25:23 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/19 11:54:30 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -74,7 +74,8 @@ SRC_NAME_LFT =     str/ft_strcdup str/ft_strdel print/ft_putstr \
 				   bigint/ft_bigint_size bigint/ft_uimax_to_bigint \
 				   bigint/ft_bigint_shiftleft bigint/ft_bigint_multiply_uint \
 				   bigint/ft_bigint_cpy bigint/ft_bigint_multiply \
-				   bigint/ft_bigint_divide bigint/ft_bigint_pow10 math/ft_abs
+				   bigint/ft_bigint_divide bigint/ft_bigint_pow10 math/ft_abs \
+				   str/ft_strupper char/ft_islower char/ft_toupper
 SRC_NAME =     	   ft_printf get_formatted_str dbg_utils print_bigint_utils \
 				   dbl_to_str_conv format_parser conv_spec_parser \
 				   int_type_handler dbl_type_handler dbl_utils \
