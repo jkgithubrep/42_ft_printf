@@ -1,24 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dbl_utils.h                                        :+:      :+:    :+:   */
+/*   dbl_digits_buf_rfmt.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/03/18 14:55:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 13:52:42 by jkettani         ###   ########.fr       */
+/*   Created: 2019/03/20 13:23:21 by jkettani          #+#    #+#             */
+/*   Updated: 2019/03/20 13:27:27 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef DBL_UTILS_H
-# define DBL_UTILS_H
+#ifndef DBL_DIGITS_BUF_RFMT_H
+# define DBL_DIGITS_BUF_RFMT_H
 
 # include "ft_printf.h"
 
-char		*handle_dbl_limit_values(t_dbls *arg_val, t_format *conv_params);
-char		*handle_dbl_precision(char **digits, int exponent,
-													t_format *conv_params);
-void		handle_g_conv_spec(int exponent, t_format *conv_params);
-int			is_limit_value(t_dbls *arg_val, t_format *conv_params);
+char		*reformat_digits_buf(char **digits, int *exponent,
+											t_format *conv_params);
 
 #endif

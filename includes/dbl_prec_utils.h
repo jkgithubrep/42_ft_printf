@@ -1,24 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dbl_utils.h                                        :+:      :+:    :+:   */
+/*   dbl_prec_utils.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/03/18 14:55:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 13:52:42 by jkettani         ###   ########.fr       */
+/*   Created: 2019/03/20 13:41:42 by jkettani          #+#    #+#             */
+/*   Updated: 2019/03/20 13:50:04 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef DBL_UTILS_H
-# define DBL_UTILS_H
+#ifndef DBL_PREC_UTILS_H
+# define DBL_PREC_UTILS_H
 
 # include "ft_printf.h"
 
-char		*handle_dbl_limit_values(t_dbls *arg_val, t_format *conv_params);
-char		*handle_dbl_precision(char **digits, int exponent,
+char		*add_exponent_sign(char **val_str, int exponent,
+														t_format *conv_params);
+char		*trim_zeros(char **val_str, int len);
+char		*add_dbl_prec(char **val_str, char *frac_part,
 													t_format *conv_params);
-void		handle_g_conv_spec(int exponent, t_format *conv_params);
-int			is_limit_value(t_dbls *arg_val, t_format *conv_params);
 
 #endif

@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/20 12:55:54 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/20 13:43:44 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,6 +82,7 @@ SRC_NAME =     	   ft_printf get_formatted_str dbg_utils print_bigint_utils \
 				   int_type_handler dbl_type_handler dbl_utils \
 				   int_to_str_conv formatting_utils int_formatting_utils \
 				   options_handler conv_spec_parser_utils \
+				   dbl_digits_buf_rfmt dbl_prec_utils \
 				   $(addprefix $(LFT_PATH)/, $(SRC_NAME_LFT))
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
