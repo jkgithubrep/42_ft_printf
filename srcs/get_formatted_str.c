@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 16:23:24 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 13:08:24 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 16:46:13 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include "int_type_handler.h"
 #include "dbl_type_handler.h"
 #include "formatting_utils.h"
-#include "print_bigint_utils.h"
 
 char			*get_formatted_str_from_char(t_format *conv_params,
 																va_list args)
