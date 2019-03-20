@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 14:52:31 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 18:49:11 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 12:12:33 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,25 +72,18 @@ char			*handle_dbl_limit_values(t_dbls *arg_val, t_format *conv_params)
 {
 	if (conv_params->len_mod == LEN_MOD_CAP_L)
 	{
-		if (arg_val->ldbl_parts.exponent == 0x7FFF)
-		{
-			if (!arg_val->ldbl_parts.mantissa)
-				return (ft_strdup("inf"));
-			else
-				return (ft_strdup("nan"));
-		}
+		if (!arg_val->ldbl_parts.mantissa)
+			return (ft_strdup("inf"));
+		else
+			return (ft_strdup("nan"));
 	}
 	else
 	{
-		if (arg_val->dbl_parts.exponent == 0x7FF)
-		{
-			if (!arg_val->dbl_parts.mantissa)
-				return (ft_strdup("inf"));
-			else
-				return (ft_strdup("nan"));
-		}
+		if (!arg_val->dbl_parts.mantissa)
+			return (ft_strdup("inf"));
+		else
+			return (ft_strdup("nan"));
 	}
-	return (NULL);
 }
 
 static char		*add_zeros_right(char **digits, int exponent,
@@ -128,7 +121,7 @@ static char		*add_exponent_sign(char **val_str, int exponent,
 	return (*val_str);
 }
 
-void		handle_g_conv_spec(int exponent, t_format *conv_params)
+void			handle_g_conv_spec(int exponent, t_format *conv_params)
 {
 	conv_params->flags |= FL_TRIM;
 	if ((conv_params->flags & FL_PREC) && !conv_params->prec)
@@ -147,7 +140,7 @@ void		handle_g_conv_spec(int exponent, t_format *conv_params)
 	}
 }
 
-char		*trim_zeros(char **val_str, int len)
+char			*trim_zeros(char **val_str, int len)
 {
 	int			i;
 
@@ -161,7 +154,7 @@ char		*trim_zeros(char **val_str, int len)
 	return (*val_str);
 }
 
-char		*add_dbl_prec(char **val_str, char *frac_part,
+char			*add_dbl_prec(char **val_str, char *frac_part,
 														t_format *conv_params)
 {
 	char		*fraction;
@@ -173,7 +166,7 @@ char		*add_dbl_prec(char **val_str, char *frac_part,
 	return (*val_str);
 }
 
-char		*handle_conv_switch(char **digits, int exponent,
+char			*handle_conv_switch(char **digits, int exponent,
 												t_format *conv_params)
 {
 	handle_g_conv_spec(exponent, conv_params);

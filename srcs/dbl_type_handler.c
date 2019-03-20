@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:49:53 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 11:58:30 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 12:13:51 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,17 @@ static char		*update_flags_limit_values(char *val_str, t_format *conv_params)
 	return (val_str);
 }
 
+int				is_limit_value(t_dbls *arg_val, t_format *conv_params)
+{
+	if ((conv_params->len_mod == LEN_MOD_CAP_L
+				&& arg_val->ldbl_parts.exponent == 0x7FFF)
+		|| (conv_params->len_mod != LEN_MOD_CAP_L
+				&& arg_val->dbl_parts.exponent == 0x7FF))
+		return (1);
+	else
+		return (0);
+}
+
 /*
 ** Convert the double value to a string with the right precision.
 */
@@ -74,8 +85,12 @@ static char		*dbl_arg_val_to_str(t_dbls *arg_val, t_format *conv_params)
 	char		*val_str;
 	int			exponent;
 
-	if ((val_str = handle_dbl_limit_values(arg_val, conv_params)))
+	if (is_limit_value(arg_val, conv_params))
+	{
+		if (!(val_str = handle_dbl_limit_values(arg_val, conv_params)))
+			return (NULL);
 		return (update_flags_limit_values(val_str, conv_params));
+	}
 	if (!(digits = ft_strnew(BUF_DIGITS_SIZE)))
 		return (NULL);
 	exponent = 0;
