@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:37:56 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 16:21:16 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 11:51:05 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,13 +58,17 @@ static char		*format_int_str(char *val_str, t_format *conv_params)
 	nb_digits = ft_strlen(val_str) - conv_params->is_neg;
 	nb_zeros_prec = get_nb_zeros_prec(nb_digits, conv_params);
 	if (nb_zeros_prec)
-		prepend_prec(&val_str, nb_zeros_prec);
+		if (!prepend_prec(&val_str, nb_zeros_prec))
+			return (NULL);
 	if (has_sign(nb_zeros_prec, conv_params))
-		prepend_sign(&val_str, conv_params);
+		if (!prepend_sign(&val_str, conv_params))
+			return (NULL);
 	if (has_prefix(conv_params))
-		prepend_prefix(&val_str, conv_params);
+		if (!prepend_prefix(&val_str, conv_params))
+			return (NULL);
 	if ((padding = conv_params->width - ft_strlen(val_str)) > 0)
-		add_padding(&val_str, padding, conv_params);
+		if (!add_padding(&val_str, padding, conv_params))
+			return (NULL);
 	return (val_str);
 }
 
@@ -75,7 +79,9 @@ char			*get_formatted_str_from_int(t_format *conv_params, va_list args)
 
 	if (!(arg_val = get_int_arg_val(conv_params, args)))
 		conv_params->flags |= FL_NULL;
-	val_str = int_arg_val_to_str(arg_val, conv_params);
-	val_str = format_int_str(val_str, conv_params);
+	if (!(val_str = int_arg_val_to_str(arg_val, conv_params)))
+		return (NULL);
+	if (!(val_str = format_int_str(val_str, conv_params)))
+		return (NULL);
 	return (val_str);
 }

@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 21:19:20 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 21:26:02 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 11:08:38 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,17 @@ const char			*save_value_skip_digits(const char *fmt,
 	return (fmt);
 }
 
+/*
+** If precision given as argument is a negative int, consider it as an invalid
+** argument and remove `FL_PREC' flag. Otherwise, update the precision (on some
+** implementations behavior might differ).
+*/
+
 const char			*save_prec(const char *fmt, t_format *conv_params,
 															va_list args)
 {
 	int				prec_arg;
 
-	prec_arg = 0;
 	conv_params->flags |= FL_PREC;
 	if (ft_isdigit(*(fmt + 1)))
 		fmt = save_value_skip_digits(fmt + 1, conv_params) - 1;
@@ -58,6 +63,13 @@ const char			*save_prec(const char *fmt, t_format *conv_params,
 	}
 	return (fmt);
 }
+
+/*
+** If width given as argument is a negative int, set the `FL_MINUS' flag.
+** If the absolute value of the int casted as an int is a negative number
+** (it is the case if width_arg = INT_MIN --> |width_arg| = INT_MAX + 1),
+** consider width equal 0 (on some implementations behavior might differ).
+*/
 
 void				save_width(t_format *conv_params, va_list args)
 {

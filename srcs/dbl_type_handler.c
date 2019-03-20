@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:49:53 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/19 18:01:00 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 11:58:30 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,6 @@ static t_dbls	*get_dbl_arg_val(t_dbls *arg_val, t_format *conv_params,
 					&& arg_val->dbl_parts.mantissa))
 			conv_params->is_neg = 1;
 	}
-	if (!(conv_params->flags & FL_PREC))
-		conv_params->prec = 6;
 	return (arg_val);
 }
 
@@ -115,6 +113,8 @@ char			*get_formatted_str_from_dbl(t_format *conv_params, va_list args)
 	char		*val_str;
 
 	arg_val.ldbl = 0.L;
+	if (!(conv_params->flags & FL_PREC))
+		conv_params->prec = 6;
 	get_dbl_arg_val(&arg_val, conv_params, args);
 	val_str = dbl_arg_val_to_str(&arg_val, conv_params);
 	val_str = format_dbl_str(val_str, conv_params);
