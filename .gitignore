@@ -1,0 +1,7 @@
+*.out
+*.dSYM
+.obj
+*.a
+fulgu
+*.sw*
+backup
