@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/20 15:42:05 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/20 16:37:33 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,12 +28,11 @@ TEST =			   test.out
 TEST_PRINTF =      printf_test.out
 SRC_PATH =         srcs
 INC_PATH =         includes
-INC_PATH_LFT =     $(SRC_PATH)/libft/includes
 OBJ_PATH =         .obj
 TEST_PATH =        tests
 TEST_SRC =         $(TEST_PATH)/main_ft_printf_test.c
 TEST_PRINTF_SRC =  $(TEST_PATH)/printf_output_tests.c
-LFT_PATH =         libft/srcs
+LFT_PATH =         libft
 LIB_PATH =         .
 RM =               rm -f
 RMDIR =            rmdir -p
@@ -48,7 +47,7 @@ endif
 VALFLAGS =         --leak-check=$(LEAK_TYPE)
 CERRFLAGS =        -Wall -Wextra
 CFLAGS =           -g3 -Werror -Wall -Wextra
-CPPFLAGS =         -I$(INC_PATH) -I$(INC_PATH_LFT)
+CPPFLAGS =         -I$(INC_PATH)
 DEPFLAGS =         -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 LIBFLAGS =         -L$(LIB_PATH) -lftprintf
 COMPILE.c =        $(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c

@@ -5,5 +5,3 @@
 fulgu
 *.sw*
 backup
-includes/dbg_utils.h
-includes/print_bigint_utils.h
