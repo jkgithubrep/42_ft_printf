@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/20 16:37:33 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/20 17:29:50 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -137,8 +137,8 @@ $(TEST_PRINTF):
 
 .PHONY: norminette
 norminette: 
-	norminette $(SRC_PATH)/*.c
-	norminette $(INC_PATH)/*.h
+	norminette $(SRC_PATH)
+	norminette $(INC_PATH)
 
 .PHONY: clean
 clean:

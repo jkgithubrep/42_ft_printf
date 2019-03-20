@@ -6,15 +6,20 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 13:53:02 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 17:31:10 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
+/*
+** stdarg.h: var_arg
+** stdlib.h: intmax, uintmax
+** sys/types.h: ssize_t
+*/
+
 # include <stdarg.h>
-# include <stdint.h>
 # include <stdlib.h>
 # include <sys/types.h>
 
@@ -235,8 +240,5 @@ typedef struct				s_worker{
 int							ft_printf(const char *fmt, ...);
 int							ft_dprintf(int d, const char *fmt, ...);
 int							ft_asprintf(char **str, const char *fmt, ...);
-int							ft_vdprintf(int d, const char *fmt, va_list args);
-int							ft_vasprintf(char **str, const char *fmt,
-																va_list args);
 
 #endif

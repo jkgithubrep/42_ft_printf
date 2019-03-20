@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/14 12:18:13 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 13:53:19 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 17:31:09 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #include "libft.h"
 #include "format_parser.h"
 
-int				ft_vasprintf(char **str, const char *fmt, va_list args)
+static int		ft_vasprintf(char **str, const char *fmt, va_list args)
 {
 	t_format	conv_params;
 	t_worker	work;
@@ -38,7 +38,7 @@ int				ft_vasprintf(char **str, const char *fmt, va_list args)
 	return (work.count);
 }
 
-int				ft_vdprintf(int d, const char *fmt, va_list args)
+static int		ft_vdprintf(int d, const char *fmt, va_list args)
 {
 	char		*str;
 	int			count;
