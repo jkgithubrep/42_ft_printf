@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:49:53 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 12:13:51 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 12:46:39 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,11 +114,14 @@ static char		*format_dbl_str(char *val_str, t_format *conv_params)
 	nb_digits = ft_strlen(val_str);
 	nb_zeros_prec = get_nb_zeros_prec_dbl(nb_digits, conv_params);
 	if (nb_zeros_prec)
-		prepend_prec(&val_str, nb_zeros_prec);
+		if (!prepend_prec(&val_str, nb_zeros_prec))
+			return (NULL);
 	if (has_sign(1, conv_params))
-		prepend_sign(&val_str, conv_params);
+		if (!prepend_sign(&val_str, conv_params))
+			return (NULL);
 	if ((padding = conv_params->width - ft_strlen(val_str)) > 0)
-		add_padding(&val_str, padding, conv_params);
+		if (!add_padding(&val_str, padding, conv_params))
+			return (NULL);
 	return (val_str);
 }
 
@@ -131,7 +134,9 @@ char			*get_formatted_str_from_dbl(t_format *conv_params, va_list args)
 	if (!(conv_params->flags & FL_PREC))
 		conv_params->prec = 6;
 	get_dbl_arg_val(&arg_val, conv_params, args);
-	val_str = dbl_arg_val_to_str(&arg_val, conv_params);
-	val_str = format_dbl_str(val_str, conv_params);
+	if (!(val_str = dbl_arg_val_to_str(&arg_val, conv_params)))
+		return (NULL);
+	if (!(val_str = format_dbl_str(val_str, conv_params)))
+		return (NULL);
 	return (val_str);
 }

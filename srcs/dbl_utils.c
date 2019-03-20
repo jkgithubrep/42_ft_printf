@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 14:52:31 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 12:12:33 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 12:57:02 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,13 +107,16 @@ static char		*add_exponent_sign(char **val_str, int exponent,
 	char	*nb_append;
 	long	u_exponent;
 
-	append = (exponent < 0) ? ft_strdup("e-") : ft_strdup("e+");
+	if (!(append = (exponent < 0) ? ft_strdup("e-") : ft_strdup("e+")))
+		return (NULL);
 	if (conv_params->type_char == 'E')
 		ft_strupper(append);
 	if (exponent > -10 && exponent < 10)
-		ft_strappend(&append, "0");
+		if (!ft_strappend(&append, "0"))
+			return (NULL);
 	u_exponent = ft_abs(exponent);
-	nb_append = ft_uimaxtoa_base(u_exponent, DEC_BASE);
+	if (!(nb_append = ft_uimaxtoa_base(u_exponent, DEC_BASE)))
+		return (ft_strdel_ret_null(&append));
 	ft_strappend(&append, nb_append);
 	ft_strdel(&nb_append);
 	ft_strappend(val_str, append);
@@ -170,7 +173,8 @@ char			*handle_conv_switch(char **digits, int exponent,
 												t_format *conv_params)
 {
 	handle_g_conv_spec(exponent, conv_params);
-	ft_strpad_left(digits, '0', -exponent);
+	if (!ft_strpad_left(digits, '0', -exponent))
+		return (NULL);
 	return (*digits);
 }
 
@@ -188,25 +192,32 @@ char			*handle_dbl_precision(char **digits, int exponent,
 	int			exp_add;
 
 	if (exponent < 0 && ft_tolower(conv_params->type_char) == 'f')
-		ft_strpad_left(digits, '0', -exponent);
-	add_zeros_right(digits, exponent, conv_params);
+		if (!ft_strpad_left(digits, '0', -exponent))
+			return (NULL);
+	if (!add_zeros_right(digits, exponent, conv_params))
+		return (NULL);
 	round_nb(*digits, &exponent, conv_params);
 	if ((conv_params->flags & FL_TRIM) && exponent == -4
 			&& ft_tolower(conv_params->type_char) == 'e')
-		handle_conv_switch(digits, exponent, conv_params);
+		if (!handle_conv_switch(digits, exponent, conv_params))
+			return (NULL);
 	exp_add = ft_max(ft_tolower(conv_params->type_char) == 'e' ? 0 : exponent,
 																			0);
 	if (!(val_str = ft_strndup(*digits, exp_add + 1)))
 		return (NULL);
 	if ((conv_params->flags & FL_HASH) || !((conv_params->flags & FL_PREC)
 										&& !(conv_params->prec)))
-		ft_strappend(&val_str, ".");
+		if (!ft_strappend(&val_str, "."))
+			return (NULL);
 	if (conv_params->prec)
-		add_dbl_prec(&val_str, *digits + exp_add + 1, conv_params);
+		if (!add_dbl_prec(&val_str, *digits + exp_add + 1, conv_params))
+			return (NULL);
 	if ((conv_params->flags & FL_TRIM) && !(conv_params->flags & FL_HASH)
 			&& ft_instr('.', val_str))
-		trim_zeros(&val_str, exp_add + 1 + conv_params->prec);
+		if (!trim_zeros(&val_str, exp_add + 1 + conv_params->prec))
+			return (ft_strdel_ret_null(&val_str));
 	if (ft_tolower(conv_params->type_char) == 'e')
-		add_exponent_sign(&val_str, exponent, conv_params);
+		if (!add_exponent_sign(&val_str, exponent, conv_params))
+			return (NULL);
 	return (val_str);
 }

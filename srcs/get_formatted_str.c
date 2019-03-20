@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 16:23:24 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/18 16:23:38 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 13:08:24 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ char			*get_formatted_str_from_char(t_format *conv_params,
 	if (!(val_str = ft_strcnew(1, arg_val)))
 		return (NULL);
 	if (conv_params->width > 1)
-		add_padding(&val_str, conv_params->width - 1, conv_params);
+		if (!add_padding(&val_str, conv_params->width - 1, conv_params))
+			return (ft_strdel_ret_null(&val_str));
 	return (val_str);
 }
 
@@ -46,9 +47,11 @@ char			*get_formatted_str_from_str(t_format *conv_params, va_list args)
 	else
 		val_str = ft_strdup(val_str);
 	if (conv_params->flags & FL_PREC)
-		ft_strcut(&val_str, conv_params->prec);
+		if (!ft_strcut(&val_str, conv_params->prec))
+			return (ft_strdel_ret_null(&val_str));
 	if ((padding = conv_params->width - ft_strlen(val_str)) > 0)
-		add_padding(&val_str, padding, conv_params);
+		if (!add_padding(&val_str, padding, conv_params))
+			return (ft_strdel_ret_null(&val_str));
 	return (val_str);
 }
 
