@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/03/18 13:27:15 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 13:53:11 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/20 15:32:37 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,8 @@ static int		conv_handler(t_worker *work, const char **fmt, va_list args,
 			return (ft_strdel_ret(&formatted_str, EXIT_FAIL));
 	}
 	len = ft_strlen(formatted_str);
-	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL) &&
-			!(conv_params->flags & FL_MINUS))
+	if ((conv_params->type_char == 'c') && (conv_params->flags & FL_NULL)
+			&& !(conv_params->flags & FL_MINUS))
 		len++;
 	if (add_to_buff(work, formatted_str, len) < 0)
 		return (ft_strdel_ret(&formatted_str, EXIT_FAIL));

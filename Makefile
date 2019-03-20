@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/20 13:43:44 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/20 15:42:05 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,11 +40,12 @@ RMDIR =            rmdir -p
 AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
-ifeq ($(type), full)
-VALFLAGS =         --leak-check=full 
+ifeq ($(LEAK_TYPE), full)
+LEAK_TYPE =        full
 else
-VALFLAGS =         
+LEAK_TYPE =        summary
 endif
+VALFLAGS =         --leak-check=$(LEAK_TYPE)
 CERRFLAGS =        -Wall -Wextra
 CFLAGS =           -g3 -Werror -Wall -Wextra
 CPPFLAGS =         -I$(INC_PATH) -I$(INC_PATH_LFT)
@@ -52,21 +53,18 @@ DEPFLAGS =         -MT $@ -MMD -MP -MF $(OBJ_PATH)/$*.Td
 LIBFLAGS =         -L$(LIB_PATH) -lftprintf
 COMPILE.c =        $(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c
 POSTCOMPILE =      @mv -f $(OBJ_PATH)/$*.Td $(OBJ_PATH)/$*.d && touch $@
-SRC_NAME_LFT =     str/ft_strcdup str/ft_strdel print/ft_putstr \
-				   print/ft_putstr_fd str/ft_strlen print/ft_putnbr \
-				   print/ft_putnbr_fd print/ft_putchar_fd \
-				   print/ft_print_bytes print/ft_putchar print/ft_putnbr_base \
-				   str/ft_strchr str/ft_instr convert/ft_atoi \
-				   char/ft_isdigit char/ft_isspace convert/ft_digits_base \
-				   convert/ft_udigits_base convert/ft_imaxtoa_base \
-				   convert/ft_uimaxtoa_base str/ft_strnew mem/ft_bzero \
-				   mem/ft_memset convert/ft_is_valid_base char/ft_isprint \
+SRC_NAME_LFT =     str/ft_strdel str/ft_strlen str/ft_strchr str/ft_instr \
+				   convert/ft_atoi char/ft_isdigit char/ft_isspace \
+				   convert/ft_digits_base convert/ft_udigits_base \
+				   convert/ft_imaxtoa_base convert/ft_uimaxtoa_base \
+				   str/ft_strnew mem/ft_bzero mem/ft_memset \
+				   convert/ft_is_valid_base char/ft_isprint \
 				   char/ft_issign math/ft_max str/ft_strpad_left \
 				   str/ft_strpad_right str/ft_strprepend str/ft_strappend \
 				   str/ft_strcnew str/ft_strjoin str/ft_strcat str/ft_strcpy \
-				   print/ft_putendl print/ft_putendl_fd str/ft_strskip \
-				   str/ft_strcut str/ft_strncpy str/ft_strdup mem/ft_memalloc \
-				   mem/ft_memcpy mem/ft_memjoin mem/ft_memcat char/ft_tolower \
+				   str/ft_strskip str/ft_strcut str/ft_strncpy \
+				   str/ft_strdup mem/ft_memalloc mem/ft_memcpy \
+				   mem/ft_memjoin mem/ft_memcat char/ft_tolower \
 				   char/ft_isupper str/ft_strndup str/ft_strcmp str/ft_strclcat\
 				   str/ft_strlcat str/ft_strdel_ret math/ft_exponent \
 				   bigint/ft_bigint_comp bigint/ft_bigint_add \
@@ -77,7 +75,7 @@ SRC_NAME_LFT =     str/ft_strcdup str/ft_strdel print/ft_putstr \
 				   bigint/ft_bigint_divide bigint/ft_bigint_pow10 math/ft_abs \
 				   str/ft_strupper char/ft_islower char/ft_toupper \
 				   str/ft_strdel_ret_null
-SRC_NAME =     	   ft_printf get_formatted_str dbg_utils print_bigint_utils \
+SRC_NAME =     	   ft_printf get_formatted_str \
 				   dbl_to_str_conv format_parser conv_spec_parser \
 				   int_type_handler dbl_type_handler dbl_utils \
 				   int_to_str_conv formatting_utils int_formatting_utils \
