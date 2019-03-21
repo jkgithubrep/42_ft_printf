@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:50:07 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 15:02:49 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/21 10:42:43 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <limits.h>
 #include <stdio.h>
 
-#define ARGS "{bold}{yellow}test{green}%13.2s{reset}", NULL
+#define ARGS "string: %s | int: %d | float: %f", "ceci est un test", 1568943, 9.965
 
 int		main(int ac, char **av)
 {

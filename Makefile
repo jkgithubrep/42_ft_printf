@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/20 17:29:50 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/21 19:40:28 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,10 +39,11 @@ RMDIR =            rmdir -p
 AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
+LEAK_TYPE :=       summary
 ifeq ($(LEAK_TYPE), full)
-LEAK_TYPE =        full
+LEAK_TYPE :=        full
 else
-LEAK_TYPE =        summary
+LEAK_TYPE :=		summary
 endif
 VALFLAGS =         --leak-check=$(LEAK_TYPE)
 CERRFLAGS =        -Wall -Wextra
