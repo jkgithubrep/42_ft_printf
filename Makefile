@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/21 19:40:28 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/22 13:25:10 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,7 +35,7 @@ TEST_PRINTF_SRC =  $(TEST_PATH)/printf_output_tests.c
 LFT_PATH =         libft
 LIB_PATH =         .
 RM =               rm -f
-RMDIR =            rmdir -p
+RMDIR =            rmdir
 AR =               ar
 ARFLAGS =          -rcs
 CC =               gcc
@@ -85,7 +85,8 @@ SRC_NAME =     	   ft_printf get_formatted_str \
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
 DEP =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.d))
-OBJ_TREE =         $(shell find $(OBJ_PATH) -type d -print 2> /dev/null)
+OBJ_TREE =         $(shell find $(OBJ_PATH) -type d -print | sort -r \
+				   2> /dev/null)
 
 .SUFFIXES:
 .SUFFIXES: .c .o .h
