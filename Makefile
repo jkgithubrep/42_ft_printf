@@ -6,7 +6,7 @@
 #    By: jkettani <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/08 14:15:50 by jkettani          #+#    #+#              #
-#    Updated: 2019/03/22 13:25:10 by jkettani         ###   ########.fr        #
+#    Updated: 2019/03/22 16:23:37 by jkettani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -85,8 +85,12 @@ SRC_NAME =     	   ft_printf get_formatted_str \
 SRC =              $(addprefix $(SRC_PATH)/, $(addsuffix .c, $(SRC_NAME)))
 OBJ =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.o))
 DEP =              $(addprefix $(OBJ_PATH)/, $(SRC:.c=.d))
+<<<<<<< HEAD
 OBJ_TREE =         $(shell find $(OBJ_PATH) -type d -print | sort -r \
 				   2> /dev/null)
+=======
+OBJ_TREE =         $(shell find $(OBJ_PATH) -type d -print 2> /dev/null)
+>>>>>>> 627646e6ab62ac558e549c8b5b10db5f9be61436
 
 .SUFFIXES:
 .SUFFIXES: .c .o .h
