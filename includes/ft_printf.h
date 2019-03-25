@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 12:18:38 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 17:31:10 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/25 11:02:19 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,8 +237,8 @@ typedef struct				s_worker{
 	int						i;
 }							t_worker;
 
-int							ft_printf(const char *fmt, ...);
-int							ft_dprintf(int d, const char *fmt, ...);
+int							ft_printf(const char *restrict fmt, ...);
+int							ft_dprintf(int d, const char *restrict fmt, ...);
 int							ft_asprintf(char **str, const char *fmt, ...);
 
 #endif
