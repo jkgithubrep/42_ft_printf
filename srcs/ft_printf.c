@@ -6,7 +6,7 @@
 /*   By: jkettani <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/14 12:18:13 by jkettani          #+#    #+#             */
-/*   Updated: 2019/03/20 17:31:09 by jkettani         ###   ########.fr       */
+/*   Updated: 2019/03/25 11:01:52 by jkettani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static int		ft_vasprintf(char **str, const char *fmt, va_list args)
 	return (work.count);
 }
 
-static int		ft_vdprintf(int d, const char *fmt, va_list args)
+static int		ft_vdprintf(int fd, const char *restrict fmt, va_list args)
 {
 	char		*str;
 	int			count;
@@ -47,12 +47,12 @@ static int		ft_vdprintf(int d, const char *fmt, va_list args)
 	str = NULL;
 	if ((count = ft_vasprintf(&str, fmt, args)) < 0)
 		return (EXIT_FAIL);
-	ret = write(d, str, count);
+	ret = write(fd, str, count);
 	ft_strdel(&str);
 	return (ret);
 }
 
-int				ft_printf(const char *fmt, ...)
+int				ft_printf(const char *restrict fmt, ...)
 {
 	va_list		args;
 	int			count;
@@ -63,13 +63,13 @@ int				ft_printf(const char *fmt, ...)
 	return (count);
 }
 
-int				ft_dprintf(int d, const char *fmt, ...)
+int				ft_dprintf(int fd, const char *restrict fmt, ...)
 {
 	va_list		args;
 	int			count;
 
 	va_start(args, fmt);
-	count = ft_vdprintf(d, fmt, args);
+	count = ft_vdprintf(fd, fmt, args);
 	va_end(args);
 	return (count);
 }
